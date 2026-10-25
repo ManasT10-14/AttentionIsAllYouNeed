@@ -124,7 +124,7 @@ def main():
         result = ExecutionResult(
             state="error", errors=[f"Odin execution failed ({type(exc).__name__})"]
         )
-    sys.stdout.write(result.model_dump_json())
+    sys.stdout.buffer.write(result.model_dump_json().encode("utf-8"))
     try:
         from odin.core.telemetry import client, enabled
 

@@ -8,7 +8,7 @@ from pathlib import Path
 
 from sqlalchemy import select, update
 
-from odin.core.config import DATA_DIR
+from odin.core.config import DATA_DIR, odin_config
 from odin.core.hooks import HOOKS
 from odin.core.models import CompanyContext, new_id
 from odin.db.session import db
@@ -77,7 +77,8 @@ def ingest_contract(company_id: str, filename: str, content: bytes) -> IngestRes
     (final / "document.pdf").write_bytes(pdf.read_bytes())
 
     headers = [chunk_header(cid, version, c.number, c.heading) + "\n" + c.text[:1800] for c in doc.clauses]
-    vectors = embed_passages(headers) if headers else []
+    vectors = (embed_passages(headers) if odin_config()["retrieval"].get("dense_enabled", True)
+               else [None] * len(headers)) if headers else []
 
     cover_json = cover.model_dump(mode="json")
     cover_json["version"] = version

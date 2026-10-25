@@ -1,7 +1,10 @@
 """Adapters observe the product; they never manufacture missing telemetry."""
 
+import hashlib
+import json
 import os
 from collections.abc import Callable, Mapping
+from pathlib import Path
 from typing import Any, Protocol
 from urllib.parse import urljoin, urlsplit
 
@@ -9,6 +12,50 @@ import httpx
 
 from .config import HTTPConfig
 from .models import EvaluationCase, ExecutionResult
+
+
+class RecordedAdapter:
+    """Re-score judges on observations; retain original deterministic outcomes."""
+
+    preserve_execution_latency = True
+
+    def __init__(self, path, dataset, *, retry_judge_errors=False):
+        from .models import RunReport
+
+        self.source = RunReport.model_validate_json(Path(path).read_text(encoding="utf-8"))
+        digest = hashlib.sha256(
+            json.dumps(dataset.model_dump(mode="json"), sort_keys=True, ensure_ascii=False).encode()
+        ).hexdigest()
+        if digest != self.source.dataset_sha256:
+            raise ValueError("Recorded report dataset hash differs from the configured dataset")
+        self.results = {case.case_id: case.execution for case in self.source.cases}
+        self.checks = {
+            case.case_id: {check.name: check for check in case.checks} for case in self.source.cases
+        }
+
+        self.retry_judge_errors = retry_judge_errors
+
+    def should_rejudge(self, case_id, name):
+        return not self.retry_judge_errors or self.checks[case_id][name].status == "error"
+
+    def should_recompute_check(self, case_id, name):
+        # Safety results cannot be inferred again from potentially masked data.
+        # Unredacted quality/agent observations remain useful for fixing matchers.
+        return self.checks[case_id][name].category != "security" and (
+            "[REDACTED]" not in self.results[case_id].model_dump_json()
+        )
+
+    def recorded_check(self, case_id, name):
+        check = self.checks[case_id][name].model_copy(deep=True)
+        check.reason = "Recorded outcome: " + check.reason
+        return check
+
+    async def execute(self, case, request_id):
+        result = self.results[case.id].model_copy(deep=True)
+        result.metadata["recorded_run_id"] = self.source.run_id
+        result.metadata["recorded_adapter"] = self.source.adapter
+        result.metadata["recorded_redaction_present"] = "[REDACTED]" in result.model_dump_json()
+        return result
 
 
 class Adapter(Protocol):

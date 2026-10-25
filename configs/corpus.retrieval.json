@@ -1,0 +1,9 @@
+{
+  "adapter": "corpus",
+  "dataset": "../datasets/corpus/retrieval.json",
+  "report": "../reports/corpus-retrieval.json",
+  "concurrency": 2,
+  "case_timeout_s": 120,
+  "corpus": {"mode": "retrieval", "product_tracing": true},
+  "tracing": {"enabled": true, "publish_timeout_s": 20}
+}

@@ -1,70 +1,60 @@
-# RAGNAROK · Odin — multi-agent contract intelligence
+# RAGNAROK - Odin
 
-Odin orchestrates five agents in LangGraph:
-- **Thor** extracts terms, with a citation for every field.
-- The **Norns** build the timeline on a simulated clock and project the worst case.
-- **Loki** attacks the contracts adversarially, within one contract and across contracts.
-- **Heimdall** watches the company Gmail inbox for events and verifies Loki's claims.
-- **Tyr** rules on disputes and drafts notices and amendments.
+Multi-agent contract intelligence with a connected RAG, agent evaluation, security
+and LangSmith tracing pipeline.
 
-Every agent capability is an audited tool. Hook points are ready for the future security and eval suites
-(see `evals/README.md`). The input formats are in **`docs/SCHEMAS.md`**.
+## Repository layout
 
-## Run locally
-```bash
-docker compose up -d db                                # Postgres + pgvector
-cd backend && py -3.11 -m venv .venv && .venv/Scripts/pip install -r requirements.txt
-cp ../.env.example ../.env                             # fill in keys (see below)
-.venv/Scripts/python -m uvicorn odin.api.main:app --port 8000
-cd ../ui-dev && npm install && npm run dev           # http://localhost:5173  (or `npm run build` → served by :8000)
-```
-Steps in the app:
-1. Log in, either with Google or with dev login.
-2. On the **Contracts** tab, click **Demo: seed sample contracts**, or upload your own.
-3. Open **Overview** to see the time slider, exposure and heatmap.
-4. Open **Events** to play the scripted emails or to send judge emails.
+Run commands from this folder, the Git repository root. There is one backend directory.
 
-Full Docker setup: `docker compose --profile full up --build` (ui-dev must be built first).
-
-## LLM providers (`config/odin.yaml`)
-Every agent tries the providers in this order: **Bedrock (OpenAI-compatible endpoint) → OpenAI → Claude → Groq**.
-- Providers without a key are skipped.
-- Each agent can override the order under `agents:`.
-- `ODIN_FORCE_PROVIDER=fake` runs everything offline with a stub LLM, for smoke tests only.
-
-## Google login + Gmail (Heimdall)
-1. In Google Cloud, create an OAuth client (Web).
-2. Set the redirect URI to `http://localhost:8000/auth/google/callback`.
-3. Enable the Gmail API.
-4. Add the company account as a test user.
-5. Set `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` in `.env`.
-
-Scopes: `gmail.readonly`, `gmail.modify` (for labels) and `gmail.send` (auto-replies and approved notices).
-The poller checks the inbox every 15 seconds. **Poll Gmail now** on the Events tab forces an immediate check.
-
-## Layout
-```
-backend/odin/
-  core/       models (all schemas), config, budget, hooks, citation guard, run context, SSE bus
-  llm/        provider factory + fallback chain + structured output + bounded tool loop
-  tools/      ToolRegistry (allowlists, hooks, approvals, audit) + every agent tool
-  agents/     odin, thor, norns, loki, heimdall, tyr, synth  (+ prompts/*.md)
-  graphs/     analysis (fan-out), contract_ws (per-contract loops), event, update
-  retrieval/  hybrid BM25 + dense (bge-small, pgvector) + RRF; reranker slot reserved
-  ingest/     PDF/DOCX → clauses with highlight boxes; version diff
-  services/   timeline engine (Norns), insights, events, ask, amend, demo, reports
-  email/      Gmail client, poller, strict event parser
-  api/        FastAPI routes, auth (Google OAuth + dev login), SSE
-frontend/     team UI (owned by the UI teammate)
-ui-dev/       placeholder React UI wired to every API endpoint (reference for the team UI)
+```text
+Ragnarok/
+  backend/odin/     Product API, agents, graphs, retrieval and services
+  backend/tests/    Product unit tests
+  frontend/         Team frontend integration directory
+  ui-dev/           Reference UI wired to the API
+  src/ragnarok/     Evaluation and security pipeline
+  tests/            Evaluator and integration tests
+  corpus/           Contract inputs, scenarios and evaluator-only goldens
+  configs/          Evaluation run configurations
+  config/           Product runtime configuration
+  docs/             Checkpoint handoff and measured results
 ```
 
-## Tests
-`backend/.venv/Scripts/python -m pytest backend/tests -q`
+## Setup and offline checks
 
+Python 3.11 and uv are required.
 
-## Corpus and evaluation checkpoint
+```powershell
+uv sync --locked --all-extras
+uv run --locked --all-extras ragnarok corpus-build
+uv run --locked --all-extras pytest -q
+```
 
-The corpus branch is integrated here alongside the backend and the installable
-evaluation pipeline. Run commands from this repository root. See
-[Corpus documentation](corpus/README.md) and [Checkpoint handoff](docs/CHECKPOINT.md).
+On Windows, `./scripts/checkpoint.ps1` runs the offline checkpoint checks.
+CI runs offline checks on Windows and Linux after pushing. Tests do not make
+paid provider calls or send mail.
+
+Create a private `.env` from `.env.example` and supply your own provider,
+LangSmith and database settings. Never commit `.env`, tokens or local reports.
+
+## Product API
+
+With a working PostgreSQL/pgvector database:
+
+```powershell
+uv run --env-file .env --all-extras uvicorn --app-dir backend odin.api.main:app --port 8000
+```
+
+The existing Docker setup is available through `docker-compose.yml`. The API
+supports Google/dev login; configured Gmail polling starts with the API lifecycle.
+No external mail is sent by evaluation workers.
+
+## Evaluation checkpoint
+
+See [setup and teammate handoff](docs/CHECKPOINT.md),
+[measured results and remaining work](docs/CHECKPOINT_RESULTS.md),
+[corpus documentation](corpus/README.md) and [input schemas](docs/SCHEMAS.md).
+Live model evaluation is explicit through `configs/corpus.*.json`; goldens never
+enter product prompts. The checkpoint is ready for frontend development and
+further evaluation improvements, with known quality gaps retained in reports.

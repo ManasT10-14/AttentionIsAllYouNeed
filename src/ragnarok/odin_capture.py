@@ -111,6 +111,7 @@ def normalize(observed: Capture, output, *, operation: str) -> ExecutionResult:
             tools.append(
                 ToolEvent(
                     name=meta["tool"],
+                    actor=record["agent"],
                     arguments=record["inputs"],
                     phase=phase,
                     authorized=meta.get("authorized"),

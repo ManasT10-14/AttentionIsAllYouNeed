@@ -1,4 +1,7 @@
-# Odin evaluation integration
+# First integration notes (historical)
+
+Current repository layout, golden setup and handoff are in [CHECKPOINT.md](CHECKPOINT.md).
+The earlier parent-workspace layout described below has been consolidated into this repository.
 
 The backend checkout is `backend/`, branch `feat/ragnarok-evaluation`, based on
 `e550f874181ce992053dcc08f523b6842d37bd94`. The evaluator remains the installable

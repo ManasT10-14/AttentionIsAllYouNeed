@@ -29,7 +29,14 @@ class OdinAdapter:
                 "parameters": {**self.config.parameters, **case_parameters},
             }
         )
+        # Golden outputs/check definitions never cross the product boundary.
+        return await self._execute_payload(
+            {"config": config.model_dump(), "input": case.input, "request_id": request_id}
+        )
+
+    async def _execute_payload(self, payload):
         env = dict(os.environ)
+        env["PYTHONIOENCODING"] = "utf-8"
         env["PYTHONPATH"] = os.pathsep.join(
             [str(Path(__file__).resolve().parents[1]), str(self.backend)]
         )
@@ -46,10 +53,7 @@ class OdinAdapter:
             stderr=asyncio.subprocess.DEVNULL,
             creationflags=flags,
         )
-        # Golden outputs/check definitions never cross the product boundary.
-        payload = json.dumps(
-            {"config": config.model_dump(), "input": case.input, "request_id": request_id}
-        ).encode()
+        payload = json.dumps(payload).encode()
         try:
             stdout, _ = await proc.communicate(payload)
         except BaseException:

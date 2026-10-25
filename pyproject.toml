@@ -33,6 +33,20 @@ odin = [
     "rapidfuzz>=3.9,<4",
     "sqlalchemy>=2,<3",
 ]
+corpus = [
+    "pillow>=11,<13",
+    "pypdf==6.10.0",
+    "reportlab==4.4.9",
+]
+api = [
+    "authlib>=1.3,<2",
+    "cryptography>=42",
+    "google-api-python-client>=2.130,<3",
+    "google-auth>=2.30,<3",
+    "itsdangerous>=2.2,<3",
+    "python-multipart>=0.0.9,<1",
+    "sse-starlette>=2.1,<4",
+]
 
 [dependency-groups]
 dev = ["pytest==8.4.2", "fastapi==0.135.3", "uvicorn>=0.34,<1", "ruff>=0.12,<1"]

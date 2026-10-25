@@ -138,7 +138,8 @@ async def run(
                         else (f"Adapter execution failed ({type(exc).__name__})")
                     )
                     execution = ExecutionResult(state="error", errors=[message])
-                execution.latency_ms = (time.perf_counter() - started) * 1000
+                if not getattr(adapter, "preserve_execution_latency", False):
+                    execution.latency_ms = (time.perf_counter() - started) * 1000
                 if execution.state == "error":
                     checks.append(
                         CheckResult(
@@ -153,7 +154,25 @@ async def run(
                     for spec in case.checks:
                         try:
                             if spec.name in JUDGE_METRICS:
-                                check = await judge.evaluate(spec, case, execution)
+                                if hasattr(
+                                    adapter, "should_rejudge"
+                                ) and not adapter.should_rejudge(case.id, spec.name):
+                                    check = adapter.recorded_check(case.id, spec.name)
+                                elif execution.metadata.get("recorded_redaction_present"):
+                                    check = result_for(
+                                        spec,
+                                        case,
+                                        "skipped",
+                                        "Recorded evidence was redacted; fresh execution is required for judging",
+                                        method="llm_judge",
+                                    )
+                                else:
+                                    check = await judge.evaluate(spec, case, execution)
+                            elif hasattr(adapter, "recorded_check"):
+                                if adapter.should_recompute_check(case.id, spec.name):
+                                    check = evaluate_check(spec, case, execution)
+                                else:
+                                    check = adapter.recorded_check(case.id, spec.name)
                             else:
                                 check = evaluate_check(spec, case, execution)
                         except Exception as exc:

@@ -73,9 +73,24 @@ class RunConfig(Model):
     fixtures: str | None = None
     http: HTTPConfig | None = None
     odin: OdinConfig | None = None
+    corpus: "CorpusConfig | None" = None
     concurrency: int = Field(default=1, ge=1, le=16)
     case_timeout_s: float = Field(default=30, gt=0, allow_inf_nan=False)
     judge: JudgeConfig = Field(default_factory=JudgeConfig)
     tracing: TracingConfig = Field(default_factory=TracingConfig)
     include_tags: list[str] = Field(default_factory=list)
     allow_side_effects: bool = False
+
+
+class CorpusConfig(Model):
+    root: str = "../corpus"
+    workspace: str = "../work/evaluation"
+    backend_path: str = "../backend"
+    mode: Literal["agent", "thor", "rag", "retrieval", "security"]
+    dense: bool = False
+    allow_fake_provider: bool = False
+    product_tracing: bool = False
+    trace_project: str = "ragnarok-odin"
+
+
+RunConfig.model_rebuild()

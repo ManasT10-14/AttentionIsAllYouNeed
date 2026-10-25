@@ -330,9 +330,7 @@ def test_fake_provider_cannot_pass_golden_run(odin_db):
     from ragnarok.models import EvaluationCase
     from ragnarok.odin_adapter import OdinAdapter
 
-    adapter = OdinAdapter(
-        OdinConfig(company_id="T", backend_path="backend"), root=Path.cwd()
-    )
+    adapter = OdinAdapter(OdinConfig(company_id="T", backend_path="backend"), root=Path.cwd())
     result = asyncio.run(adapter.execute(EvaluationCase(id="q", input="renewal"), "request"))
     assert result.state == "error" and "Fake provider rejected" in result.errors[-1]
 

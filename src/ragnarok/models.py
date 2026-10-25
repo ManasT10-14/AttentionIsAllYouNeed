@@ -35,6 +35,7 @@ class Document(Model):
 
 class ToolEvent(Model):
     name: str
+    actor: str | None = None
     arguments: dict[str, JsonValue] = Field(default_factory=dict)
     phase: Literal["requested", "authorized", "attempted", "executed", "failed"]
     authorized: bool | None = None

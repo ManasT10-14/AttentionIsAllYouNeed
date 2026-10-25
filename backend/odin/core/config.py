@@ -31,15 +31,11 @@ class Settings(BaseSettings):
 
 @lru_cache
 def settings() -> Settings:
-    s = Settings()
-    # .env values must also be visible to os.environ for ${VAR} expansion + LangSmith SDK
-    env_file = ROOT / ".env"
-    if env_file.exists():
-        for line in env_file.read_text(encoding="utf-8").splitlines():
-            if "=" in line and not line.lstrip().startswith("#"):
-                k, v = line.split("=", 1)
-                os.environ.setdefault(k.strip(), v.strip())
-    return s
+    from dotenv import load_dotenv
+    # A real dotenv parser preserves quoting/comments and empty credentials.
+    # Existing shell settings win; both provider expansion and SDKs see values.
+    load_dotenv(ROOT / ".env", override=False)
+    return Settings(_env_file=ROOT / ".env")
 
 
 _VAR = re.compile(r"\$\{([A-Z0-9_]+)\}")

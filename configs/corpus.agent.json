@@ -1,0 +1,11 @@
+{
+  "adapter": "corpus",
+  "dataset": "../datasets/corpus/agent.json",
+  "report": "../reports/corpus-agent.json",
+  "concurrency": 1,
+  "case_timeout_s": 1200,
+  "corpus": {"mode": "agent", "product_tracing": true},
+  "judge": {"enabled": true, "model": "odin:openai", "timeout_s": 180},
+  "tracing": {"enabled": true, "publish_timeout_s": 20},
+  "include_tags": ["PAY-03"]
+}

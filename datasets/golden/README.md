@@ -1,3 +1,10 @@
+# Custom dataset templates
+
+Current corpus goldens are compiled with `ragnarok corpus-build` into
+`datasets/corpus/`. See `docs/CHECKPOINT.md` for the active workflow.
+This folder retains the generic schema and earlier authoring notes for additional
+team datasets; the awaiting-upload notes below describe the earlier template stage.
+
 # Golden datasets (awaiting upload)
 
 No golden answers or model-accuracy scores are invented here. Supply `rag.json`,

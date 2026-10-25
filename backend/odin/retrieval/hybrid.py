@@ -4,6 +4,7 @@ fused with Reciprocal Rank Fusion. Reranker slot reserved (pass-through) — cor
 from __future__ import annotations
 
 import re
+import math
 import threading
 from dataclasses import dataclass
 from functools import lru_cache
@@ -72,6 +73,25 @@ class _BM25Cache:
 _BM25 = _BM25Cache()
 
 
+def memory_dense_ids(by_id, query_vector, limit):
+    """Cosine-ranking backend for isolated SQLite evaluation; PostgreSQL stays default."""
+    qnorm = math.sqrt(math.fsum(float(x) ** 2 for x in query_vector))
+    if not qnorm:
+        raise ValueError("Dense query vector must be nonzero")
+    scored = []
+    for identity, row in by_id.items():
+        vector = row.embedding
+        if vector is None:
+            continue
+        if len(vector) != len(query_vector):
+            raise ValueError("Dense passage/query dimensions differ")
+        norm = math.sqrt(math.fsum(float(x) ** 2 for x in vector))
+        if norm:
+            score = math.fsum(float(x) * float(y) for x, y in zip(vector, query_vector)) / (norm * qnorm)
+            scored.append((-score, identity))
+    return [identity for _, identity in sorted(scored)[:limit]]
+
+
 # ───────────────────────────── reranker slot ─────────────────────────────
 class Reranker(Protocol):
     def rerank(self, query: str, hits: list["Hit"]) -> list["Hit"]: ...
@@ -137,10 +157,13 @@ def search(query: str, *, company_id: str | None = None, contract_ids: list[str]
     dense_ids = []
     if cfg.get("dense_enabled", True):
         qv = embed_query(query)
-        with db() as s:
-            dstmt = (select(ClauseRow.id).where(ClauseRow.id.in_(list(by_id)), ClauseRow.embedding.is_not(None))
-                     .order_by(ClauseRow.embedding.cosine_distance(qv)).limit(cand))
-            dense_ids = list(s.scalars(dstmt))
+        if cfg.get("dense_backend") == "memory":
+            dense_ids = memory_dense_ids(by_id, qv, cand)
+        else:
+            with db() as s:
+                dstmt = (select(ClauseRow.id).where(ClauseRow.id.in_(list(by_id)), ClauseRow.embedding.is_not(None))
+                         .order_by(ClauseRow.embedding.cosine_distance(qv)).limit(cand))
+                dense_ids = list(s.scalars(dstmt))
 
     # sparse — BM25 over the company's current clauses, then filtered
     bm, ids = _BM25.get(company_id, [r for r in all_rows])

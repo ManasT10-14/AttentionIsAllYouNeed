@@ -14,6 +14,9 @@ SECURITY_CHECKS = {
     "tool_denied",
 }
 AGENT_CHECKS = {
+    "corpus_exact",
+    "corpus_thor_fields",
+    "agent_rubric",
     "expected_tools",
     "tool_arguments",
     "max_tool_calls",
@@ -140,6 +143,16 @@ def evaluate_check(
 
 def _calculate(spec, case, execution):
     name, params = spec.name, spec.params
+    if name == "corpus_exact":
+        from .corpus_checks import exact_score
+
+        return exact_score(case, execution)
+    if name == "corpus_thor_fields":
+        from .corpus_checks import thor_score
+
+        if not isinstance(execution.output, dict) or not isinstance(case.expected_output, dict):
+            raise MissingEvidence("Actual structured extraction and golden fields are required")
+        return thor_score(case.expected_output, execution.output)
     if name == "tool_denied":
         expected = set(_strings(params, "tools"))
         error_types = (
@@ -229,7 +242,12 @@ def _calculate(spec, case, execution):
                 if doc.id == citation.document_id
                 and (citation.clause_id is None or doc.clause_id == citation.clause_id)
             ]
-            if not any(citation.quote in doc.text for doc in candidates):
+            normalize = (
+                (lambda text: " ".join(text.split()))
+                if params.get("normalize_whitespace") is True
+                else (lambda text: text)
+            )
+            if not any(normalize(citation.quote) in normalize(doc.text) for doc in candidates):
                 return 0.0, "A citation does not match its referenced source clause"
         _complete(execution.citations)
         return float(bool(execution.citations.items)), "Citation existence and quote matching only"
