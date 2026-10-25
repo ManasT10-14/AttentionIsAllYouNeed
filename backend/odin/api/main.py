@@ -11,7 +11,7 @@ from fastapi.responses import RedirectResponse
 from sse_starlette.sse import EventSourceResponse
 from starlette.middleware.sessions import SessionMiddleware
 
-from odin.api import auth, routes
+from odin.api import auth, quality, routes, workflow
 from odin.api.deps import current_user
 from odin.core import bus
 from odin.core.config import settings
@@ -40,6 +40,8 @@ app.add_middleware(CORSMiddleware, allow_origins=[settings().frontend_url], allo
 app.include_router(auth.router, prefix="/api")
 app.include_router(auth.router)                # Google redirect URI (/auth/google/callback)
 app.include_router(routes.router, prefix="/api")
+app.include_router(workflow.router, prefix="/api")
+app.include_router(quality.router, prefix="/api")      # security + evals (installs both hooks)
 
 
 @app.get("/api/health")
