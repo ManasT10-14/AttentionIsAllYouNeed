@@ -1,34 +1,33 @@
-# Security and eval suite: plug-in points (nothing is built here yet)
+# Connected evaluation and security suite
 
-The product is wired so that both suites attach **without any changes to the graphs**.
+The installable Ragnarok evaluator is in the parent workspace, one level above
+this backend checkout. Instructions: `../docs/odin-integration.md` from the
+checkout root, or `../../docs/odin-integration.md` from this folder.
 
-## Hooks: `backend/odin/core/hooks.py`
-| Hook | Fires on | Use |
-|---|---|---|
-| `GuardHook.pre_llm / post_llm` | every LLM call (`llm/call.py`) | prompt-injection / PII / output policy |
-| `GuardHook.pre_tool / post_tool` | every tool call (`tools/registry.py`) | scope checks, arg sanitising; raise `Blocked` to veto |
-| `GuardHook.on_ingest` | contract + company-context upload | malicious documents |
-| `GuardHook.on_email` | every event email | injection in emails (see `samples/emails/06_prompt_injection.txt`) |
-| `EvalHook.record(kind, agent, inputs, output, meta)` | every LLM output (`kind="llm"`) and every retrieval (`kind="retrieval"`) | DeepEval metrics, LangSmith datasets |
+From the parent workspace:
 
-Register hooks without touching any code:
-`ODIN_GUARD_HOOKS=mypkg.guards:InjectionGuard` and `ODIN_EVAL_HOOKS=mypkg.evals:DeepEvalRecorder`.
+```powershell
+uv sync --locked --all-extras
+uv run --locked --all-extras pytest -q
+uv run --env-file .env --all-extras ragnarok run --config configs/odin.security.json
+```
 
-## The tool surface
-`GET /api/tools` lists every tool with its scope, side effects, approval requirement, PII flag and the
-agents allowed to call it. Every call is audited in the `tool_calls` table, and calls that were blocked
-are flagged.
+The suite uses request-scoped hook subscribers. Retrieval records full ranked
+source clauses and empty results. Tool records include authorization, approval,
+function-entry and terminal outcome. Agent start/end and messaging events support
+trajectory checks. Direct clause reads are observed too. Capped capture buffers
+mark evidence partial.
 
-## LangSmith
-- Set `LANGSMITH_TRACING=true` and `LANGSMITH_API_KEY`.
-- Each graph run uses the Odin `run_id` as its root run id, so `runs.trace_url` links straight to the trace.
-- Each LLM call is named `<agent>:<provider>` and tagged with the agent, provider and `whatif`.
-- Metadata on each call: `company_id`, `run_id`, `contract_id`, `prompt_hash`, `event_id`.
+Workers call Ask Odin, the retriever or actual analysis/event/update graphs.
+Ordinary API responses omit this evidence, so no public debug route was added.
+Writes require an explicitly disposable evaluation database and external tool
+effects are fenced. Security probes require explicit expected denial types.
 
-## Suggested metrics
-- Citation faithfulness: the share of quotes that pass `core/citations.verify`.
-- Field accuracy against goldens: build these from `samples/contracts` plus expected extraction JSON.
-- Hallucinated-clause rate.
-- Conflict recall on the planted cross-contract traps.
-- Alert precision.
-- Retrieval recall@k and MRR: `EvalHook.record(kind="retrieval")` logs the dense and sparse rankings.
+LangSmith instrumentation is centralized in `odin/core/telemetry.py`. A scoped
+client hides inputs/outputs and sanitizes outgoing exception text for child
+traces. Evaluator scores are published separately and linked by product trace ID.
+Configuration and keys come from ignored environment files.
+
+Golden configs live in the parent workspace's `configs/odin.*.json` and await
+reviewed datasets under `datasets/golden/`. Fake providers are rejected by default.
+Model accuracy and dense retrieval require a real evaluation database/provider.

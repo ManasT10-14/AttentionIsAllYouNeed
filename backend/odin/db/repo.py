@@ -43,6 +43,8 @@ def put(kind: str, model: BaseModel, *, company_id: str | None = None, contract_
             s.add(row)
         else:
             row.data, row.status, row.updated_at = data, status, datetime.utcnow()
+            if run_id:
+                row.run_id = run_id
             if contract_id:
                 row.contract_id = contract_id
             if version is not None:

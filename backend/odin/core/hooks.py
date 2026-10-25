@@ -15,8 +15,22 @@ from __future__ import annotations
 
 import importlib
 import os
+from contextlib import contextmanager
+from contextvars import ContextVar
 from dataclasses import dataclass, field
 from typing import Any, Protocol, runtime_checkable
+
+_subscribers: ContextVar[tuple] = ContextVar("odin_eval_subscribers", default=())
+
+
+@contextmanager
+def subscribe(recorder):
+    """Case-local observers, inherited by LangGraph/pmap workers, never global."""
+    token = _subscribers.set((recorder,))
+    try:
+        yield
+    finally:
+        _subscribers.reset(token)
 
 
 class Blocked(Exception):
@@ -69,7 +83,7 @@ class HookRegistry:
         return self._chain("on_email", raw, meta)
 
     def record(self, kind, agent, inputs, output, meta):
-        for e in self.evals:
+        for e in (*self.evals, *_subscribers.get()):
             try:
                 e.record(kind, agent, inputs, output, meta)
             except Exception:   # eval must never break the product path

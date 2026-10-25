@@ -21,6 +21,7 @@ from odin.core import budget as budget_mod
 from odin.core.config import limits, odin_config
 from odin.core.context import maybe_current
 from odin.core.hooks import HOOKS
+from odin.core.telemetry import traced
 from odin.llm.factory import chain_for, chat_model, model_for, price
 from odin.llm.fake import fake_instance
 
@@ -48,6 +49,7 @@ def _run_config(agent: str, provider: str, prompt_hash: str, extra: dict | None)
     return {"run_name": f"{agent}:{provider}", "tags": tags, "metadata": meta}
 
 
+@traced("odin:structured")
 def structured(agent: str, schema: Type[T], system: str, user: str, *, tools: list[str] | None = None,
                meta: dict | None = None) -> T:
     c = maybe_current()
@@ -127,6 +129,8 @@ def _tool_phase(agent: str, model, convo: list, tool_names: list[str], cfg: dict
             break
         for tc in calls:
             result = REGISTRY.invoke(agent, tc["name"], tc.get("args") or {})
-            convo.append(ToolMessage(content=REGISTRY.render(result), tool_call_id=tc["id"]))
+            rendered = REGISTRY.render(result)
+            HOOKS.record("model_context", agent, None, rendered, {"tool": tc["name"]})
+            convo.append(ToolMessage(content=rendered, tool_call_id=tc["id"]))
     convo.append(HumanMessage("Now produce your final answer using the required output tool."))
     return convo, tin, tout

@@ -6,3 +6,14 @@ data/
 __pycache__/
 *.pyc
 .pytest_cache/
+
+# Evaluation pipeline local state
+.env.*
+!.env.example
+.ruff_cache/
+.deepeval/
+.benchmarks/
+reports/
+dist/
+build/
+*.egg-info/

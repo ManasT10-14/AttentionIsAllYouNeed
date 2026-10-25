@@ -1,0 +1,27 @@
+{
+  "dataset": "../datasets/odin/synthetic.json",
+  "report": "../reports/http.json",
+  "adapter": "http",
+  "http": {
+    "base_url": "http://127.0.0.1:8000",
+    "endpoint": "/evaluate",
+    "input_field": "input",
+    "response_mapping": {
+      "output": "output",
+      "documents": "documents",
+      "tools": "tools",
+      "events": "events",
+      "citations": "citations",
+      "state": "state",
+      "usage": "usage",
+      "trace_id": "trace_id"
+    },
+    "allow_error_responses": true
+  },
+  "judge": {
+    "enabled": false
+  },
+  "tracing": {
+    "enabled": false
+  }
+}

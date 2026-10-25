@@ -1,0 +1,12 @@
+{
+  "adapter": "odin",
+  "dataset": "../datasets/golden/retrieval.json",
+  "report": "../reports/odin-retrieval-golden.json",
+  "odin": {
+    "backend_path": "../backend",
+    "company_id": "SET_YOUR_EVALUATION_COMPANY_ID",
+    "operation": "retrieval",
+    "product_tracing": true
+  },
+  "tracing": {"enabled": true}
+}

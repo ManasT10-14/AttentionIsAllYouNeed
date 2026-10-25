@@ -1,0 +1,57 @@
+[build-system]
+requires = ["hatchling>=1.26,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ragnarok-eval"
+version = "0.1.0"
+description = "Independent evaluation and security pipeline for agents and RAG applications"
+requires-python = ">=3.11"
+dependencies = ["pydantic==2.13.5", "httpx==0.28.1"]
+
+[project.optional-dependencies]
+judge = ["deepeval==4.3.1"]
+tracing = ["langsmith==0.4.4"]
+graph = ["langgraph==1.0.7"]
+odin = [
+    "fastembed>=0.4,<1",
+    "holidays>=0.50,<1",
+    "langchain-anthropic>=1,<2",
+    "langchain-groq>=1,<2",
+    "langchain-openai>=1,<2",
+    "langgraph==1.0.7",
+    "langgraph-checkpoint-postgres>=2,<4",
+    "langsmith==0.4.4",
+    "pgvector>=0.3,<1",
+    "psycopg[binary,pool]>=3.2,<4",
+    "pydantic-settings>=2.3,<3",
+    "pymupdf>=1.24,<2",
+    "python-dateutil>=2.9,<3",
+    "python-docx>=1.1,<2",
+    "pyyaml>=6,<7",
+    "rank-bm25>=0.2.2,<1",
+    "rapidfuzz>=3.9,<4",
+    "sqlalchemy>=2,<3",
+]
+
+[dependency-groups]
+dev = ["pytest==8.4.2", "fastapi==0.135.3", "uvicorn>=0.34,<1", "ruff>=0.12,<1"]
+
+[project.scripts]
+ragnarok = "ragnarok.__main__:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ragnarok"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests", "backend/tests"]
+pythonpath = ["src", ".", "backend"]
+addopts = "-ra"
+markers = ["live: explicitly enabled network/paid integration checks"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]

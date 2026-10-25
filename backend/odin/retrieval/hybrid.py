@@ -15,6 +15,7 @@ from sqlalchemy import select
 from odin.core.config import odin_config
 from odin.core.context import maybe_current
 from odin.core.hooks import HOOKS
+from odin.core.telemetry import traced
 from odin.db.session import db
 from odin.db.tables import ClauseRow
 
@@ -102,13 +103,16 @@ class Hit:
     score: float
     dense_rank: int | None = None
     sparse_rank: int | None = None
+    company_id: str | None = None
 
-    def as_dict(self, max_chars: int = 900) -> dict:
+    def as_dict(self, max_chars: int | None = 900) -> dict:
         return {"contract_id": self.contract_id, "clause_number": self.number, "heading": self.heading,
                 "clause_type": self.clause_type, "page": self.page, "version": self.version,
+                "clause_id": self.clause_id, "company_id": self.company_id,
                 "score": round(self.score, 4), "text": self.text[:max_chars]}
 
 
+@traced("odin:retrieval", "retriever")
 def search(query: str, *, company_id: str | None = None, contract_ids: list[str] | None = None,
            clause_types: list[str] | None = None, top_k: int | None = None, current_only: bool = True) -> list[Hit]:
     cfg = odin_config()["retrieval"]
@@ -123,15 +127,20 @@ def search(query: str, *, company_id: str | None = None, contract_ids: list[str]
     rows = [r for r in all_rows
             if (not contract_ids or r.contract_id in contract_ids) and (not clause_types or r.clause_type in clause_types)]
     if not rows:
+        HOOKS.record("retrieval", (maybe_current().agent if maybe_current() else "system"), query,
+                     [], {"dense": [], "sparse": [], "filters": {"contract_ids": contract_ids,
+                            "clause_types": clause_types}})
         return []
     by_id = {r.id: r for r in rows}
 
     # dense — pgvector cosine distance over the filtered set
-    qv = embed_query(query)
-    with db() as s:
-        dstmt = (select(ClauseRow.id).where(ClauseRow.id.in_(list(by_id)), ClauseRow.embedding.is_not(None))
-                 .order_by(ClauseRow.embedding.cosine_distance(qv)).limit(cand))
-        dense_ids = list(s.scalars(dstmt))
+    dense_ids = []
+    if cfg.get("dense_enabled", True):
+        qv = embed_query(query)
+        with db() as s:
+            dstmt = (select(ClauseRow.id).where(ClauseRow.id.in_(list(by_id)), ClauseRow.embedding.is_not(None))
+                     .order_by(ClauseRow.embedding.cosine_distance(qv)).limit(cand))
+            dense_ids = list(s.scalars(dstmt))
 
     # sparse — BM25 over the company's current clauses, then filtered
     bm, ids = _BM25.get(company_id, [r for r in all_rows])
@@ -152,11 +161,12 @@ def search(query: str, *, company_id: str | None = None, contract_ids: list[str]
     dpos = {c: i for i, c in enumerate(dense_ids)}
     spos = {c: i for i, c in enumerate(sparse_ids)}
     hits = [Hit(c, by_id[c].contract_id, by_id[c].version, by_id[c].number, by_id[c].heading,
-                by_id[c].clause_type, by_id[c].text, by_id[c].page, fused[c], dpos.get(c), spos.get(c))
+                by_id[c].clause_type, by_id[c].text, by_id[c].page, fused[c], dpos.get(c), spos.get(c),
+                by_id[c].company_id)
             for c in order]
     hits = reranker().rerank(query, hits)[:top_k]
     HOOKS.record("retrieval", (maybe_current().agent if maybe_current() else "system"), query,
-                 [h.as_dict(200) for h in hits],
+                 [h.as_dict(None) for h in hits],
                  {"dense": dense_ids[:top_k], "sparse": sparse_ids[:top_k], "filters":
                   {"contract_ids": contract_ids, "clause_types": clause_types}})
     return hits

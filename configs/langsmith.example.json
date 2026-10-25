@@ -1,0 +1,15 @@
+{
+  "dataset": "../datasets/odin/synthetic.json",
+  "fixtures": "../datasets/odin/safe-results.json",
+  "adapter": "fixture",
+  "report": "../reports/traced.json",
+  "judge": {
+    "enabled": false
+  },
+  "tracing": {
+    "enabled": true,
+    "project": "ragnarok-evaluation",
+    "api_key_env": "LANGSMITH_API_KEY",
+    "endpoint": "https://api.smith.langchain.com"
+  }
+}

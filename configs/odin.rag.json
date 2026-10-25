@@ -1,0 +1,14 @@
+{
+  "adapter": "odin",
+  "dataset": "../datasets/golden/rag.json",
+  "report": "../reports/odin-rag-golden.json",
+  "case_timeout_s": 300,
+  "odin": {
+    "backend_path": "../backend",
+    "company_id": "SET_YOUR_EVALUATION_COMPANY_ID",
+    "operation": "ask",
+    "product_tracing": true
+  },
+  "judge": {"enabled": true},
+  "tracing": {"enabled": true}
+}

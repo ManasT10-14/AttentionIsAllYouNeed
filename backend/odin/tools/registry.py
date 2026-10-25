@@ -68,33 +68,46 @@ class ToolRegistry:
 
     # ── execution ──
     def invoke(self, agent: str, name: str, args: dict | BaseModel | None = None, *, approval_id: str | None = None):
-        spec = self.tools.get(name)
-        if not spec:
-            raise ToolDenied(f"unknown tool {name}")
-        if name not in self.allow.get(agent, set()):
-            self._audit(agent, spec, {}, f"denied: {agent} not allowed", ok=False, blocked=True)
-            raise ToolDenied(f"agent '{agent}' may not call '{name}'")
+        from odin.core.telemetry import span
+        with span(f"tool:{name}", "tool"):
+            return self._invoke(agent, name, args, approval_id=approval_id)
+
+    def _invoke(self, agent, name, args=None, *, approval_id=None):
         payload = args.model_dump(mode="json") if isinstance(args, BaseModel) else dict(args or {})
-        c = maybe_current()
-        if c and c.run_id:
-            from odin.core.budget import for_run
-            for_run(c.run_id).tool_calls += 1
+        spec = self.tools.get(name)
         t0 = time.perf_counter()
+        decision = {"tool": name, "authorized": False, "approved": None,
+                    "executed": False, "ok": False}
         try:
-            payload = HOOKS.pre_tool(agent, name, spec.scope, payload)
+            if not spec:
+                raise ToolDenied(f"unknown tool {name}")
+            if name not in self.allow.get(agent, set()):
+                raise ToolDenied(f"agent '{agent}' may not call '{name}'")
+            decision["authorized"] = True
+            c = maybe_current()
+            if c and c.run_id:
+                from odin.core.budget import for_run
+                for_run(c.run_id).tool_calls += 1
             if spec.requires_approval:
+                decision["approved"] = False
                 self._check_approval(approval_id)
+                decision["approved"] = True
+            payload = HOOKS.pre_tool(agent, name, spec.scope, payload)
             parsed = spec.args.model_validate(payload)
+            decision["executed"] = True
             result = spec.fn(parsed)
             result = HOOKS.post_tool(agent, name, result)
-        except Blocked as e:
-            self._audit(agent, spec, payload, f"blocked by guard: {e}", ok=False, blocked=True, t0=t0)
-            raise
+            decision["ok"] = True
+            self._audit(agent, spec, payload, self.render(result, 300), ok=True, t0=t0)
+            return result
         except Exception as e:
-            self._audit(agent, spec, payload, f"{type(e).__name__}: {e}"[:500], ok=False, t0=t0)
+            decision["error_type"] = type(e).__name__
+            if spec:
+                self._audit(agent, spec, payload, f"{type(e).__name__}: {e}"[:500], ok=False,
+                            blocked=isinstance(e, (Blocked, ToolDenied, ApprovalRequired)), t0=t0)
             raise
-        self._audit(agent, spec, payload, self.render(result, 300), ok=True, t0=t0)
-        return result
+        finally:
+            HOOKS.record("tool", agent, payload, None, decision)
 
     def _check_approval(self, approval_id: str | None) -> None:
         from odin.db import repo

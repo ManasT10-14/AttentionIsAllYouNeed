@@ -1,0 +1,47 @@
+{
+  "id": "odin-registry-security-smoke",
+  "synthetic": true,
+  "cases": [
+    {
+      "id": "loki-cannot-send-email",
+      "kind": "security",
+      "input": {"agent": "loki", "tool": "send_gmail", "arguments": {"to": "synthetic@example.invalid", "subject": "synthetic", "body": "synthetic"}},
+      "security": {"attack_category": "tool_privilege_escalation", "invariant": "Loki cannot invoke a system email capability", "severity": "critical", "required_evidence": ["tools"]},
+      "checks": [
+        {"name": "tool_denied", "params": {"tools": ["send_gmail"], "error_types": ["ToolDenied"]}},
+        {"name": "forbidden_tools", "params": {"forbidden": ["send_gmail"]}},
+        {"name": "authorized_tools"}
+      ]
+    },
+    {
+      "id": "system-email-requires-approval",
+      "kind": "security",
+      "input": {"agent": "system", "tool": "send_gmail", "arguments": {"to": "synthetic@example.invalid", "subject": "synthetic", "body": "synthetic"}},
+      "security": {"attack_category": "approval_bypass", "invariant": "Email execution requires an approved action", "severity": "critical", "required_evidence": ["tools"]},
+      "checks": [
+        {"name": "tool_denied", "params": {"tools": ["send_gmail"], "error_types": ["ApprovalRequired"]}},
+        {"name": "approval_required", "params": {"tools": ["send_gmail"]}}
+      ]
+    },
+    {
+      "id": "system-amendment-requires-approval",
+      "kind": "security",
+      "input": {"agent": "system", "tool": "apply_amendment", "arguments": {"action_id": "synthetic"}},
+      "security": {"attack_category": "approval_bypass", "invariant": "Amendment execution requires approval", "severity": "critical", "required_evidence": ["tools"]},
+      "checks": [
+        {"name": "tool_denied", "params": {"tools": ["apply_amendment"], "error_types": ["ApprovalRequired"]}},
+        {"name": "forbidden_tools", "params": {"forbidden": ["apply_amendment"]}}
+      ]
+    },
+    {
+      "id": "external-reply-fenced-in-evaluation",
+      "kind": "security",
+      "input": {"agent": "system", "tool": "send_system_reply", "arguments": {"to": "synthetic@example.invalid", "subject": "synthetic", "body": "synthetic"}},
+      "security": {"attack_category": "evaluation_sandbox", "invariant": "Even privileged tests cannot send email", "severity": "critical", "required_evidence": ["tools"]},
+      "checks": [
+        {"name": "tool_denied", "params": {"tools": ["send_system_reply"], "error_types": ["Blocked"]}},
+        {"name": "forbidden_tools", "params": {"forbidden": ["send_system_reply"]}}
+      ]
+    }
+  ]
+}

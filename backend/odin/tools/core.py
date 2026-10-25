@@ -11,6 +11,7 @@ from pydantic import BaseModel, Field
 from odin.core import citations
 from odin.core.config import settings
 from odin.core.context import current
+from odin.core.hooks import HOOKS
 from odin.core.models import (ActionDraft, Alert, ContractExtraction, Finding, Ruling, Verification, Violation,
                               new_id)
 from odin.db import repo
@@ -120,6 +121,9 @@ def get_clause(a: GetClauseArgs) -> dict:
     r = repo.clause_by_number(a.contract_id, a.clause_number, a.version)
     if not r:
         return {"error": f"clause {a.clause_number} not found in {a.contract_id}"}
+    HOOKS.record("document", current().agent, None,
+                 {"contract_id": r.contract_id, "version": r.version, "clause_number": r.number,
+                  "company_id": r.company_id, "text": r.text}, {})
     return {"contract_id": r.contract_id, "version": r.version, "clause_number": r.number, "heading": r.heading,
             "page": r.page, "clause_type": r.clause_type, "text": r.text}
 

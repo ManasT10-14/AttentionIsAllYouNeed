@@ -9,7 +9,7 @@ from pathlib import Path
 
 from odin.core import budget as budget_mod
 from odin.core.context import current, run_ctx
-from odin.core.hooks import Blocked
+from odin.core.hooks import HOOKS, Blocked
 from odin.core.models import AgentMessage
 from odin.db import repo
 from odin.db.tables import ClauseRow
@@ -49,7 +49,17 @@ def agent_node(agent: str):
                     say(agent, "odin", "error", f"crash: {type(e).__name__}: {str(e)[:300]}",
                         contract_id=state.get("contract_id"))
                     return {"errors": [f"{agent}: crash {type(e).__name__}: {str(e)[:300]}"]}
-        return wrapper
+        @functools.wraps(fn)
+        def observed(state, *a, **kw):
+            from odin.core.telemetry import span
+            with span(f"agent:{agent}:{fn.__name__}"):
+                HOOKS.record("agent", agent, None, None, {"event": f"{agent}.{fn.__name__}.start"})
+                output = wrapper(state, *a, **kw)
+                HOOKS.record("agent", agent, None, output,
+                             {"event": f"{agent}.{fn.__name__}.end",
+                              "failed": bool(output.get("errors") or output.get("budget_hit"))})
+                return output
+        return observed
     return deco
 
 
@@ -70,6 +80,7 @@ def say(sender: str, receiver: str, kind: str, summary: str, payload: dict | Non
     c = current()
     repo.message(AgentMessage(run_id=c.run_id or "adhoc", sender=sender, receiver=receiver, kind=kind,
                               summary=summary, payload=payload or {}, contract_id=contract_id))
+    HOOKS.record("message", sender, None, payload or {}, {"event": kind, "target": receiver})
 
 
 def tool(name: str, args=None, **kw):
@@ -85,6 +96,9 @@ def doc_block(rows: list[ClauseRow], max_chars: int = 90000) -> str:
             break
         out.append(chunk)
         n += len(chunk)
+        HOOKS.record("document", current().agent, None,
+                     {"contract_id": r.contract_id, "version": r.version, "clause_number": r.number,
+                      "company_id": r.company_id, "text": r.text}, {})
     cid = rows[0].contract_id if rows else "?"
     return f'<document contract_id="{cid}">\n' + "\n".join(out) + "\n</document>"
 

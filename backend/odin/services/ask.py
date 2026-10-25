@@ -6,10 +6,12 @@ from odin.core import citations
 from odin.core.config import odin_config
 from odin.core.context import run_ctx
 from odin.core.models import AskAnswer
+from odin.core.telemetry import traced
 from odin.llm.call import structured
 from odin.retrieval import hybrid
 
 
+@traced("odin:ask")
 def ask(company_id: str, question: str, contract_ids: list[str] | None = None) -> dict:
     with run_ctx(company_id, agent="ask"):
         queries = [question]
@@ -27,11 +29,14 @@ def ask(company_id: str, question: str, contract_ids: list[str] | None = None) -
                     seen.add(h.clause_id)
                     hits.append(h)
         passages = [h.as_dict(1500) for h in hits[:12]]
+        if not passages:
+            return {"answer": "I do not have supporting contract evidence for this question.",
+                    "citations": [], "insufficient_evidence": True, "passages": []}
         ans = structured("ask", AskAnswer, prompt("ask"),
                          f"Question: {question}\n\n<document contract_id=\"multiple\">\n{j(passages)}\n</document>",
                          tools=["get_clause", "hybrid_search"])
         ans.citations = citations.verify_all(ans.citations)
-        if ans.citations and not any(c.verified for c in ans.citations):
+        if not ans.citations or not all(c.verified for c in ans.citations):
             ans.insufficient_evidence = True
-            ans.answer = "I could not verify any supporting clause for this answer. " + ans.answer
+            ans.answer = "I could not verify supporting contract evidence for this answer."
         return {**ans.model_dump(mode="json"), "passages": passages}

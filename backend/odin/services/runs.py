@@ -20,8 +20,8 @@ _plans: dict[str, dict[str, Workstream]] = {}
 _lock = threading.Lock()
 
 
-def new_run(company_id: str, kind: str, scenario_id: str | None = None) -> str:
-    run_id = str(uuid.uuid4())
+def new_run(company_id: str, kind: str, scenario_id: str | None = None, *, run_id: str | None = None) -> str:
+    run_id = run_id or str(uuid.uuid4())
     with db() as s:
         s.add(Run(id=run_id, company_id=company_id, kind=kind, status="running", scenario_id=scenario_id))
     return run_id
@@ -59,7 +59,8 @@ def start(company_id: str, kind: str, fn: Callable[[str], str], *, scenario_id: 
 
     def _go():
         status, err = "failed", ""
-        with run_ctx(company_id, run_id=run_id, scenario_id=scenario_id, agent="odin"):
+        from odin.core.telemetry import span
+        with run_ctx(company_id, run_id=run_id, scenario_id=scenario_id, agent="odin"), span(f"odin:run:{kind}"):
             try:
                 status = fn(run_id) or "done"
             except Exception as e:   # noqa: BLE001

@@ -1,0 +1,365 @@
+{
+  "$defs": {
+    "CheckSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "enabled": {
+          "default": true,
+          "title": "Enabled",
+          "type": "boolean"
+        },
+        "required": {
+          "default": true,
+          "title": "Required",
+          "type": "boolean"
+        },
+        "threshold": {
+          "default": 1,
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Threshold",
+          "type": "number"
+        },
+        "params": {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "title": "Params",
+          "type": "object"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "CheckSpec",
+      "type": "object"
+    },
+    "Document": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        },
+        "tenant_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tenant Id"
+        },
+        "clause_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Clause Id"
+        }
+      },
+      "required": [
+        "id",
+        "text"
+      ],
+      "title": "Document",
+      "type": "object"
+    },
+    "EvaluationCase": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "default": "quality",
+          "enum": [
+            "quality",
+            "agent"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "input": {
+          "$ref": "#/$defs/JsonValue"
+        },
+        "expected_output": {
+          "$ref": "#/$defs/JsonValue",
+          "default": null
+        },
+        "reference_context": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/Document"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reference Context"
+        },
+        "expected_relevant_document_ids": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expected Relevant Document Ids"
+        },
+        "checks": {
+          "items": {
+            "$ref": "#/$defs/CheckSpec"
+          },
+          "title": "Checks",
+          "type": "array"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Tags",
+          "type": "array"
+        },
+        "enabled": {
+          "default": true,
+          "title": "Enabled",
+          "type": "boolean"
+        },
+        "metadata": {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "title": "Metadata",
+          "type": "object"
+        }
+      },
+      "required": [
+        "id",
+        "input"
+      ],
+      "title": "EvaluationCase",
+      "type": "object"
+    },
+    "JsonValue": {},
+    "SecurityCase": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "security",
+          "default": "security",
+          "title": "Kind",
+          "type": "string"
+        },
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "input": {
+          "$ref": "#/$defs/JsonValue"
+        },
+        "expected_output": {
+          "$ref": "#/$defs/JsonValue",
+          "default": null
+        },
+        "reference_context": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/Document"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reference Context"
+        },
+        "expected_relevant_document_ids": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expected Relevant Document Ids"
+        },
+        "checks": {
+          "items": {
+            "$ref": "#/$defs/CheckSpec"
+          },
+          "title": "Checks",
+          "type": "array"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Tags",
+          "type": "array"
+        },
+        "enabled": {
+          "default": true,
+          "title": "Enabled",
+          "type": "boolean"
+        },
+        "metadata": {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "title": "Metadata",
+          "type": "object"
+        },
+        "security": {
+          "$ref": "#/$defs/SecurityScenario"
+        }
+      },
+      "required": [
+        "id",
+        "input",
+        "security"
+      ],
+      "title": "SecurityCase",
+      "type": "object"
+    },
+    "SecurityScenario": {
+      "additionalProperties": false,
+      "properties": {
+        "attack_category": {
+          "title": "Attack Category",
+          "type": "string"
+        },
+        "invariant": {
+          "minLength": 1,
+          "title": "Invariant",
+          "type": "string"
+        },
+        "severity": {
+          "default": "high",
+          "enum": [
+            "info",
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "evaluation_method": {
+          "const": "deterministic",
+          "default": "deterministic",
+          "title": "Evaluation Method",
+          "type": "string"
+        },
+        "required_evidence": {
+          "items": {
+            "enum": [
+              "output",
+              "documents",
+              "observed_documents",
+              "model_context",
+              "tools",
+              "events",
+              "citations",
+              "usage"
+            ],
+            "type": "string"
+          },
+          "title": "Required Evidence",
+          "type": "array"
+        },
+        "side_effecting": {
+          "default": false,
+          "title": "Side Effecting",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "attack_category",
+        "invariant"
+      ],
+      "title": "SecurityScenario",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "minLength": 1,
+      "title": "Id",
+      "type": "string"
+    },
+    "synthetic": {
+      "default": true,
+      "title": "Synthetic",
+      "type": "boolean"
+    },
+    "cases": {
+      "items": {
+        "discriminator": {
+          "mapping": {
+            "agent": "#/$defs/EvaluationCase",
+            "quality": "#/$defs/EvaluationCase",
+            "security": "#/$defs/SecurityCase"
+          },
+          "propertyName": "kind"
+        },
+        "oneOf": [
+          {
+            "$ref": "#/$defs/SecurityCase"
+          },
+          {
+            "$ref": "#/$defs/EvaluationCase"
+          }
+        ]
+      },
+      "title": "Cases",
+      "type": "array"
+    }
+  },
+  "required": [
+    "id",
+    "cases"
+  ],
+  "title": "Dataset",
+  "type": "object"
+}
