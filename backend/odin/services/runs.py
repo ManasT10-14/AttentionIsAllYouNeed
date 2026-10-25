@@ -13,7 +13,7 @@ from odin.core.context import run_ctx
 from odin.core.models import Workstream
 from odin.db import repo
 from odin.db.session import db
-from odin.db.tables import Run
+from odin.db.tables import Run, Company
 
 log = logging.getLogger("odin.runs")
 _plans: dict[str, dict[str, Workstream]] = {}
@@ -24,6 +24,8 @@ _lock = threading.Lock()
 def new_run(company_id: str, kind: str, scenario_id: str | None = None, *, run_id: str | None = None) -> str:
     run_id = run_id or str(uuid.uuid4())
     with db() as s:
+        from sqlalchemy import select
+        s.scalar(select(Company).where(Company.id == company_id).with_for_update())
         s.add(Run(id=run_id, company_id=company_id, kind=kind, status="running", scenario_id=scenario_id))
     return run_id
 
@@ -64,12 +66,14 @@ def start(company_id: str, kind: str, fn: Callable[[str], str], *, scenario_id: 
         from odin.core.telemetry import _set_outputs, span
         with run_ctx(company_id, run_id=run_id, scenario_id=scenario_id, agent="odin"),                 span(f"odin:run:{kind}", inputs={"kind": kind, "run_id": run_id}) as trace_run:
             try:
+                if kind in ("analysis", "update", "report", "event") and not scenario_id:
+                    archive_legacy_report(company_id)
                 status = fn(run_id) or "done"
                 _set_outputs(trace_run, {"status": status})
             except Exception as e:   # noqa: BLE001
                 log.exception("run %s failed", run_id)
                 err = f"{type(e).__name__}: {e}"[:1000]
-            if kind in ("analysis", "update", "report"):
+            if kind in ("analysis", "update", "report", "event") and not scenario_id:
                 try:
                     snapshot_report(company_id, run_id, kind)
                 except Exception:   # noqa: BLE001
@@ -186,27 +190,82 @@ def diff_states(prev: dict | None, cur: dict) -> dict:
                                "currency": ce["currency"]}}
 
 
+def recover_report_outputs(run_id: str, reports: list[dict]) -> dict | None:
+    """Assemble only actual saved Synth outputs for one run, never current-state reconstruction."""
+    eligible = [r for r in reports if not r.get("run_id") or r["run_id"] == run_id]
+    own = list({(r.get("kind"), r.get("contract_id")): r for r in reversed(eligible)}.values())
+    company = next((r for r in own if r.get("kind") == "company"), None)
+    if not company and own:
+        company = {"kind": "company", "title": "Saved contract reports", "completeness": "partial",
+                   "generated_at": max((r.get("generated_at") or "" for r in own), default=""),
+                   "run_id": run_id, "summary_status": "unavailable",
+                   "summary": {"executive_summary": "Contract reports were saved for this run. A final company synthesis was not saved.", "unavailable": True}}
+    if not company:
+        return None
+    return {"run_id": run_id, "generated_at": company.get("generated_at", ""),
+            "previous_run_id": None, "diff": {}, "report": company,
+            "contract_reports": [r for r in own if r.get("kind") == "contract"],
+            "recovery_note": "Saved Synth outputs for this run. No historical change comparison was saved."}
+
+
 def run_reports(company_id: str) -> list[dict]:
-    """Stored per-run workflow reports, newest first."""
+    """Snapshots plus surviving per-run Synth outputs, newest first."""
     from sqlalchemy import select
-    from odin.db.tables import Record
+    from odin.db.tables import Record, AgentMessageRow
     with db() as s:
-        rows = s.scalars(select(Record).where(Record.company_id == company_id, Record.kind == "report_run")
-                         .order_by(Record.created_at.desc())).all()
-        return [r.data for r in rows]
+        rows = s.scalars(select(Record).where(Record.company_id == company_id,
+                         Record.kind.in_(["report_run", "report_revision", "report"]),
+                         Record.scenario_id.is_(None))).all()
+        out = [r.data for r in rows if r.kind == "report_run"]
+        grouped = {}
+        for row in rows:
+            if row.kind in ("report_revision", "report") and row.run_id:
+                grouped.setdefault(row.run_id, []).append(row.data)
+        # Messages can retain full Synth outputs even after latest report records were overwritten.
+        messages = s.scalars(select(AgentMessageRow).where(AgentMessageRow.company_id == company_id,
+                            AgentMessageRow.sender == "synth").order_by(AgentMessageRow.ts.desc())).all()
+        for msg in messages:
+            payload = msg.payload or {}
+            rep = payload.get("result_snapshot")
+            if isinstance(rep, dict) and not payload.get("scenario_id"):
+                grouped.setdefault(msg.run_id, []).append(rep)
+        existing = {r["run_id"] for r in out}
+        for rid, reports in grouped.items():
+            if rid in existing:
+                continue
+            run = s.get(Run, rid)
+            if not run or run.scenario_id is not None:
+                continue
+            recovered = recover_report_outputs(rid, reports)
+            if recovered:
+                recovered["run_kind"] = run.kind
+                out.append(recovered)
+        return sorted(out, key=lambda r: r.get("generated_at") or "", reverse=True)
 
 
 def snapshot_report(company_id: str, run_id: str, kind: str) -> None:
     """Freeze the company report + a diff against the previous run's snapshot (call inside the run ctx)."""
     from odin.db.tables import Record
-    rep = repo.get("report", "report:company")
-    if not rep:
+    rep = repo.get("report_revision", f"reportrevision:{run_id}:company") or repo.get("report", "report:company")
+    if not rep or rep.get("run_id") != run_id:
         return
-    prev = next(iter(run_reports(company_id)), None)
+    if any(r["run_id"] == run_id for r in repo.query("report_run")):
+        return
+    prev = next((r for r in run_reports(company_id) if r["run_id"] != run_id and r.get("state")), None)
     state = current_state()
     data = {"id": f"reportrun:{run_id}", "run_id": run_id, "run_kind": kind, "generated_at": datetime.utcnow().isoformat(),
             "previous_run_id": prev["run_id"] if prev else None,
-            "diff": diff_states(prev.get("state") if prev else None, state), "state": state, "report": rep}
+            "diff": diff_states(prev.get("state") if prev else None, state), "state": state, "report": rep,
+            "contract_reports": repo.query("report_revision", run_id=run_id, contract_ids=[c.contract_id for c in repo.contracts()]) or
+                                [r for r in repo.query("report") if r.get("run_id") == run_id]}
     with db() as s:
         s.add(Record(id=repo._pk(company_id, data["id"]), company_id=company_id, kind="report_run", run_id=run_id,
                      status=rep.get("completeness", ""), data=data))
+
+
+def archive_legacy_report(company_id: str) -> None:
+    """Freeze any surviving pre-snapshot final report before a new run replaces it."""
+    from odin.agents.synth import _R
+    for report in run_reports(company_id):
+        if report.get("recovery_note") and not repo.get("report_run", f"reportrun:{report['run_id']}"):
+            repo.put("report_run", _R(id=f"reportrun:{report['run_id']}", **report), publish=False)

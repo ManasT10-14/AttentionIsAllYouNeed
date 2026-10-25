@@ -82,6 +82,12 @@ def pmap(fn, items, max_workers: int = 8) -> list:
 def say(sender: str, receiver: str, kind: str, summary: str, payload: dict | None = None,
         contract_id: str | None = None) -> None:
     c = current()
+    payload = dict(payload or {})
+    from odin.services.message_results import capture_result
+    try:
+        payload.setdefault("contribution", capture_result(sender, kind, contract_id, payload))
+    except Exception:
+        log.exception("Could not capture %s message contribution", sender)
     repo.message(AgentMessage(run_id=c.run_id or "adhoc", sender=sender, receiver=receiver, kind=kind,
                               summary=summary, payload=payload or {}, contract_id=contract_id))
     HOOKS.record("message", sender, None, payload or {}, {"event": kind, "target": receiver})
