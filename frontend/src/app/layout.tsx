@@ -13,6 +13,7 @@ import './landing-security.css';
 import './dashboard-refinement.css';
 import './theme.css';
 import './workplan.css';
+import './workspace-layout.css';
 
 export const metadata: Metadata = { title: { default: 'Odin — Contract intelligence', template: '%s · Odin' }, description: 'Understand obligations, anticipate contract risk, and act with evidence.' };
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

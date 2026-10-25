@@ -68,9 +68,13 @@ class ToolRegistry:
 
     # ── execution ──
     def invoke(self, agent: str, name: str, args: dict | BaseModel | None = None, *, approval_id: str | None = None):
-        from odin.core.telemetry import span
-        with span(f"tool:{name}", "tool"):
-            return self._invoke(agent, name, args, approval_id=approval_id)
+        from odin.core.telemetry import _plain, _set_outputs, span
+        ins = args.model_dump(mode="json") if isinstance(args, BaseModel) else dict(args or {})
+        with span(f"tool:{name}", "tool", inputs={"agent": agent, "args": _plain(ins)}, metadata={"agent": agent},
+                  tags=[agent]) as run:
+            out = self._invoke(agent, name, args, approval_id=approval_id)
+            _set_outputs(run, out)
+            return out
 
     def _invoke(self, agent, name, args=None, *, approval_id=None):
         payload = args.model_dump(mode="json") if isinstance(args, BaseModel) else dict(args or {})

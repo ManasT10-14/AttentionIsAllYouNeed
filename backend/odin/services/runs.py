@@ -61,10 +61,11 @@ def start(company_id: str, kind: str, fn: Callable[[str], str], *, scenario_id: 
 
     def _go():
         status, err = "failed", ""
-        from odin.core.telemetry import span
-        with run_ctx(company_id, run_id=run_id, scenario_id=scenario_id, agent="odin"), span(f"odin:run:{kind}"):
+        from odin.core.telemetry import _set_outputs, span
+        with run_ctx(company_id, run_id=run_id, scenario_id=scenario_id, agent="odin"),                 span(f"odin:run:{kind}", inputs={"kind": kind, "run_id": run_id}) as trace_run:
             try:
                 status = fn(run_id) or "done"
+                _set_outputs(trace_run, {"status": status})
             except Exception as e:   # noqa: BLE001
                 log.exception("run %s failed", run_id)
                 err = f"{type(e).__name__}: {e}"[:1000]

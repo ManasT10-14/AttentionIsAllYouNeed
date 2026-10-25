@@ -36,7 +36,12 @@ export async function demoRequest(path: string, options: RequestInit = {}): Prom
     edges: contracts.flatMap(c=>[{source:'party-'+c.id,target:'c:'+c.id,kind:'party_to'},...c.clauses.map(o=>({source:'c:'+c.id,target:c.id+'-'+o.number,kind:'contains'}))]),
     cascades: {}
   };
-  if (route === '/api/runs') return [{ id: 'preview-run', kind: 'analysis', status: 'partial', workplan: { workstreams: contracts.map(c => ({ contract_id: c.id, status: 'partial', evidence_score: .6, reason: 'Sample text only; original documents are not available in preview.', tasks: [] })) }, budget: { agent_calls: 4, tool_calls: 0, tokens_in: 0, tokens_out: 0, usd: 0, fallbacks: 0 } }];
+  if (route === '/api/runs') return [{ id: 'preview-run', kind: 'analysis', status: 'partial', started_at: p.asOf + 'T09:00:00Z', workplan: { workstreams: contracts.map(c => ({ id: 'ws:' + c.id, contract_id: c.id, status: 'partial', evidence_score: .6, reason: 'Sample text only; original documents are not available in preview.', tasks: [] })) }, budget: { agent_calls: 4, tool_calls: 0, tokens_in: 0, tokens_out: 0, usd: 0, fallbacks: 0 } }];
+  if (route === '/api/report-index') return { runs: [], contracts: [], events: p.events.map(e => ({ event_id: e.id, subject: e.title, date: e.date, contract_ids: [e.contractId], run_ids: [], status: 'processed' })) };
+  if (route === '/api/workflow/preview-run') {
+    const run = (await demoRequest('/api/runs') as ApiRecord[])[0];
+    return { run, workstreams: record(run.workplan).workstreams, timeline: { running: false, tool_call_count: 0, agents: {}, steps: p.findings.map(f => ({ id: f.id, sender: f.agent, receiver: 'odin', kind: f.kind.toLowerCase(), summary: f.body, ended_at: f.timestamp, tool_calls: [] })) }, outputs: { finding: [], violation: [], alert: [], action: [] }, debate: [], reports: [], remarks: { decision: 'partial', complete: false, gaps: [{ contract_id: 'Preview', status: 'partial', reason: 'Sample text only; no agents ran and no verified report was generated.' }] } };
+  }
   if (route === '/api/runs/preview-run') return { id: 'preview-run', status: 'partial', messages: p.findings.map(f => ({ sender: f.agent, summary: f.body, ts: f.timestamp, kind: f.kind.toLowerCase() })), tool_calls: [], budget: { per_agent: {} } };
   if (route === '/api/violations') return [];
   if (route === '/api/email/template') return 'Subject: Payment update\nContract: [contract id]\nDate: [YYYY-MM-DD]\nAmount: [amount and currency]\nDetails: [event details]';

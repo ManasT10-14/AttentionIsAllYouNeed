@@ -17,7 +17,7 @@ export const navigation = [
  { name: 'Exposure', href: '/dashboard/exposure', icon: BarChart3 }, { name: 'Debate', href: '/dashboard/agent-review', icon: Activity },
  { name: 'Alerts & Actions', href: '/dashboard/actions', icon: Zap }, { name: 'Events & Inbox', href: '/dashboard/events', icon: Inbox },
  { name: 'Ask Odin', href: '/dashboard/ask', icon: MessageSquare }, { name: 'Reports', href: '/dashboard/reports', icon: ScrollText },
- { name: 'Observability', href: '/dashboard/observability', icon: Radio }, { name: 'Evaluations', href: '/dashboard/evals', icon: FlaskConical },
+ { name: 'Agent runs', href: '/dashboard/workflow', icon: Activity }, { name: 'Observability', href: '/dashboard/observability', icon: Radio }, { name: 'Evaluations', href: '/dashboard/evals', icon: FlaskConical },
  { name: 'Security', href: '/dashboard/security', icon: ShieldCheck }, { name: 'Admin', href: '/dashboard/admin', icon: SlidersHorizontal }
 ];
 export function GmailPill() {
