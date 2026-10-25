@@ -22,7 +22,7 @@ from odin.core.config import limits, odin_config
 from odin.core.context import maybe_current
 from odin.core.hooks import HOOKS
 from odin.core.telemetry import traced
-from odin.llm.factory import chain_for, chat_model, model_for, price
+from odin.llm.factory import chain_for, chat_model, max_tokens_for, model_for, price
 from odin.llm.fake import fake_instance
 
 log = logging.getLogger("odin.llm")
@@ -42,11 +42,14 @@ def _run_config(agent: str, provider: str, prompt_hash: str, extra: dict | None)
     c = maybe_current()
     meta = {"agent": agent, "provider": provider, "prompt_hash": prompt_hash, **(extra or {})}
     tags = [agent, provider]
+    if (extra or {}).get("contract_id"):
+        tags.append(f"contract:{extra['contract_id']}")
     if c:
         meta.update(company_id=c.company_id, run_id=c.run_id, scenario_id=c.scenario_id)
         if c.scenario_id:
             tags.append("whatif")
-    return {"run_name": f"{agent}:{provider}", "tags": tags, "metadata": meta}
+    meta["run_kind"] = (extra or {}).get("run_kind") or (c.agent if c else None)
+    return {"run_name": f"{agent}:{provider}", "tags": tags, "metadata": {k: v for k, v in meta.items() if v is not None}}
 
 
 @traced("odin:structured")
@@ -71,7 +74,8 @@ def structured(agent: str, schema: Type[T], system: str, user: str, *, tools: li
             t0 = time.perf_counter()
             try:
                 cfg = _run_config(agent, prov, prompt_hash, meta)
-                model = chat_model(prov, odin_config()["defaults"].get("temperature", 0), model_for(agent, prov))
+                model = chat_model(prov, odin_config()["defaults"].get("temperature", 0), model_for(agent, prov),
+                                   max_tokens_for(agent))
                 convo = list(messages)
                 tin = tout = 0
                 if tools:
