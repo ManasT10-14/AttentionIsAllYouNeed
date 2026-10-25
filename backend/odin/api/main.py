@@ -7,15 +7,14 @@ from contextlib import asynccontextmanager
 
 from fastapi import Depends, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
-from fastapi.staticfiles import StaticFiles
+from fastapi.responses import RedirectResponse
 from sse_starlette.sse import EventSourceResponse
 from starlette.middleware.sessions import SessionMiddleware
 
 from odin.api import auth, routes
 from odin.api.deps import current_user
 from odin.core import bus
-from odin.core.config import ROOT, settings
+from odin.core.config import settings
 from odin.db.session import init_db
 from odin.db.tables import User
 
@@ -69,11 +68,7 @@ async def stream(request: Request, u: User = Depends(current_user)):
     return EventSourceResponse(gen(), headers={"Cache-Control": "no-cache, no-transform"})
 
 
-dist = ROOT / "ui-dev" / "dist"          # placeholder UI build; the team UI lives in frontend/
-if dist.exists():
-    app.mount("/assets", StaticFiles(directory=dist / "assets"), name="assets")
-
-    @app.get("/{path:path}", include_in_schema=False)
-    def spa(path: str):
-        f = dist / path
-        return FileResponse(f if path and f.is_file() else dist / "index.html")
+@app.get("/", include_in_schema=False)
+def root():
+    """The UI lives in frontend/ (served separately); send browsers there."""
+    return RedirectResponse(settings().frontend_url)

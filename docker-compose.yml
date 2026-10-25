@@ -22,7 +22,6 @@ services:
     volumes:
       - ./backend/config:/app/backend/config:ro
       - ./corpus/samples:/app/corpus/samples:ro
-      - ./ui-dev/dist:/app/ui-dev/dist:ro
       - odindata:/data
     ports: ["8000:8000"]
     depends_on:

@@ -1,7 +1,6 @@
 # Odin UI component specification (for the frontend team)
 
-Status: the backend API is live. The placeholder UI under `ui-dev/` is a throwaway reference that shows the
-data flows; replace it freely. All data comes from the REST API (`/api/*`, OpenAPI at `/docs`), plus one
+Status: the backend API is live and the team UI in `frontend/` is connected to it. All data comes from the REST API (`/api/*`, OpenAPI at `/docs`), plus one
 live stream (`GET /api/stream`, Server-Sent Events).
 
 Run `npm run gen:api` with the backend up to get TypeScript types for every endpoint.

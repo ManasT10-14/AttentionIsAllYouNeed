@@ -16,7 +16,6 @@ corpus (`corpus/`).
 | Team UI (`frontend/`) | Next.js app, connected to the live backend through its dev proxy. Login, overview, slider, graph, debate, alerts and actions, events, PDF reference viewer and the live feed were checked in a browser. |
 | Gmail (Heimdall) | Verified: a real `[ODIN-EVENT]` email produced violations, highlights, alerts and drafted actions. |
 | Evaluation (`eval/`) | 165 offline tests pass. Live Thor run: 85 of 114 golden assertions matched. |
-| Reference UI (`ui-dev/`) | Simple React UI wired to every endpoint. Kept as a fallback. |
 
 Known gaps are listed under [Known gaps](#known-gaps).
 
@@ -38,7 +37,6 @@ eval/               Evaluation and security pipeline
 corpus/             15 test contracts, scenarios, evaluator-only oracle
   samples/          6 demo contracts, company context and demo emails (used by "Demo seed")
 frontend/           Team UI (Next.js)
-ui-dev/             Reference UI (React + Vite)
 scripts/            make_samples.py, checkpoint.ps1; corpus/ holds corpus generators and validators
 docs/               Specs and handoffs; archive/ holds superseded plans
 ```
@@ -139,16 +137,6 @@ The sidebar shows **Live feed · live** when the UI is receiving live updates fr
 
 On the sign-in page, **Explore demo workspace** opens the UI with clearly labelled sample data. It
 cannot upload, run agents or send email.
-
-### Reference UI instead of the team UI
-
-```powershell
-cd ui-dev
-npm ci
-npm run dev
-```
-
-Open http://localhost:5173, and set `FRONTEND_URL` and `PUBLIC_BASE_URL` to that address in `.env`.
 
 ## 4. Demo script
 
