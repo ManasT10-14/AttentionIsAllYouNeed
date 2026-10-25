@@ -1,0 +1,23 @@
+From: operations@aurora.example
+To: odin-inbox@aurora.example
+Subject: [ODIN-EVENT] DELIVERY_RECEIVED C04
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+
+EVENT_ID: EVT-TRAP-02-DEL1
+EVENT_TYPE: DELIVERY_RECEIVED
+OCCURRED_AT: 2027-02-07T12:00:00Z
+CONTRACT_ID: C04
+REFERENCE: SO-AX7
+DESCRIPTION:
+{
+  "observation_type": "delivery_accepted",
+  "source_ref": "record:DEL1",
+  "order_id": "SO-AX7",
+  "lot_id": "LOT-AX7",
+  "quantity": 100,
+  "conforming": true,
+  "destination": "SITE-W",
+  "acceptance_ref": "record-receipt-DEL1"
+}

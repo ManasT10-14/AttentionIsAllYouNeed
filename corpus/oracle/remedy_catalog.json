@@ -1,0 +1,136 @@
+{
+  "rules": [
+    {
+      "contract_id": "C01",
+      "evidence": [
+        "C01:3.1",
+        "C01:4.1"
+      ],
+      "direction": "Provider credit to Aurora",
+      "rule": "INR 10000 per qualifying incident; INR 20000 monthly cap; approved maintenance exclusion"
+    },
+    {
+      "contract_id": "C02",
+      "evidence": [
+        "C02:5.1",
+        "C02:6.1"
+      ],
+      "direction": "Aurora credit to Forge",
+      "rule": "INR 15000 per qualifying incident; INR 45000 monthly cap; no imported maintenance exclusion"
+    },
+    {
+      "contract_id": "C03",
+      "evidence": [
+        "C03:4.1"
+      ],
+      "direction": "Forge delay payment to Aurora",
+      "rule": "INR 2000 per started date; INR 20000 cap"
+    },
+    {
+      "contract_id": "C04",
+      "evidence": [
+        "C04:4.1",
+        "C04:19.1"
+      ],
+      "direction": "Aurora delay payment to Willow",
+      "rule": "INR 5000 per started date; INR 50000 cap; blank interest percentage remains unquantified"
+    },
+    {
+      "contract_id": "C05",
+      "evidence": [
+        "C05:6.1"
+      ],
+      "direction": "Aurora late-rent charge",
+      "rule": "0.1 percent per started date after grace on then-unpaid principal; INR 5000 per-invoice cap"
+    },
+    {
+      "contract_id": "C06",
+      "evidence": [
+        "C06:6.1",
+        "C06:7.1",
+        "C06:18.1"
+      ],
+      "direction": "Cure and early-exit conditions",
+      "rule": "Separate cause/convenience routes; Schedule B migration fee remains unknown"
+    },
+    {
+      "contract_id": "C07",
+      "evidence": [
+        "C07:6.1",
+        "C07:7.1",
+        "C07:11.1"
+      ],
+      "direction": "Remediation and termination route",
+      "rule": "Missing safeguard attestation can breach; no numeric regulatory fine supplied"
+    },
+    {
+      "contract_id": "C08",
+      "evidence": [
+        "C08:18.1",
+        "C08:19.1"
+      ],
+      "direction": "Unresolved exit notice",
+      "rule": "Do not silently select 30 or 60 days; request clarification"
+    },
+    {
+      "contract_id": "C09",
+      "evidence": [
+        "C09:3.2"
+      ],
+      "direction": "Aurora hand-back charge",
+      "rule": "INR 2000 per started date for both nodes combined; INR 20000 cap"
+    },
+    {
+      "contract_id": "C10",
+      "evidence": [
+        "C10:4.1",
+        "C10:4.2"
+      ],
+      "direction": "Aurora portal credit to Willow",
+      "rule": "5 percent of monthly fee below 99.5 percent availability; INR 15000 cap; claim required"
+    },
+    {
+      "contract_id": "C11",
+      "evidence": [
+        "C11:4.2"
+      ],
+      "direction": "Aurora demonstration-delay charge",
+      "rule": "INR 1500 per started date; INR 30000 cap; missing signature alone is insufficient"
+    },
+    {
+      "contract_id": "C12",
+      "evidence": [
+        "C12:2.1",
+        "C12:3.1"
+      ],
+      "direction": "Willow reimbursement to Aurora",
+      "rule": "Only approved incurred repair cost after missed response deadline; INR 25000 ticket cap"
+    },
+    {
+      "contract_id": "C13",
+      "evidence": [
+        "C13:6.1",
+        "C13:6.2"
+      ],
+      "direction": "Responsible Recipient disclosure payment",
+      "rule": "INR 100000 per distinct proven unauthorized recipient; INR 300000 cap; return delay alone insufficient"
+    },
+    {
+      "contract_id": "C14",
+      "evidence": [
+        "C14:3.2"
+      ],
+      "direction": "Aurora recovery credit to Willow",
+      "rule": "20 percent of monthly fee; INR 8000 monthly cap; more than four elapsed hours"
+    },
+    {
+      "contract_id": "C15",
+      "evidence": [
+        "C15:3.2",
+        "C15:3.3"
+      ],
+      "direction": "Forge replacement-delay charge",
+      "rule": "INR 1000 per started date after valid replacement due date; INR 10000 claim cap"
+    }
+  ]
+}

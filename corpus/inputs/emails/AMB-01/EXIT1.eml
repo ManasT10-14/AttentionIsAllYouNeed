@@ -1,0 +1,20 @@
+From: operations@aurora.example
+To: odin-inbox@aurora.example
+Subject: [ODIN-EVENT] CUSTOM C06
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+
+EVENT_ID: EVT-AMB-01-EXIT1
+EVENT_TYPE: CUSTOM
+OCCURRED_AT: 2027-02-01T08:00:00Z
+CONTRACT_ID: C06
+REFERENCE: record:EXIT1
+DESCRIPTION:
+{
+  "observation_type": "early_exit_requested",
+  "source_ref": "record:EXIT1",
+  "requestor_id": "P01",
+  "subscription_id": "TOOL-CIRCUIT",
+  "requested_exit_at": "2027-02-15T17:00:00Z"
+}

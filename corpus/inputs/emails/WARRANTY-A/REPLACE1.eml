@@ -1,0 +1,22 @@
+From: operations@aurora.example
+To: odin-inbox@aurora.example
+Subject: [ODIN-EVENT] CUSTOM C15
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+
+EVENT_ID: EVT-WARRANTY-A-REPLACE1
+EVENT_TYPE: CUSTOM
+OCCURRED_AT: 2027-05-11T17:00:00Z
+CONTRACT_ID: C15
+REFERENCE: record:REPLACE1
+DESCRIPTION:
+{
+  "observation_type": "replacement_received",
+  "source_ref": "record:REPLACE1",
+  "agreement_ref": "C15",
+  "claim_id": "RMA-001",
+  "conforming": true,
+  "recipient_party_id": "P01",
+  "receipt_ref": "REPLACEMENT-001"
+}

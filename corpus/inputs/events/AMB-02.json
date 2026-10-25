@@ -1,0 +1,17 @@
+[
+  {
+    "event_id": "LNOTICE1",
+    "event_type": "notice_received",
+    "occurred_at": "2027-12-01T17:00:00Z",
+    "received_at": "2027-12-01T17:00:00Z",
+    "source_ref": "record:LNOTICE1",
+    "payload": {
+      "sender_party_id": "P01",
+      "recipient_party_id": "P02",
+      "recipient_address": "notices@forge.example",
+      "subject": "TOOL-CIRCUIT non-renewal",
+      "subscription_id": "TOOL-CIRCUIT",
+      "delivery_receipt": "record-circuit-receipt"
+    }
+  }
+]

@@ -1,0 +1,31 @@
+[
+  {
+    "event_id": "DEL1",
+    "event_type": "delivery_accepted",
+    "occurred_at": "2027-02-07T12:00:00Z",
+    "received_at": "2027-02-07T12:00:00Z",
+    "source_ref": "record:DEL1",
+    "payload": {
+      "order_id": "SO-AX7",
+      "lot_id": "LOT-AX7",
+      "quantity": 100,
+      "conforming": true,
+      "destination": "SITE-W",
+      "acceptance_ref": "record-receipt-DEL1"
+    }
+  },
+  {
+    "event_id": "INV1",
+    "event_type": "invoice_received",
+    "occurred_at": "2027-02-07T12:00:00Z",
+    "received_at": "2027-02-07T12:00:00Z",
+    "source_ref": "record:INV1",
+    "payload": {
+      "invoice_id": "INV-SOAX7",
+      "order_id": "SO-AX7",
+      "amount": "650000",
+      "currency": "INR",
+      "recipient_id": "P03"
+    }
+  }
+]

@@ -1,0 +1,15 @@
+From: operations@aurora.example
+To: odin-inbox@aurora.example
+Subject: [ODIN-EVENT] PAYMENT_LATE C05
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+
+EVENT_ID: EVT-TEMPLATE-02
+EVENT_TYPE: PAYMENT_LATE
+OCCURRED_AT: 2027-02-11T09:00:00Z
+CONTRACT_ID: C05
+AMOUNT: INR 1,00,000
+REFERENCE: RENT-2027-01
+DESCRIPTION:
+The January rent balance remains unpaid at the recorded time.

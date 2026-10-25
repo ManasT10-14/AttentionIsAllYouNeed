@@ -1,0 +1,30 @@
+[
+  {
+    "event_id": "ACT1",
+    "event_type": "recovery_activated",
+    "occurred_at": "2027-03-02T08:00:00Z",
+    "received_at": "2027-03-02T08:00:00Z",
+    "source_ref": "record:ACT1",
+    "payload": {
+      "agreement_ref": "C14",
+      "service_id": "DR-RESIDENT",
+      "activation_id": "REC-001",
+      "requested_by": "Kavya Paul",
+      "accepted_by": "Mira Sen"
+    }
+  },
+  {
+    "event_id": "RESTORE1",
+    "event_type": "recovery_completed",
+    "occurred_at": "2027-03-02T13:00:00Z",
+    "received_at": "2027-03-02T13:00:00Z",
+    "source_ref": "record:RESTORE1",
+    "payload": {
+      "agreement_ref": "C14",
+      "service_id": "DR-RESIDENT",
+      "activation_id": "REC-001",
+      "complete": true,
+      "record_ref": "RECOVERY-001"
+    }
+  }
+]

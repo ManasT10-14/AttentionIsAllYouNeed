@@ -1,0 +1,63 @@
+[
+  {
+    "event_id": "OUT1",
+    "event_type": "service_restored",
+    "occurred_at": "2027-01-16T11:30:00Z",
+    "received_at": "2027-01-16T11:30:00Z",
+    "source_ref": "record:OUT1",
+    "payload": {
+      "agreement_ref": "C01",
+      "provider_id": "P02",
+      "service_id": "SVC-ATLAS",
+      "application_id": "APP-ATLAS",
+      "incident_id": "INC-PORTFOLIO-01",
+      "start": "2027-01-16T10:00:00Z",
+      "end": "2027-01-16T11:30:00Z",
+      "scheduled_maintenance": false
+    }
+  },
+  {
+    "event_id": "CLAIM1",
+    "event_type": "service_credit_claim_received",
+    "occurred_at": "2027-01-20T10:00:00Z",
+    "received_at": "2027-01-20T10:00:00Z",
+    "source_ref": "record:CLAIM1",
+    "payload": {
+      "agreement_ref": "C01",
+      "incident_id": "INC-PORTFOLIO-01",
+      "sender_party_id": "P01",
+      "recipient_party_id": "P02",
+      "recipient_address": "claims@forge.example",
+      "receipt_ref": "CLAIM-PORTFOLIO-01"
+    }
+  },
+  {
+    "event_id": "PAY1",
+    "event_type": "payment_cleared",
+    "occurred_at": "2027-01-24T12:00:00Z",
+    "received_at": "2027-01-24T12:00:00Z",
+    "source_ref": "record:PAY1",
+    "payload": {
+      "agreement_ref": "C05",
+      "payer_id": "P01",
+      "payee_id": "P03",
+      "invoice_id": "RENT-2027-01",
+      "amount": "60000",
+      "currency": "INR",
+      "bank_transaction_id": "BANK-PORTFOLIO-01"
+    }
+  },
+  {
+    "event_id": "UPLOAD1",
+    "event_type": "contract_received",
+    "occurred_at": "2027-01-25T09:00:00Z",
+    "received_at": "2027-01-25T09:00:00Z",
+    "source_ref": "record:UPLOAD1",
+    "payload": {
+      "agreement_ref": "C08",
+      "document_id": "C08",
+      "file": "inputs/contracts/C08.pdf",
+      "uploader_party_id": "P01"
+    }
+  }
+]

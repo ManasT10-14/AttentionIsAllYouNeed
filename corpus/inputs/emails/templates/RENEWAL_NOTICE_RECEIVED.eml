@@ -1,0 +1,15 @@
+From: operations@aurora.example
+To: odin-inbox@aurora.example
+Subject: [ODIN-EVENT] RENEWAL_NOTICE_RECEIVED C05
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+EVENT_ID: EVT-TEMPLATE-12
+EVENT_TYPE: RENEWAL_NOTICE_RECEIVED
+OCCURRED_AT: 2027-02-11T09:00:00Z
+CONTRACT_ID: C05
+REFERENCE: UNIT-5 NON-RENEWAL
+DESCRIPTION:
+Receipt addressed to notices@willow.example from authorized sender Mira Sen w=
+ith subject UNIT-5 NON-RENEWAL.

@@ -1,0 +1,32 @@
+{
+  "dataset": "odin-agent-goldens",
+  "evaluator_only": true,
+  "agents": [
+    "odin",
+    "thor",
+    "norns",
+    "loki",
+    "heimdall",
+    "tyr"
+  ],
+  "scenario_count": 64,
+  "agent_scenario_vectors": 384,
+  "thor_contract_goldens": 15,
+  "typed_extraction_assertions": 114,
+  "verified_citation_units": 276,
+  "worked_scenarios": [
+    "AMB-01",
+    "DEMO-PORTFOLIO",
+    "LINK-01",
+    "OUT-07",
+    "PAY-03",
+    "PROJECT-B"
+  ],
+  "status": "Authored expected outputs and rubrics; no agent execution or independent human review claimed.",
+  "source_hashes": {
+    "manifest.json": "d713a24b1da98ea85e34cf3d6274f81739d780fa786b0fac4aff9e193efb2264",
+    "oracle/expected_cases.json": "c64d24fd307e72e9eb3e573a034baabc7631c6715e75ab15fd159c0215d579ec",
+    "oracle/expected_terms.json": "f1c26ec31e2cbbd98eb3ebb4622824453712fc88410c90ed3f863b8835359695",
+    "oracle/evidence_index.json": "eeea3f987204545d1cc718061f6f6b027814f36f96a9895540b39c100d7aa009"
+  }
+}

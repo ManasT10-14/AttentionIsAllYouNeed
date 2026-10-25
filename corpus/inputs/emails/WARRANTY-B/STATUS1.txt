@@ -1,0 +1,16 @@
+Subject: [ODIN-EVENT] CUSTOM C15
+
+EVENT_ID: EVT-WARRANTY-B-STATUS1
+EVENT_TYPE: CUSTOM
+OCCURRED_AT: 2027-05-14T09:00:00Z
+CONTRACT_ID: C15
+REFERENCE: record:STATUS1
+DESCRIPTION:
+{
+  "observation_type": "replacement_status_recorded",
+  "source_ref": "record:STATUS1",
+  "agreement_ref": "C15",
+  "claim_id": "RMA-001",
+  "replacement_received": false,
+  "recorded_by": "Mira Sen"
+}

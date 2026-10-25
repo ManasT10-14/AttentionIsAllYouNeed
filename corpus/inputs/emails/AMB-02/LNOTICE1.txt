@@ -1,0 +1,18 @@
+Subject: [ODIN-EVENT] RENEWAL_NOTICE_RECEIVED C06
+
+EVENT_ID: EVT-AMB-02-LNOTICE1
+EVENT_TYPE: RENEWAL_NOTICE_RECEIVED
+OCCURRED_AT: 2027-12-01T17:00:00Z
+CONTRACT_ID: C06
+REFERENCE: record:LNOTICE1
+DESCRIPTION:
+{
+  "observation_type": "notice_received",
+  "source_ref": "record:LNOTICE1",
+  "sender_party_id": "P01",
+  "recipient_party_id": "P02",
+  "recipient_address": "notices@forge.example",
+  "subject": "TOOL-CIRCUIT non-renewal",
+  "subscription_id": "TOOL-CIRCUIT",
+  "delivery_receipt": "record-circuit-receipt"
+}

@@ -17,3 +17,6 @@ reports/
 dist/
 build/
 *.egg-info/
+work/
+*.zip
+tokens/

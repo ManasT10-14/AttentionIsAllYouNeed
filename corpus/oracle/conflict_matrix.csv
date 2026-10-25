@@ -1,0 +1,9 @@
+contract_a,contract_b,issue,evidence,expected_supported_finding,case_ids
+C03,C04,delivery_gap,C03:2.1;C04:2.1,Upstream latest receipt 2027-02-10 follows downstream commitment 2027-02-08,DEP-01;DEP-02;DEP-03
+C01,C02,service_threshold_mismatch,C01:3.1;C02:5.1,More than 60 minutes upstream versus more than 30 minutes downstream,OUT-02;OUT-03;OUT-04
+C03,C08,exclusive_procurement_conflict,C03:17.1;C08:3.1,Exclusive Forge sourcing overlaps a separate Willow controller purchase,TRAP-04;ARR-01
+C04,C08,joint_forum_uncertainty,C04:8.1;C08:7.1,Pune and Mumbai scopes require separate consent for combined proceedings,JUR-01;JUR-02
+C05,C02,office_continuity_gap,C05:2.1;C02:7.1,Initial lease ends 2027-06-30; required UNIT-5 support runs through 2027-12-31,TRAP-05
+C01,C02,hosting_continuity_gap,C01:2.1;C02:3.1,Hosting ends 2027-12-14 without renewal; application service ends 2027-12-31,LINK-02
+C09,C14,backup_asset_continuity_gap,C09:2.1;C14:1.2;C14:5.1,Equipment hire ends 2027-06-30; dependent recovery runs through 2027-12-15,LINK-01
+C08,C08,internal_notice_contradiction,C08:18.1;C08:19.1,The same convenience termination carries both 30-day and 60-day notice with no hierarchy,TRAP-03

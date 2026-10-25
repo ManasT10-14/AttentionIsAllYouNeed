@@ -1,0 +1,24 @@
+{
+  "schema_version": "2.0",
+  "scenario_id": "ARR-01",
+  "baseline_clock": "2027-01-15T09:00:00Z",
+  "initial_contract_ids": [
+    "C02",
+    "C03",
+    "C04",
+    "C05"
+  ],
+  "events_file": "inputs/events/ARR-01.json",
+  "clock_checkpoints": [
+    "2027-01-15T09:00:00Z",
+    "2027-01-24T09:00:00Z",
+    "2027-01-25T09:00:00Z",
+    "2027-02-01T09:00:00Z"
+  ],
+  "reset_required": true,
+  "visibility_rule": "received_at <= clock; apply visible observations using occurred_at and contractual effective dates; retain as-known history",
+  "ingestion_rule": "Only initial PDFs are visible until a contract_received event releases its referenced PDF.",
+  "email_files": [
+    "inputs/emails/ARR-01/UPLOAD1.eml"
+  ]
+}

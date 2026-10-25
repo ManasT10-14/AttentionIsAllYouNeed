@@ -1,0 +1,17 @@
+Subject: [ODIN-EVENT] CUSTOM C14
+
+EVENT_ID: EVT-RECOVERY-B-ACT1
+EVENT_TYPE: CUSTOM
+OCCURRED_AT: 2027-03-02T08:00:00Z
+CONTRACT_ID: C14
+REFERENCE: record:ACT1
+DESCRIPTION:
+{
+  "observation_type": "recovery_activated",
+  "source_ref": "record:ACT1",
+  "agreement_ref": "C14",
+  "service_id": "DR-RESIDENT",
+  "activation_id": "REC-001",
+  "requested_by": "Kavya Paul",
+  "accepted_by": "Mira Sen"
+}

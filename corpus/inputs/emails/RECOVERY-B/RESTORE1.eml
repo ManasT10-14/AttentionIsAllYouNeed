@@ -1,0 +1,22 @@
+From: operations@aurora.example
+To: odin-inbox@aurora.example
+Subject: [ODIN-EVENT] CUSTOM C14
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+
+EVENT_ID: EVT-RECOVERY-B-RESTORE1
+EVENT_TYPE: CUSTOM
+OCCURRED_AT: 2027-03-02T13:00:00Z
+CONTRACT_ID: C14
+REFERENCE: record:RESTORE1
+DESCRIPTION:
+{
+  "observation_type": "recovery_completed",
+  "source_ref": "record:RESTORE1",
+  "agreement_ref": "C14",
+  "service_id": "DR-RESIDENT",
+  "activation_id": "REC-001",
+  "complete": true,
+  "record_ref": "RECOVERY-001"
+}

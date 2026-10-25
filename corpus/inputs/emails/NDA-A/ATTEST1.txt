@@ -1,0 +1,22 @@
+Subject: [ODIN-EVENT] CUSTOM C13
+
+EVENT_ID: EVT-NDA-A-ATTEST1
+EVENT_TYPE: CUSTOM
+OCCURRED_AT: 2027-05-11T17:00:00Z
+CONTRACT_ID: C13
+REFERENCE: record:ATTEST1
+DESCRIPTION:
+{
+  "observation_type": "return_attestation_received",
+  "source_ref": "record:ATTEST1",
+  "agreement_ref": "C13",
+  "request_id": "RETURN-ENG-001",
+  "material_refs": [
+    "AX-7 interface drawings",
+    "Connector source specification"
+  ],
+  "signed_by": "Mira Sen",
+  "signature_ref": "RETURN-ATTEST-001",
+  "method": "destroyed",
+  "retained_copies": []
+}

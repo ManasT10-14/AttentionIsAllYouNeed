@@ -1,0 +1,20 @@
+Subject: [ODIN-EVENT] INVOICE_RECEIVED C11
+
+EVENT_ID: EVT-PROJECT-A-INVOICE1
+EVENT_TYPE: INVOICE_RECEIVED
+OCCURRED_AT: 2027-01-31T12:30:00Z
+CONTRACT_ID: C11
+AMOUNT: INR 6,00,000
+REFERENCE: INT-M1-2027
+DESCRIPTION:
+{
+  "observation_type": "invoice_received",
+  "source_ref": "record:INVOICE1",
+  "agreement_ref": "C11",
+  "project_id": "INT-AX7",
+  "milestone_id": "M1",
+  "invoice_id": "INT-M1-2027",
+  "amount": "600000",
+  "currency": "INR",
+  "recipient_id": "P02"
+}

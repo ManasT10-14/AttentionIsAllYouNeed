@@ -1,0 +1,19 @@
+[
+  {
+    "event_id": "RETURN1",
+    "event_type": "equipment_return_received",
+    "occurred_at": "2027-06-30T17:00:00Z",
+    "received_at": "2027-06-30T17:00:00Z",
+    "source_ref": "record:RETURN1",
+    "payload": {
+      "agreement_ref": "C09",
+      "asset_ids": [
+        "EQ-DR01",
+        "EQ-DR02"
+      ],
+      "destination": "DEPOT-F",
+      "receipt_ref": "EQ-RETURN-001",
+      "recipient_party_id": "P02"
+    }
+  }
+]

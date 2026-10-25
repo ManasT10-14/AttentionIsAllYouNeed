@@ -1,0 +1,14 @@
+[
+  {
+    "event_id": "UPLOAD1",
+    "event_type": "contract_received",
+    "occurred_at": "2027-01-25T09:00:00Z",
+    "received_at": "2027-01-25T09:00:00Z",
+    "source_ref": "record:UPLOAD1",
+    "payload": {
+      "document_id": "C08",
+      "file": "inputs/contracts/C08.pdf",
+      "uploader_party_id": "P01"
+    }
+  }
+]

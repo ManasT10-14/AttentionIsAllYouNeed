@@ -1,0 +1,23 @@
+From: operations@aurora.example
+To: odin-inbox@aurora.example
+Subject: [ODIN-EVENT] CUSTOM C01
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+
+EVENT_ID: EVT-DEMO-PORTFOLIO-CLAIM1
+EVENT_TYPE: CUSTOM
+OCCURRED_AT: 2027-01-20T10:00:00Z
+CONTRACT_ID: C01
+REFERENCE: INC-PORTFOLIO-01
+DESCRIPTION:
+{
+  "observation_type": "service_credit_claim_received",
+  "source_ref": "record:CLAIM1",
+  "agreement_ref": "C01",
+  "incident_id": "INC-PORTFOLIO-01",
+  "sender_party_id": "P01",
+  "recipient_party_id": "P02",
+  "recipient_address": "claims@forge.example",
+  "receipt_ref": "CLAIM-PORTFOLIO-01"
+}

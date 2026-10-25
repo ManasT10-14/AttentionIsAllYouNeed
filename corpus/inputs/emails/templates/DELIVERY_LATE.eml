@@ -1,0 +1,14 @@
+From: operations@aurora.example
+To: odin-inbox@aurora.example
+Subject: [ODIN-EVENT] DELIVERY_LATE C03
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+
+EVENT_ID: EVT-TEMPLATE-07
+EVENT_TYPE: DELIVERY_LATE
+OCCURRED_AT: 2027-02-11T09:00:00Z
+CONTRACT_ID: C03
+REFERENCE: PO-AX7
+DESCRIPTION:
+LOT-AX7 has not arrived at DEPOT-A as of 2027-02-11T09:00:00Z.

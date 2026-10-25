@@ -1,0 +1,18 @@
+[
+  {
+    "event_id": "DISP1",
+    "event_type": "dispute_request_received",
+    "occurred_at": "2027-02-02T08:00:00Z",
+    "received_at": "2027-02-02T08:00:00Z",
+    "source_ref": "record:DISP1",
+    "payload": {
+      "requestor_id": "P03",
+      "requested_forum": "Mumbai",
+      "requested_scope": [
+        "SO-AX7",
+        "PROJECT-HABITAT"
+      ],
+      "request": "Combine controller-supply and deployment-partnership claims in one proceeding."
+    }
+  }
+]

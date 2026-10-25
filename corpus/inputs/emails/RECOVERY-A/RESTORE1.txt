@@ -1,0 +1,17 @@
+Subject: [ODIN-EVENT] CUSTOM C14
+
+EVENT_ID: EVT-RECOVERY-A-RESTORE1
+EVENT_TYPE: CUSTOM
+OCCURRED_AT: 2027-03-02T12:00:00Z
+CONTRACT_ID: C14
+REFERENCE: record:RESTORE1
+DESCRIPTION:
+{
+  "observation_type": "recovery_completed",
+  "source_ref": "record:RESTORE1",
+  "agreement_ref": "C14",
+  "service_id": "DR-RESIDENT",
+  "activation_id": "REC-001",
+  "complete": true,
+  "record_ref": "RECOVERY-001"
+}

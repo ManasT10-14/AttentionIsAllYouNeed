@@ -1,0 +1,15 @@
+From: operations@aurora.example
+To: odin-inbox@aurora.example
+Subject: [ODIN-EVENT] FORCE_MAJEURE ALL
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+EVENT_ID: EVT-TEMPLATE-14
+EVENT_TYPE: FORCE_MAJEURE
+OCCURRED_AT: 2027-02-11T09:00:00Z
+CONTRACT_ID: ALL
+COUNTERPARTY: Forge Electronics Private Limited
+DESCRIPTION:
+Supplier reports a flood affecting its depot and asks for relief. Causation a=
+nd mitigation evidence have not been supplied.

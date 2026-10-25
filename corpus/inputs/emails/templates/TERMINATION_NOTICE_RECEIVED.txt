@@ -1,0 +1,9 @@
+Subject: [ODIN-EVENT] TERMINATION_NOTICE_RECEIVED C03
+
+EVENT_ID: EVT-TEMPLATE-11
+EVENT_TYPE: TERMINATION_NOTICE_RECEIVED
+OCCURRED_AT: 2027-02-11T09:00:00Z
+CONTRACT_ID: C03
+COUNTERPARTY: Forge Electronics Private Limited
+DESCRIPTION:
+Supplier received a notice asserting termination for delivery breach. Check prior breach notice, cure evidence and authority before accepting its effect.

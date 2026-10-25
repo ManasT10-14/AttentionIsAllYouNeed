@@ -1,0 +1,19 @@
+Subject: [ODIN-EVENT] PAYMENT_MADE C05
+
+EVENT_ID: EVT-PAY-03-PAY1
+EVENT_TYPE: PAYMENT_MADE
+OCCURRED_AT: 2027-01-24T12:00:00Z
+CONTRACT_ID: C05
+AMOUNT: INR 60,000
+REFERENCE: RENT-2027-01
+DESCRIPTION:
+{
+  "observation_type": "payment_cleared",
+  "source_ref": "record:PAY1",
+  "payer_id": "P01",
+  "payee_id": "P03",
+  "invoice_id": "RENT-2027-01",
+  "amount": "60000",
+  "currency": "INR",
+  "bank_transaction_id": "BANK-001"
+}

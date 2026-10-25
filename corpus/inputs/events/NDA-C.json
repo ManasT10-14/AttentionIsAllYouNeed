@@ -1,0 +1,19 @@
+[
+  {
+    "event_id": "DISC1",
+    "event_type": "disclosure_recorded",
+    "occurred_at": "2027-05-03T10:00:00Z",
+    "received_at": "2027-05-03T10:00:00Z",
+    "source_ref": "record:DISC1",
+    "payload": {
+      "agreement_ref": "C13",
+      "material_ref": "AX-7 interface drawings",
+      "disclosed_by": "P01",
+      "recipient_party_id": "P03",
+      "authorisation_status": "not_granted",
+      "material_public": false,
+      "verified_by": "Mira Sen",
+      "record_ref": "DISC-001"
+    }
+  }
+]

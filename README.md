@@ -61,3 +61,10 @@ ui-dev/       placeholder React UI wired to every API endpoint (reference for th
 
 ## Tests
 `backend/.venv/Scripts/python -m pytest backend/tests -q`
+
+
+## Corpus and evaluation checkpoint
+
+The corpus branch is integrated here alongside the backend and the installable
+evaluation pipeline. Run commands from this repository root. See
+[Corpus documentation](corpus/README.md) and [Checkpoint handoff](docs/CHECKPOINT.md).

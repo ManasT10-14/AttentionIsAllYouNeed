@@ -1,0 +1,15 @@
+From: operations@aurora.example
+To: odin-inbox@aurora.example
+Subject: [ODIN-EVENT] PRICE_CHANGE C06
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+EVENT_ID: EVT-TEMPLATE-10
+EVENT_TYPE: PRICE_CHANGE
+OCCURRED_AT: 2027-02-11T09:00:00Z
+CONTRACT_ID: C06
+AMOUNT: INR 1,50,000
+DESCRIPTION:
+Vendor proposes an annual renewal price of INR 1,50,000. No signed price amen=
+dment is attached.

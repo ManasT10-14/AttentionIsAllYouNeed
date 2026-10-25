@@ -1,0 +1,26 @@
+From: operations@aurora.example
+To: odin-inbox@aurora.example
+Subject: [ODIN-EVENT] CUSTOM C13
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+
+EVENT_ID: EVT-NDA-A-REQ1
+EVENT_TYPE: CUSTOM
+OCCURRED_AT: 2027-05-01T09:00:00Z
+CONTRACT_ID: C13
+REFERENCE: record:REQ1
+DESCRIPTION:
+{
+  "observation_type": "material_return_requested",
+  "source_ref": "record:REQ1",
+  "agreement_ref": "C13",
+  "request_id": "RETURN-ENG-001",
+  "sender_party_id": "P02",
+  "recipient_party_id": "P01",
+  "material_refs": [
+    "AX-7 interface drawings",
+    "Connector source specification"
+  ],
+  "receipt_ref": "NDA-REQUEST-001"
+}

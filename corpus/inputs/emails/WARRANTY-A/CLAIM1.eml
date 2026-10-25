@@ -1,0 +1,27 @@
+From: operations@aurora.example
+To: odin-inbox@aurora.example
+Subject: [ODIN-EVENT] CUSTOM C15
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+
+EVENT_ID: EVT-WARRANTY-A-CLAIM1
+EVENT_TYPE: CUSTOM
+OCCURRED_AT: 2027-05-01T09:00:00Z
+CONTRACT_ID: C15
+REFERENCE: PO-AX7
+DESCRIPTION:
+{
+  "observation_type": "warranty_claim_received",
+  "source_ref": "record:CLAIM1",
+  "agreement_ref": "C15",
+  "claim_id": "RMA-001",
+  "serial_number": "AX7-SN001",
+  "order_id": "PO-AX7",
+  "original_acceptance_at": "2027-02-07T12:00:00Z",
+  "defect": "manufacturing solder failure",
+  "normal_use": true,
+  "unauthorised_modification": false,
+  "recipient_party_id": "P02",
+  "receipt_ref": "RMA-RECEIPT-001"
+}

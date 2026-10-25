@@ -1,0 +1,20 @@
+From: operations@aurora.example
+To: odin-inbox@aurora.example
+Subject: [ODIN-EVENT] CUSTOM C08
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+
+EVENT_ID: EVT-ARR-01-UPLOAD1
+EVENT_TYPE: CUSTOM
+OCCURRED_AT: 2027-01-25T09:00:00Z
+CONTRACT_ID: C08
+REFERENCE: record:UPLOAD1
+DESCRIPTION:
+{
+  "observation_type": "contract_received",
+  "source_ref": "record:UPLOAD1",
+  "document_id": "C08",
+  "file": "inputs/contracts/C08.pdf",
+  "uploader_party_id": "P01"
+}

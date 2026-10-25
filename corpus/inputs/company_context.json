@@ -1,0 +1,193 @@
+{
+  "company_id": "P01",
+  "company_name": "Aurora Software Private Limited",
+  "industry": "B2B software and electronics integration",
+  "jurisdictions": [
+    "IN",
+    "EU"
+  ],
+  "headquarters": "Bengaluru, India",
+  "fiscal_year_start": "04-01",
+  "base_currency": "INR",
+  "risk_appetite": "low",
+  "approval_threshold_inr": "1000000",
+  "key_contacts": [
+    "aurora-legal@aurora.example",
+    "cfo@aurora.example"
+  ],
+  "strategic_priorities": [
+    "Reduce vendor lock-in",
+    "Deliver INT-AX7",
+    "Protect resident data",
+    "Maintain service and recovery continuity"
+  ],
+  "critical_dependencies": [
+    "SVC-ATLAS hosting",
+    "AX-7 supply and warranty",
+    "UNIT-5 lease and maintenance",
+    "EQ-DR01/EQ-DR02 node hire",
+    "Resident portal and DS-HOUSING recovery"
+  ],
+  "contract_registry": [
+    {
+      "contract_id": "C01",
+      "title": "Cloud Hosting Agreement",
+      "party_ids": [
+        "P01",
+        "P02"
+      ],
+      "effective_date": "2026-12-15",
+      "document_form": "Hosting services undertaking"
+    },
+    {
+      "contract_id": "C02",
+      "title": "Customer Application Service Agreement",
+      "party_ids": [
+        "P01",
+        "P02"
+      ],
+      "effective_date": "2027-01-01",
+      "document_form": "Customer letter agreement"
+    },
+    {
+      "contract_id": "C03",
+      "title": "Component Supplier Agreement",
+      "party_ids": [
+        "P01",
+        "P02"
+      ],
+      "effective_date": "2027-01-05",
+      "document_form": "Purchase order conditions"
+    },
+    {
+      "contract_id": "C04",
+      "title": "Customer Controller Supply Agreement",
+      "party_ids": [
+        "P01",
+        "P03"
+      ],
+      "effective_date": "2027-01-08",
+      "document_form": "Sales order acceptance"
+    },
+    {
+      "contract_id": "C05",
+      "title": "Office Lease",
+      "party_ids": [
+        "P01",
+        "P03"
+      ],
+      "effective_date": "2027-01-03",
+      "document_form": "Lease deed"
+    },
+    {
+      "contract_id": "C06",
+      "title": "Firmware Development Software Subscription",
+      "party_ids": [
+        "P01",
+        "P02"
+      ],
+      "effective_date": "2027-01-10",
+      "document_form": "Software subscription order"
+    },
+    {
+      "contract_id": "C07",
+      "title": "Resident Data Processing and Confidentiality Agreement",
+      "party_ids": [
+        "P01",
+        "P03"
+      ],
+      "effective_date": "2027-01-12",
+      "document_form": "Processing instruction agreement"
+    },
+    {
+      "contract_id": "C09",
+      "title": "Equipment Hire Deed",
+      "party_ids": [
+        "P01",
+        "P02"
+      ],
+      "effective_date": "2027-01-04",
+      "document_form": "Equipment hire deed"
+    },
+    {
+      "contract_id": "C10",
+      "title": "Resident Portal Service Order",
+      "party_ids": [
+        "P01",
+        "P03"
+      ],
+      "effective_date": "2027-01-07",
+      "document_form": "SaaS commercial order"
+    },
+    {
+      "contract_id": "C11",
+      "title": "Controller Integration Statement of Work",
+      "party_ids": [
+        "P01",
+        "P02"
+      ],
+      "effective_date": "2027-01-09",
+      "document_form": "Milestone statement of work"
+    },
+    {
+      "contract_id": "C12",
+      "title": "UNIT-5 Emergency Maintenance Work Order",
+      "party_ids": [
+        "P01",
+        "P03"
+      ],
+      "effective_date": "2027-01-11",
+      "document_form": "Facilities work order"
+    },
+    {
+      "contract_id": "C13",
+      "title": "Mutual Engineering Confidentiality Undertaking",
+      "party_ids": [
+        "P01",
+        "P02"
+      ],
+      "effective_date": "2026-12-20",
+      "document_form": "Mutual confidentiality undertaking"
+    },
+    {
+      "contract_id": "C14",
+      "title": "Resident-Service Recovery Schedule",
+      "party_ids": [
+        "P01",
+        "P03"
+      ],
+      "effective_date": "2027-01-13",
+      "document_form": "Recovery service schedule"
+    },
+    {
+      "contract_id": "C15",
+      "title": "AX-7 Product Warranty Undertaking",
+      "party_ids": [
+        "P01",
+        "P02"
+      ],
+      "effective_date": "2027-01-14",
+      "document_form": "Product warranty undertaking"
+    }
+  ],
+  "timezone": "UTC",
+  "baseline_clock": "2027-01-15T09:00:00Z",
+  "parties": [
+    {
+      "party_id": "P01",
+      "legal_name": "Aurora Software Private Limited",
+      "sector": "software"
+    },
+    {
+      "party_id": "P02",
+      "legal_name": "Forge Electronics Private Limited",
+      "sector": "electronics"
+    },
+    {
+      "party_id": "P03",
+      "legal_name": "Willow Housing Private Limited",
+      "sector": "housing"
+    }
+  ],
+  "initial_records": "Only records explicitly supplied in a scenario exist; earlier term balances are outside this dataset."
+}

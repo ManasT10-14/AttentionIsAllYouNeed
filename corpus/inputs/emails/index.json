@@ -1,0 +1,694 @@
+[
+  {
+    "scenario_id": "REN-01",
+    "source_event_id": "NOTICE1",
+    "email_event_id": "EVT-REN-01-NOTICE1",
+    "received_at": "2027-05-31T17:00:00Z",
+    "file": "inputs/emails/REN-01/NOTICE1.eml",
+    "copy_text": "inputs/emails/REN-01/NOTICE1.txt"
+  },
+  {
+    "scenario_id": "REN-02",
+    "source_event_id": "NOTICE1",
+    "email_event_id": "EVT-REN-02-NOTICE1",
+    "received_at": "2027-05-31T17:00:01Z",
+    "file": "inputs/emails/REN-02/NOTICE1.eml",
+    "copy_text": "inputs/emails/REN-02/NOTICE1.txt"
+  },
+  {
+    "scenario_id": "REN-03",
+    "source_event_id": "NOTICE1",
+    "email_event_id": "EVT-REN-03-NOTICE1",
+    "received_at": "2027-05-30T12:00:00Z",
+    "file": "inputs/emails/REN-03/NOTICE1.eml",
+    "copy_text": "inputs/emails/REN-03/NOTICE1.txt"
+  },
+  {
+    "scenario_id": "PAY-03",
+    "source_event_id": "PAY1",
+    "email_event_id": "EVT-PAY-03-PAY1",
+    "received_at": "2027-01-24T12:00:00Z",
+    "file": "inputs/emails/PAY-03/PAY1.eml",
+    "copy_text": "inputs/emails/PAY-03/PAY1.txt"
+  },
+  {
+    "scenario_id": "PAY-04",
+    "source_event_id": "PAY1",
+    "email_event_id": "EVT-PAY-04-PAY1",
+    "received_at": "2027-01-24T12:00:00Z",
+    "file": "inputs/emails/PAY-04/PAY1.eml",
+    "copy_text": "inputs/emails/PAY-04/PAY1.txt"
+  },
+  {
+    "scenario_id": "PAY-05",
+    "source_event_id": "PAY1",
+    "email_event_id": "EVT-PAY-05-PAY1",
+    "received_at": "2027-01-24T12:00:00Z",
+    "file": "inputs/emails/PAY-05/PAY1.eml",
+    "copy_text": "inputs/emails/PAY-05/PAY1.txt"
+  },
+  {
+    "scenario_id": "PAY-05",
+    "source_event_id": "PAY2",
+    "email_event_id": "EVT-PAY-05-PAY2",
+    "received_at": "2027-01-24T12:00:00Z",
+    "file": "inputs/emails/PAY-05/PAY2.eml",
+    "copy_text": "inputs/emails/PAY-05/PAY2.txt"
+  },
+  {
+    "scenario_id": "PAY-07",
+    "source_event_id": "PAY1",
+    "email_event_id": "EVT-PAY-07-PAY1",
+    "received_at": "2027-01-29T09:00:00Z",
+    "file": "inputs/emails/PAY-07/PAY1.eml",
+    "copy_text": "inputs/emails/PAY-07/PAY1.txt"
+  },
+  {
+    "scenario_id": "DEP-02",
+    "source_event_id": "DEL1",
+    "email_event_id": "EVT-DEP-02-DEL1",
+    "received_at": "2027-02-07T08:00:00Z",
+    "file": "inputs/emails/DEP-02/DEL1.eml",
+    "copy_text": "inputs/emails/DEP-02/DEL1.txt"
+  },
+  {
+    "scenario_id": "DEP-02",
+    "source_event_id": "DEL2",
+    "email_event_id": "EVT-DEP-02-DEL2",
+    "received_at": "2027-02-07T12:00:00Z",
+    "file": "inputs/emails/DEP-02/DEL2.eml",
+    "copy_text": "inputs/emails/DEP-02/DEL2.txt"
+  },
+  {
+    "scenario_id": "OUT-01",
+    "source_event_id": "OUT1",
+    "email_event_id": "EVT-OUT-01-OUT1",
+    "received_at": "2027-01-16T10:30:00Z",
+    "file": "inputs/emails/OUT-01/OUT1.eml",
+    "copy_text": "inputs/emails/OUT-01/OUT1.txt"
+  },
+  {
+    "scenario_id": "OUT-02",
+    "source_event_id": "OUT1",
+    "email_event_id": "EVT-OUT-02-OUT1",
+    "received_at": "2027-01-16T10:45:00Z",
+    "file": "inputs/emails/OUT-02/OUT1.eml",
+    "copy_text": "inputs/emails/OUT-02/OUT1.txt"
+  },
+  {
+    "scenario_id": "OUT-03",
+    "source_event_id": "OUT1",
+    "email_event_id": "EVT-OUT-03-OUT1",
+    "received_at": "2027-01-16T11:00:00Z",
+    "file": "inputs/emails/OUT-03/OUT1.eml",
+    "copy_text": "inputs/emails/OUT-03/OUT1.txt"
+  },
+  {
+    "scenario_id": "OUT-04",
+    "source_event_id": "OUT1",
+    "email_event_id": "EVT-OUT-04-OUT1",
+    "received_at": "2027-01-16T11:30:00Z",
+    "file": "inputs/emails/OUT-04/OUT1.eml",
+    "copy_text": "inputs/emails/OUT-04/OUT1.txt"
+  },
+  {
+    "scenario_id": "OUT-05",
+    "source_event_id": "APPROVAL1",
+    "email_event_id": "EVT-OUT-05-APPROVAL1",
+    "received_at": "2027-01-16T09:00:00Z",
+    "file": "inputs/emails/OUT-05/APPROVAL1.eml",
+    "copy_text": "inputs/emails/OUT-05/APPROVAL1.txt"
+  },
+  {
+    "scenario_id": "OUT-05",
+    "source_event_id": "OUT1",
+    "email_event_id": "EVT-OUT-05-OUT1",
+    "received_at": "2027-01-16T11:30:00Z",
+    "file": "inputs/emails/OUT-05/OUT1.eml",
+    "copy_text": "inputs/emails/OUT-05/OUT1.txt"
+  },
+  {
+    "scenario_id": "OUT-06",
+    "source_event_id": "OUT1",
+    "email_event_id": "EVT-OUT-06-OUT1",
+    "received_at": "2027-01-16T11:30:00Z",
+    "file": "inputs/emails/OUT-06/OUT1.eml",
+    "copy_text": "inputs/emails/OUT-06/OUT1.txt"
+  },
+  {
+    "scenario_id": "OUT-07",
+    "source_event_id": "OUT1",
+    "email_event_id": "EVT-OUT-07-OUT1",
+    "received_at": "2027-01-16T11:30:00Z",
+    "file": "inputs/emails/OUT-07/OUT1.eml",
+    "copy_text": "inputs/emails/OUT-07/OUT1.txt"
+  },
+  {
+    "scenario_id": "OUT-07",
+    "source_event_id": "APPROVAL1",
+    "email_event_id": "EVT-OUT-07-APPROVAL1",
+    "received_at": "2027-01-17T09:00:00Z",
+    "file": "inputs/emails/OUT-07/APPROVAL1.eml",
+    "copy_text": "inputs/emails/OUT-07/APPROVAL1.txt"
+  },
+  {
+    "scenario_id": "OUT-08",
+    "source_event_id": "OUT1",
+    "email_event_id": "EVT-OUT-08-OUT1",
+    "received_at": "2027-01-16T11:30:00Z",
+    "file": "inputs/emails/OUT-08/OUT1.eml",
+    "copy_text": "inputs/emails/OUT-08/OUT1.txt"
+  },
+  {
+    "scenario_id": "OUT-08",
+    "source_event_id": "OUT2",
+    "email_event_id": "EVT-OUT-08-OUT2",
+    "received_at": "2027-01-17T11:30:00Z",
+    "file": "inputs/emails/OUT-08/OUT2.eml",
+    "copy_text": "inputs/emails/OUT-08/OUT2.txt"
+  },
+  {
+    "scenario_id": "OUT-08",
+    "source_event_id": "OUT3",
+    "email_event_id": "EVT-OUT-08-OUT3",
+    "received_at": "2027-01-18T11:30:00Z",
+    "file": "inputs/emails/OUT-08/OUT3.eml",
+    "copy_text": "inputs/emails/OUT-08/OUT3.txt"
+  },
+  {
+    "scenario_id": "OUT-09",
+    "source_event_id": "OUT-DUP",
+    "email_event_id": "EVT-OUT-09-OUT-DUP",
+    "received_at": "2027-01-16T11:30:00Z",
+    "file": "inputs/emails/OUT-09/OUT-DUP.eml",
+    "copy_text": "inputs/emails/OUT-09/OUT-DUP.txt"
+  },
+  {
+    "scenario_id": "OUT-09",
+    "source_event_id": "OUT1",
+    "email_event_id": "EVT-OUT-09-OUT1",
+    "received_at": "2027-01-16T11:30:00Z",
+    "file": "inputs/emails/OUT-09/OUT1.eml",
+    "copy_text": "inputs/emails/OUT-09/OUT1.txt"
+  },
+  {
+    "scenario_id": "OUT-10",
+    "source_event_id": "OUT1",
+    "email_event_id": "EVT-OUT-10-OUT1",
+    "received_at": "2027-01-16T11:30:00Z",
+    "file": "inputs/emails/OUT-10/OUT1.eml",
+    "copy_text": "inputs/emails/OUT-10/OUT1.txt"
+  },
+  {
+    "scenario_id": "REG-01",
+    "source_event_id": "RULE1",
+    "email_event_id": "EVT-REG-01-RULE1",
+    "received_at": "2027-03-20T09:00:00Z",
+    "file": "inputs/emails/REG-01/RULE1.eml",
+    "copy_text": "inputs/emails/REG-01/RULE1.txt"
+  },
+  {
+    "scenario_id": "REG-02",
+    "source_event_id": "RULE1",
+    "email_event_id": "EVT-REG-02-RULE1",
+    "received_at": "2027-03-20T09:00:00Z",
+    "file": "inputs/emails/REG-02/RULE1.eml",
+    "copy_text": "inputs/emails/REG-02/RULE1.txt"
+  },
+  {
+    "scenario_id": "REG-02",
+    "source_event_id": "ATT1",
+    "email_event_id": "EVT-REG-02-ATT1",
+    "received_at": "2027-03-31T12:00:00Z",
+    "file": "inputs/emails/REG-02/ATT1.eml",
+    "copy_text": "inputs/emails/REG-02/ATT1.txt"
+  },
+  {
+    "scenario_id": "REG-03",
+    "source_event_id": "RULE1",
+    "email_event_id": "EVT-REG-03-RULE1",
+    "received_at": "2027-03-20T09:00:00Z",
+    "file": "inputs/emails/REG-03/RULE1.eml",
+    "copy_text": "inputs/emails/REG-03/RULE1.txt"
+  },
+  {
+    "scenario_id": "REG-04",
+    "source_event_id": "RULE1",
+    "email_event_id": "EVT-REG-04-RULE1",
+    "received_at": "2027-04-02T09:00:00Z",
+    "file": "inputs/emails/REG-04/RULE1.eml",
+    "copy_text": "inputs/emails/REG-04/RULE1.txt"
+  },
+  {
+    "scenario_id": "JUR-01",
+    "source_event_id": "DISP1",
+    "email_event_id": "EVT-JUR-01-DISP1",
+    "received_at": "2027-02-02T08:00:00Z",
+    "file": "inputs/emails/JUR-01/DISP1.eml",
+    "copy_text": "inputs/emails/JUR-01/DISP1.txt"
+  },
+  {
+    "scenario_id": "CUR-01",
+    "source_event_id": "BREACH1",
+    "email_event_id": "EVT-CUR-01-BREACH1",
+    "received_at": "2027-02-11T09:00:00Z",
+    "file": "inputs/emails/CUR-01/BREACH1.eml",
+    "copy_text": "inputs/emails/CUR-01/BREACH1.txt"
+  },
+  {
+    "scenario_id": "CUR-02",
+    "source_event_id": "BREACH1",
+    "email_event_id": "EVT-CUR-02-BREACH1",
+    "received_at": "2027-02-11T09:00:00Z",
+    "file": "inputs/emails/CUR-02/BREACH1.eml",
+    "copy_text": "inputs/emails/CUR-02/BREACH1.txt"
+  },
+  {
+    "scenario_id": "CUR-03",
+    "source_event_id": "BREACH1",
+    "email_event_id": "EVT-CUR-03-BREACH1",
+    "received_at": "2027-02-11T09:00:00Z",
+    "file": "inputs/emails/CUR-03/BREACH1.eml",
+    "copy_text": "inputs/emails/CUR-03/BREACH1.txt"
+  },
+  {
+    "scenario_id": "CUR-03",
+    "source_event_id": "DEL1",
+    "email_event_id": "EVT-CUR-03-DEL1",
+    "received_at": "2027-02-21T16:00:00Z",
+    "file": "inputs/emails/CUR-03/DEL1.eml",
+    "copy_text": "inputs/emails/CUR-03/DEL1.txt"
+  },
+  {
+    "scenario_id": "AMB-01",
+    "source_event_id": "EXIT1",
+    "email_event_id": "EVT-AMB-01-EXIT1",
+    "received_at": "2027-02-01T08:00:00Z",
+    "file": "inputs/emails/AMB-01/EXIT1.eml",
+    "copy_text": "inputs/emails/AMB-01/EXIT1.txt"
+  },
+  {
+    "scenario_id": "AMB-02",
+    "source_event_id": "LNOTICE1",
+    "email_event_id": "EVT-AMB-02-LNOTICE1",
+    "received_at": "2027-12-01T17:00:00Z",
+    "file": "inputs/emails/AMB-02/LNOTICE1.eml",
+    "copy_text": "inputs/emails/AMB-02/LNOTICE1.txt"
+  },
+  {
+    "scenario_id": "ARR-01",
+    "source_event_id": "UPLOAD1",
+    "email_event_id": "EVT-ARR-01-UPLOAD1",
+    "received_at": "2027-01-25T09:00:00Z",
+    "file": "inputs/emails/ARR-01/UPLOAD1.eml",
+    "copy_text": "inputs/emails/ARR-01/UPLOAD1.txt"
+  },
+  {
+    "scenario_id": "OUT-11",
+    "source_event_id": "OUT1",
+    "email_event_id": "EVT-OUT-11-OUT1",
+    "received_at": "2027-01-16T11:30:00Z",
+    "file": "inputs/emails/OUT-11/OUT1.eml",
+    "copy_text": "inputs/emails/OUT-11/OUT1.txt"
+  },
+  {
+    "scenario_id": "OUT-11",
+    "source_event_id": "CORR1",
+    "email_event_id": "EVT-OUT-11-CORR1",
+    "received_at": "2027-01-17T09:00:00Z",
+    "file": "inputs/emails/OUT-11/CORR1.eml",
+    "copy_text": "inputs/emails/OUT-11/CORR1.txt"
+  },
+  {
+    "scenario_id": "TRAP-01",
+    "source_event_id": "CHANGE1",
+    "email_event_id": "EVT-TRAP-01-CHANGE1",
+    "received_at": "2027-01-19T09:00:00Z",
+    "file": "inputs/emails/TRAP-01/CHANGE1.eml",
+    "copy_text": "inputs/emails/TRAP-01/CHANGE1.txt"
+  },
+  {
+    "scenario_id": "TRAP-02",
+    "source_event_id": "DEL1",
+    "email_event_id": "EVT-TRAP-02-DEL1",
+    "received_at": "2027-02-07T12:00:00Z",
+    "file": "inputs/emails/TRAP-02/DEL1.eml",
+    "copy_text": "inputs/emails/TRAP-02/DEL1.txt"
+  },
+  {
+    "scenario_id": "TRAP-02",
+    "source_event_id": "INV1",
+    "email_event_id": "EVT-TRAP-02-INV1",
+    "received_at": "2027-02-07T12:00:00Z",
+    "file": "inputs/emails/TRAP-02/INV1.eml",
+    "copy_text": "inputs/emails/TRAP-02/INV1.txt"
+  },
+  {
+    "scenario_id": "TRAP-05",
+    "source_event_id": "NOTICE1",
+    "email_event_id": "EVT-TRAP-05-NOTICE1",
+    "received_at": "2027-05-31T17:00:00Z",
+    "file": "inputs/emails/TRAP-05/NOTICE1.eml",
+    "copy_text": "inputs/emails/TRAP-05/NOTICE1.txt"
+  },
+  {
+    "scenario_id": "HIRE-A",
+    "source_event_id": "RETURN1",
+    "email_event_id": "EVT-HIRE-A-RETURN1",
+    "received_at": "2027-06-30T17:00:00Z",
+    "file": "inputs/emails/HIRE-A/RETURN1.eml",
+    "copy_text": "inputs/emails/HIRE-A/RETURN1.txt"
+  },
+  {
+    "scenario_id": "HIRE-B",
+    "source_event_id": "RETURN1",
+    "email_event_id": "EVT-HIRE-B-RETURN1",
+    "received_at": "2027-07-03T12:00:00Z",
+    "file": "inputs/emails/HIRE-B/RETURN1.eml",
+    "copy_text": "inputs/emails/HIRE-B/RETURN1.txt"
+  },
+  {
+    "scenario_id": "PORTAL-A",
+    "source_event_id": "REPORT1",
+    "email_event_id": "EVT-PORTAL-A-REPORT1",
+    "received_at": "2027-03-01T09:00:00Z",
+    "file": "inputs/emails/PORTAL-A/REPORT1.eml",
+    "copy_text": "inputs/emails/PORTAL-A/REPORT1.txt"
+  },
+  {
+    "scenario_id": "PORTAL-B",
+    "source_event_id": "REPORT1",
+    "email_event_id": "EVT-PORTAL-B-REPORT1",
+    "received_at": "2027-03-01T09:00:00Z",
+    "file": "inputs/emails/PORTAL-B/REPORT1.eml",
+    "copy_text": "inputs/emails/PORTAL-B/REPORT1.txt"
+  },
+  {
+    "scenario_id": "PROJECT-A",
+    "source_event_id": "ACCEPT1",
+    "email_event_id": "EVT-PROJECT-A-ACCEPT1",
+    "received_at": "2027-01-31T12:00:00Z",
+    "file": "inputs/emails/PROJECT-A/ACCEPT1.eml",
+    "copy_text": "inputs/emails/PROJECT-A/ACCEPT1.txt"
+  },
+  {
+    "scenario_id": "PROJECT-A",
+    "source_event_id": "INVOICE1",
+    "email_event_id": "EVT-PROJECT-A-INVOICE1",
+    "received_at": "2027-01-31T12:30:00Z",
+    "file": "inputs/emails/PROJECT-A/INVOICE1.eml",
+    "copy_text": "inputs/emails/PROJECT-A/INVOICE1.txt"
+  },
+  {
+    "scenario_id": "PROJECT-B",
+    "source_event_id": "ACCEPT1",
+    "email_event_id": "EVT-PROJECT-B-ACCEPT1",
+    "received_at": "2027-01-31T12:00:00Z",
+    "file": "inputs/emails/PROJECT-B/ACCEPT1.eml",
+    "copy_text": "inputs/emails/PROJECT-B/ACCEPT1.txt"
+  },
+  {
+    "scenario_id": "PROJECT-B",
+    "source_event_id": "INVOICE1",
+    "email_event_id": "EVT-PROJECT-B-INVOICE1",
+    "received_at": "2027-01-31T12:30:00Z",
+    "file": "inputs/emails/PROJECT-B/INVOICE1.eml",
+    "copy_text": "inputs/emails/PROJECT-B/INVOICE1.txt"
+  },
+  {
+    "scenario_id": "PROJECT-C",
+    "source_event_id": "STATUS1",
+    "email_event_id": "EVT-PROJECT-C-STATUS1",
+    "received_at": "2027-02-03T09:00:00Z",
+    "file": "inputs/emails/PROJECT-C/STATUS1.eml",
+    "copy_text": "inputs/emails/PROJECT-C/STATUS1.txt"
+  },
+  {
+    "scenario_id": "MAINT-A",
+    "source_event_id": "TICKET1",
+    "email_event_id": "EVT-MAINT-A-TICKET1",
+    "received_at": "2027-02-01T08:00:00Z",
+    "file": "inputs/emails/MAINT-A/TICKET1.eml",
+    "copy_text": "inputs/emails/MAINT-A/TICKET1.txt"
+  },
+  {
+    "scenario_id": "MAINT-A",
+    "source_event_id": "ACK1",
+    "email_event_id": "EVT-MAINT-A-ACK1",
+    "received_at": "2027-02-01T12:00:00Z",
+    "file": "inputs/emails/MAINT-A/ACK1.eml",
+    "copy_text": "inputs/emails/MAINT-A/ACK1.txt"
+  },
+  {
+    "scenario_id": "MAINT-B",
+    "source_event_id": "TICKET1",
+    "email_event_id": "EVT-MAINT-B-TICKET1",
+    "received_at": "2027-02-01T08:00:00Z",
+    "file": "inputs/emails/MAINT-B/TICKET1.eml",
+    "copy_text": "inputs/emails/MAINT-B/TICKET1.txt"
+  },
+  {
+    "scenario_id": "MAINT-B",
+    "source_event_id": "ACK1",
+    "email_event_id": "EVT-MAINT-B-ACK1",
+    "received_at": "2027-02-01T12:00:01Z",
+    "file": "inputs/emails/MAINT-B/ACK1.eml",
+    "copy_text": "inputs/emails/MAINT-B/ACK1.txt"
+  },
+  {
+    "scenario_id": "MAINT-B",
+    "source_event_id": "COST1",
+    "email_event_id": "EVT-MAINT-B-COST1",
+    "received_at": "2027-02-01T13:00:00Z",
+    "file": "inputs/emails/MAINT-B/COST1.eml",
+    "copy_text": "inputs/emails/MAINT-B/COST1.txt"
+  },
+  {
+    "scenario_id": "NDA-A",
+    "source_event_id": "REQ1",
+    "email_event_id": "EVT-NDA-A-REQ1",
+    "received_at": "2027-05-01T09:00:00Z",
+    "file": "inputs/emails/NDA-A/REQ1.eml",
+    "copy_text": "inputs/emails/NDA-A/REQ1.txt"
+  },
+  {
+    "scenario_id": "NDA-A",
+    "source_event_id": "ATTEST1",
+    "email_event_id": "EVT-NDA-A-ATTEST1",
+    "received_at": "2027-05-11T17:00:00Z",
+    "file": "inputs/emails/NDA-A/ATTEST1.eml",
+    "copy_text": "inputs/emails/NDA-A/ATTEST1.txt"
+  },
+  {
+    "scenario_id": "NDA-B",
+    "source_event_id": "REQ1",
+    "email_event_id": "EVT-NDA-B-REQ1",
+    "received_at": "2027-05-01T09:00:00Z",
+    "file": "inputs/emails/NDA-B/REQ1.eml",
+    "copy_text": "inputs/emails/NDA-B/REQ1.txt"
+  },
+  {
+    "scenario_id": "NDA-C",
+    "source_event_id": "DISC1",
+    "email_event_id": "EVT-NDA-C-DISC1",
+    "received_at": "2027-05-03T10:00:00Z",
+    "file": "inputs/emails/NDA-C/DISC1.eml",
+    "copy_text": "inputs/emails/NDA-C/DISC1.txt"
+  },
+  {
+    "scenario_id": "RECOVERY-A",
+    "source_event_id": "ACT1",
+    "email_event_id": "EVT-RECOVERY-A-ACT1",
+    "received_at": "2027-03-02T08:00:00Z",
+    "file": "inputs/emails/RECOVERY-A/ACT1.eml",
+    "copy_text": "inputs/emails/RECOVERY-A/ACT1.txt"
+  },
+  {
+    "scenario_id": "RECOVERY-A",
+    "source_event_id": "RESTORE1",
+    "email_event_id": "EVT-RECOVERY-A-RESTORE1",
+    "received_at": "2027-03-02T12:00:00Z",
+    "file": "inputs/emails/RECOVERY-A/RESTORE1.eml",
+    "copy_text": "inputs/emails/RECOVERY-A/RESTORE1.txt"
+  },
+  {
+    "scenario_id": "RECOVERY-B",
+    "source_event_id": "ACT1",
+    "email_event_id": "EVT-RECOVERY-B-ACT1",
+    "received_at": "2027-03-02T08:00:00Z",
+    "file": "inputs/emails/RECOVERY-B/ACT1.eml",
+    "copy_text": "inputs/emails/RECOVERY-B/ACT1.txt"
+  },
+  {
+    "scenario_id": "RECOVERY-B",
+    "source_event_id": "RESTORE1",
+    "email_event_id": "EVT-RECOVERY-B-RESTORE1",
+    "received_at": "2027-03-02T13:00:00Z",
+    "file": "inputs/emails/RECOVERY-B/RESTORE1.eml",
+    "copy_text": "inputs/emails/RECOVERY-B/RESTORE1.txt"
+  },
+  {
+    "scenario_id": "WARRANTY-A",
+    "source_event_id": "CLAIM1",
+    "email_event_id": "EVT-WARRANTY-A-CLAIM1",
+    "received_at": "2027-05-01T09:00:00Z",
+    "file": "inputs/emails/WARRANTY-A/CLAIM1.eml",
+    "copy_text": "inputs/emails/WARRANTY-A/CLAIM1.txt"
+  },
+  {
+    "scenario_id": "WARRANTY-A",
+    "source_event_id": "REPLACE1",
+    "email_event_id": "EVT-WARRANTY-A-REPLACE1",
+    "received_at": "2027-05-11T17:00:00Z",
+    "file": "inputs/emails/WARRANTY-A/REPLACE1.eml",
+    "copy_text": "inputs/emails/WARRANTY-A/REPLACE1.txt"
+  },
+  {
+    "scenario_id": "WARRANTY-B",
+    "source_event_id": "CLAIM1",
+    "email_event_id": "EVT-WARRANTY-B-CLAIM1",
+    "received_at": "2027-05-01T09:00:00Z",
+    "file": "inputs/emails/WARRANTY-B/CLAIM1.eml",
+    "copy_text": "inputs/emails/WARRANTY-B/CLAIM1.txt"
+  },
+  {
+    "scenario_id": "WARRANTY-B",
+    "source_event_id": "STATUS1",
+    "email_event_id": "EVT-WARRANTY-B-STATUS1",
+    "received_at": "2027-05-14T09:00:00Z",
+    "file": "inputs/emails/WARRANTY-B/STATUS1.eml",
+    "copy_text": "inputs/emails/WARRANTY-B/STATUS1.txt"
+  },
+  {
+    "scenario_id": "DEMO-PORTFOLIO",
+    "source_event_id": "OUT1",
+    "email_event_id": "EVT-DEMO-PORTFOLIO-OUT1",
+    "received_at": "2027-01-16T11:30:00Z",
+    "file": "inputs/emails/DEMO-PORTFOLIO/OUT1.eml",
+    "copy_text": "inputs/emails/DEMO-PORTFOLIO/OUT1.txt"
+  },
+  {
+    "scenario_id": "DEMO-PORTFOLIO",
+    "source_event_id": "CLAIM1",
+    "email_event_id": "EVT-DEMO-PORTFOLIO-CLAIM1",
+    "received_at": "2027-01-20T10:00:00Z",
+    "file": "inputs/emails/DEMO-PORTFOLIO/CLAIM1.eml",
+    "copy_text": "inputs/emails/DEMO-PORTFOLIO/CLAIM1.txt"
+  },
+  {
+    "scenario_id": "DEMO-PORTFOLIO",
+    "source_event_id": "PAY1",
+    "email_event_id": "EVT-DEMO-PORTFOLIO-PAY1",
+    "received_at": "2027-01-24T12:00:00Z",
+    "file": "inputs/emails/DEMO-PORTFOLIO/PAY1.eml",
+    "copy_text": "inputs/emails/DEMO-PORTFOLIO/PAY1.txt"
+  },
+  {
+    "scenario_id": "DEMO-PORTFOLIO",
+    "source_event_id": "UPLOAD1",
+    "email_event_id": "EVT-DEMO-PORTFOLIO-UPLOAD1",
+    "received_at": "2027-01-25T09:00:00Z",
+    "file": "inputs/emails/DEMO-PORTFOLIO/UPLOAD1.eml",
+    "copy_text": "inputs/emails/DEMO-PORTFOLIO/UPLOAD1.txt"
+  },
+  {
+    "template_type": "PAYMENT_MADE",
+    "file": "inputs/emails/templates/PAYMENT_MADE.eml",
+    "copy_text": "inputs/emails/templates/PAYMENT_MADE.txt"
+  },
+  {
+    "template_type": "PAYMENT_LATE",
+    "file": "inputs/emails/templates/PAYMENT_LATE.eml",
+    "copy_text": "inputs/emails/templates/PAYMENT_LATE.txt"
+  },
+  {
+    "template_type": "PAYMENT_MISSED",
+    "file": "inputs/emails/templates/PAYMENT_MISSED.eml",
+    "copy_text": "inputs/emails/templates/PAYMENT_MISSED.txt"
+  },
+  {
+    "template_type": "INVOICE_RECEIVED",
+    "file": "inputs/emails/templates/INVOICE_RECEIVED.eml",
+    "copy_text": "inputs/emails/templates/INVOICE_RECEIVED.txt"
+  },
+  {
+    "template_type": "SERVICE_OUTAGE",
+    "file": "inputs/emails/templates/SERVICE_OUTAGE.eml",
+    "copy_text": "inputs/emails/templates/SERVICE_OUTAGE.txt"
+  },
+  {
+    "template_type": "SLA_BREACH",
+    "file": "inputs/emails/templates/SLA_BREACH.eml",
+    "copy_text": "inputs/emails/templates/SLA_BREACH.txt"
+  },
+  {
+    "template_type": "DELIVERY_LATE",
+    "file": "inputs/emails/templates/DELIVERY_LATE.eml",
+    "copy_text": "inputs/emails/templates/DELIVERY_LATE.txt"
+  },
+  {
+    "template_type": "DELIVERY_RECEIVED",
+    "file": "inputs/emails/templates/DELIVERY_RECEIVED.eml",
+    "copy_text": "inputs/emails/templates/DELIVERY_RECEIVED.txt"
+  },
+  {
+    "template_type": "REGULATORY_CHANGE",
+    "file": "inputs/emails/templates/REGULATORY_CHANGE.eml",
+    "copy_text": "inputs/emails/templates/REGULATORY_CHANGE.txt"
+  },
+  {
+    "template_type": "PRICE_CHANGE",
+    "file": "inputs/emails/templates/PRICE_CHANGE.eml",
+    "copy_text": "inputs/emails/templates/PRICE_CHANGE.txt"
+  },
+  {
+    "template_type": "TERMINATION_NOTICE_RECEIVED",
+    "file": "inputs/emails/templates/TERMINATION_NOTICE_RECEIVED.eml",
+    "copy_text": "inputs/emails/templates/TERMINATION_NOTICE_RECEIVED.txt"
+  },
+  {
+    "template_type": "RENEWAL_NOTICE_RECEIVED",
+    "file": "inputs/emails/templates/RENEWAL_NOTICE_RECEIVED.eml",
+    "copy_text": "inputs/emails/templates/RENEWAL_NOTICE_RECEIVED.txt"
+  },
+  {
+    "template_type": "PARTY_CHANGE",
+    "file": "inputs/emails/templates/PARTY_CHANGE.eml",
+    "copy_text": "inputs/emails/templates/PARTY_CHANGE.txt"
+  },
+  {
+    "template_type": "FORCE_MAJEURE",
+    "file": "inputs/emails/templates/FORCE_MAJEURE.eml",
+    "copy_text": "inputs/emails/templates/FORCE_MAJEURE.txt"
+  },
+  {
+    "template_type": "DISPUTE_RAISED",
+    "file": "inputs/emails/templates/DISPUTE_RAISED.eml",
+    "copy_text": "inputs/emails/templates/DISPUTE_RAISED.txt"
+  },
+  {
+    "template_type": "CUSTOM",
+    "file": "inputs/emails/templates/CUSTOM.eml",
+    "copy_text": "inputs/emails/templates/CUSTOM.txt"
+  },
+  {
+    "parser_fixture_id": "NO_EVENT_ID",
+    "file": "inputs/emails/parser/NO_EVENT_ID.eml",
+    "copy_text": "inputs/emails/parser/NO_EVENT_ID.txt"
+  },
+  {
+    "parser_fixture_id": "MISSING_KEYS",
+    "file": "inputs/emails/parser/MISSING_KEYS.eml",
+    "copy_text": "inputs/emails/parser/MISSING_KEYS.txt"
+  },
+  {
+    "parser_fixture_id": "INVALID_DATE",
+    "file": "inputs/emails/parser/INVALID_DATE.eml",
+    "copy_text": "inputs/emails/parser/INVALID_DATE.txt"
+  },
+  {
+    "parser_fixture_id": "INVALID_TYPE",
+    "file": "inputs/emails/parser/INVALID_TYPE.eml",
+    "copy_text": "inputs/emails/parser/INVALID_TYPE.txt"
+  }
+]

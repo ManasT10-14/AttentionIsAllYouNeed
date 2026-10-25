@@ -1,0 +1,20 @@
+{
+  "schema_version": "2.0",
+  "scenario_id": "CUR-03",
+  "baseline_clock": "2027-01-15T09:00:00Z",
+  "initial_contract_ids": [
+    "C03"
+  ],
+  "events_file": "inputs/events/CUR-03.json",
+  "clock_checkpoints": [
+    "2027-01-15T09:00:00Z",
+    "2027-02-21T17:00:01Z"
+  ],
+  "reset_required": true,
+  "visibility_rule": "received_at <= clock; apply visible observations using occurred_at and contractual effective dates; retain as-known history",
+  "ingestion_rule": "Only initial PDFs are visible until a contract_received event releases its referenced PDF.",
+  "email_files": [
+    "inputs/emails/CUR-03/BREACH1.eml",
+    "inputs/emails/CUR-03/DEL1.eml"
+  ]
+}

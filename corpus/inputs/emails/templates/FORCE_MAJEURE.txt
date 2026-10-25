@@ -1,0 +1,9 @@
+Subject: [ODIN-EVENT] FORCE_MAJEURE ALL
+
+EVENT_ID: EVT-TEMPLATE-14
+EVENT_TYPE: FORCE_MAJEURE
+OCCURRED_AT: 2027-02-11T09:00:00Z
+CONTRACT_ID: ALL
+COUNTERPARTY: Forge Electronics Private Limited
+DESCRIPTION:
+Supplier reports a flood affecting its depot and asks for relief. Causation and mitigation evidence have not been supplied.

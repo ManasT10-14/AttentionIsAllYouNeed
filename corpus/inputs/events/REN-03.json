@@ -1,0 +1,17 @@
+[
+  {
+    "event_id": "NOTICE1",
+    "event_type": "notice_received",
+    "occurred_at": "2027-05-30T12:00:00Z",
+    "received_at": "2027-05-30T12:00:00Z",
+    "source_ref": "record:NOTICE1",
+    "payload": {
+      "sender_party_id": "P01",
+      "recipient_party_id": "P03",
+      "recipient_address": "wrong@willow.example",
+      "subject": "UNIT-5 NON-RENEWAL",
+      "authorized_sender": "Mira Sen",
+      "delivery_receipt": "receipt-001"
+    }
+  }
+]

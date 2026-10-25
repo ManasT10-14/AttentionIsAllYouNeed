@@ -1,0 +1,16 @@
+From: operations@aurora.example
+To: odin-inbox@aurora.example
+Subject: [ODIN-EVENT] SERVICE_OUTAGE C01,C02
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+EVENT_ID: EVT-TEMPLATE-05
+EVENT_TYPE: SERVICE_OUTAGE
+OCCURRED_AT: 2027-02-11T09:00:00Z
+CONTRACT_ID: C01,C02
+COUNTERPARTY: Forge Electronics Private Limited
+REFERENCE: INC-DEMO-01
+DESCRIPTION:
+SVC-ATLAS and APP-ATLAS were unavailable from 2027-01-16T10:00:00Z through 20=
+27-01-16T11:30:00Z. This incident was unscheduled.

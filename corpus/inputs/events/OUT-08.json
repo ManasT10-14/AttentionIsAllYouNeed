@@ -1,0 +1,50 @@
+[
+  {
+    "event_id": "OUT1",
+    "event_type": "service_restored",
+    "occurred_at": "2027-01-16T11:30:00Z",
+    "received_at": "2027-01-16T11:30:00Z",
+    "source_ref": "record:OUT1",
+    "payload": {
+      "provider_id": "P02",
+      "service_id": "SVC-ATLAS",
+      "application_id": "APP-ATLAS",
+      "incident_id": "INC-OUT1",
+      "start": "2027-01-16T10:00:00Z",
+      "end": "2027-01-16T11:30:00Z",
+      "scheduled_maintenance": false
+    }
+  },
+  {
+    "event_id": "OUT2",
+    "event_type": "service_restored",
+    "occurred_at": "2027-01-17T11:30:00Z",
+    "received_at": "2027-01-17T11:30:00Z",
+    "source_ref": "record:OUT2",
+    "payload": {
+      "provider_id": "P02",
+      "service_id": "SVC-ATLAS",
+      "application_id": "APP-ATLAS",
+      "incident_id": "INC-OUT2",
+      "start": "2027-01-17T10:00:00Z",
+      "end": "2027-01-17T11:30:00Z",
+      "scheduled_maintenance": false
+    }
+  },
+  {
+    "event_id": "OUT3",
+    "event_type": "service_restored",
+    "occurred_at": "2027-01-18T11:30:00Z",
+    "received_at": "2027-01-18T11:30:00Z",
+    "source_ref": "record:OUT3",
+    "payload": {
+      "provider_id": "P02",
+      "service_id": "SVC-ATLAS",
+      "application_id": "APP-ATLAS",
+      "incident_id": "INC-OUT3",
+      "start": "2027-01-18T10:00:00Z",
+      "end": "2027-01-18T11:30:00Z",
+      "scheduled_maintenance": false
+    }
+  }
+]

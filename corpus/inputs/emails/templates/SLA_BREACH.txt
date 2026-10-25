@@ -1,0 +1,10 @@
+Subject: [ODIN-EVENT] SLA_BREACH C01,C02
+
+EVENT_ID: EVT-TEMPLATE-06
+EVENT_TYPE: SLA_BREACH
+OCCURRED_AT: 2027-02-11T09:00:00Z
+CONTRACT_ID: C01,C02
+REFERENCE: INC-DEMO-02
+SEVERITY_HINT: high
+DESCRIPTION:
+Sender alleges an SLA breach after 45 minutes of APP-ATLAS unavailability; verify the allegation against the agreements.

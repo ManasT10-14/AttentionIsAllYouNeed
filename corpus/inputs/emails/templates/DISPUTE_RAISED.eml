@@ -1,0 +1,15 @@
+From: operations@aurora.example
+To: odin-inbox@aurora.example
+Subject: [ODIN-EVENT] DISPUTE_RAISED C04,C08
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+EVENT_ID: EVT-TEMPLATE-15
+EVENT_TYPE: DISPUTE_RAISED
+OCCURRED_AT: 2027-02-11T09:00:00Z
+CONTRACT_ID: C04,C08
+COUNTERPARTY: Willow Housing Private Limited
+DESCRIPTION:
+Willow requests one Mumbai proceeding for SO-AX7 and PROJECT-HABITAT claims. =
+No joint forum agreement is attached.

@@ -1,0 +1,8 @@
+Subject: [ODIN-EVENT] CUSTOM UNKNOWN
+
+EVENT_ID: EVT-TEMPLATE-16
+EVENT_TYPE: CUSTOM
+OCCURRED_AT: 2027-01-16T10:30:00+05:30
+CONTRACT_ID: UNKNOWN
+DESCRIPTION:
+A document mentioning an AX-7 procurement commitment has arrived; identify the relevant agreements from the observation.

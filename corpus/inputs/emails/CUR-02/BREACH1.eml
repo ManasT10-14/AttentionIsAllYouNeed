@@ -1,0 +1,23 @@
+From: operations@aurora.example
+To: odin-inbox@aurora.example
+Subject: [ODIN-EVENT] CUSTOM C03
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+
+EVENT_ID: EVT-CUR-02-BREACH1
+EVENT_TYPE: CUSTOM
+OCCURRED_AT: 2027-02-11T09:00:00Z
+CONTRACT_ID: C03
+REFERENCE: PO-AX7
+DESCRIPTION:
+{
+  "observation_type": "notice_received",
+  "source_ref": "record:BREACH1",
+  "sender_party_id": "P01",
+  "recipient_party_id": "P02",
+  "recipient_address": "notices@forge.example",
+  "order_id": "PO-AX7",
+  "subject": "Delivery breach LOT-AX7",
+  "delivery_receipt": "record-notice-receipt"
+}

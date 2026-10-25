@@ -1,0 +1,23 @@
+From: operations@aurora.example
+To: odin-inbox@aurora.example
+Subject: [ODIN-EVENT] RENEWAL_NOTICE_RECEIVED C05
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+
+EVENT_ID: EVT-REN-03-NOTICE1
+EVENT_TYPE: RENEWAL_NOTICE_RECEIVED
+OCCURRED_AT: 2027-05-30T12:00:00Z
+CONTRACT_ID: C05
+REFERENCE: record:NOTICE1
+DESCRIPTION:
+{
+  "observation_type": "notice_received",
+  "source_ref": "record:NOTICE1",
+  "sender_party_id": "P01",
+  "recipient_party_id": "P03",
+  "recipient_address": "wrong@willow.example",
+  "subject": "UNIT-5 NON-RENEWAL",
+  "authorized_sender": "Mira Sen",
+  "delivery_receipt": "receipt-001"
+}

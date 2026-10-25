@@ -1,0 +1,14 @@
+[
+  {
+    "event_id": "CHANGE1",
+    "event_type": "change_request_received",
+    "occurred_at": "2027-01-19T09:00:00Z",
+    "received_at": "2027-01-19T09:00:00Z",
+    "source_ref": "record:CHANGE1",
+    "payload": {
+      "requestor_id": "P01",
+      "order_id": "PO-AX7",
+      "request": "Please propose an earlier delivery date."
+    }
+  }
+]

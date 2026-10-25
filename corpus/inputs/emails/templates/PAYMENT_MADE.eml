@@ -1,0 +1,15 @@
+From: operations@aurora.example
+To: odin-inbox@aurora.example
+Subject: [ODIN-EVENT] PAYMENT_MADE C05
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+
+EVENT_ID: EVT-TEMPLATE-01
+EVENT_TYPE: PAYMENT_MADE
+OCCURRED_AT: 2027-02-11T09:00:00Z
+CONTRACT_ID: C05
+AMOUNT: INR 60,000
+REFERENCE: RENT-2027-01
+DESCRIPTION:
+Bank transaction BANK-DEMO-01 cleared for the January rent invoice.

@@ -1,0 +1,25 @@
+From: operations@aurora.example
+To: odin-inbox@aurora.example
+Subject: [ODIN-EVENT] CUSTOM C07
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+
+EVENT_ID: EVT-REG-02-ATT1
+EVENT_TYPE: CUSTOM
+OCCURRED_AT: 2027-03-31T12:00:00Z
+CONTRACT_ID: C07
+REFERENCE: record:ATT1
+DESCRIPTION:
+{
+  "observation_type": "safeguard_attested",
+  "source_ref": "record:ATT1",
+  "processor_id": "P01",
+  "rule_id": "FDB-27-A",
+  "dataset_id": "DS-HOUSING",
+  "region_id": "REGION-NORTH",
+  "safeguards": [
+    "access-review-attestation"
+  ],
+  "signature_ref": "record-attestation-01"
+}
