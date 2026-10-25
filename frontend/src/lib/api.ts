@@ -49,8 +49,48 @@ export async function api<T = unknown>(path: string, options: RequestInit = {}):
     if (response.status === 401 && typeof window !== 'undefined') window.dispatchEvent(new Event('odin-session-expired'));
     throw new ApiError(response.status, text(record(record(body).detail).error ?? record(body).detail ?? record(body).error, 'Request failed (' + response.status + ').'), body);
   }
-  if ((options.method ?? 'GET') === 'GET') validatePayload(path, body);
+  if ((options.method ?? 'GET') === 'GET') { adaptPayload(path, body); validatePayload(path, body); }
   return body as T;
+}
+
+const META_KEYS = new Set(['confidence', 'citation', 'status', 'note', 'source']);
+const EXTRACTION_ONE = ['term', 'renewal', 'liability_cap', 'governing_law', 'forum', 'notice'];
+const EXTRACTION_LIST = ['payments', 'obligations', 'penalties', 'compliance', 'termination', 'periods', 'related_contracts'];
+/** Turns Thor's extraction object into the flat field list the contract detail renders. */
+export function extractionFields(extraction: ApiRecord): ApiRecord[] {
+  const field = (name: string, raw: unknown): ApiRecord => {
+    const f = record(raw); const value = Object.fromEntries(Object.entries(f).filter(([k]) => !META_KEYS.has(k)));
+    return { name, value: Object.keys(value).length === 1 && 'value' in value ? value.value : value, status: f.status, source: f.source, confidence: f.confidence, citation: f.citation, note: f.note };
+  };
+  return [
+    ...(Array.isArray(extraction.parties) && extraction.parties.length ? [{ name: 'parties', value: extraction.parties, status: 'found', source: 'sourced' }] : []),
+    ...EXTRACTION_ONE.filter(k => extraction[k]).map(k => field(k, extraction[k])),
+    ...EXTRACTION_LIST.flatMap(k => list(extraction[k]).map((item, i, all) => field(all.length > 1 ? `${k} ${i + 1}` : k, item))),
+  ];
+}
+/** Adds the field names the UI reads to backend payloads (docs/api-samples is the source of truth). Originals are kept. */
+export function adaptPayload(path: string, body: unknown) {
+  const route = path.split('?')[0];
+  const o = record(body);
+  const contract = (c: ApiRecord) => {
+    const meta = record(c.meta);
+    c.id ??= c.contract_id; c.parties ??= meta.parties; c.governing_law ??= meta.governing_law;
+    c.health_score ??= number(record(c.health).score) ?? number(c.health);
+    c.parse_warnings ??= c.warnings;
+    const x = record(c.extraction);
+    if (c.extraction && !('fields' in x)) c.extraction = { ...x, fields: extractionFields(x) };
+  };
+  const analysis = (a: ApiRecord) => { a.source ??= 'analysis'; };
+  if (route === '/api/contracts') list(body).forEach(contract);
+  else if (/^\/api\/contracts\/[^/]+$/.test(route)) contract(o);
+  else if (route === '/api/timeline' && !Array.isArray(o.entries)) o.entries = list(o.contracts).flatMap(c => list(c.entries)).sort((a, b) => text(a.date, '').localeCompare(text(b.date, '')));
+  else if (route === '/api/events') list(body).forEach(e => { e.date ??= e.occurred_at; e.type ??= e.event_type; e.title ??= e.subject; });
+  else if (route === '/api/actions') list(body).forEach(a => { a.needs_approval ??= a.needs_human_approval; });
+  else if (/^\/api\/actions\/[^/]+$/.test(route)) o.needs_approval ??= o.needs_human_approval;
+  else if (route === '/api/alerts') list(body).forEach(analysis);
+  else if (route === '/api/dashboard') list(o.alerts).forEach(analysis);
+  else if (route === '/api/debate') list(o.findings).forEach(f => { f.title ??= f.claim; });
+  else if (/^\/api\/contracts\/[^/]+\/diff$/.test(route)) list(o.changes).forEach(c => { c.kind ??= c.change; });
 }
 export function post<T = unknown>(path: string, body?: unknown) { return api<T>(path, { method: 'POST', body: body === undefined ? undefined : JSON.stringify(body) }); }
 export function viewerLink(citation: Citation) {

@@ -56,7 +56,7 @@ export function DownloadLink({ path, children }: { path: string; children: React
 export function FieldValue({ value }: { value: unknown }) {
   if (value === null || value === undefined) return <span className="muted-note">Not provided</span>;
   if (typeof value !== 'object') return <>{String(value)}</>;
-  if ('amount' in record(value)) return <>{formatMoney(value)}</>;
+  if (typeof record(value).amount === 'number' && typeof record(value).currency === 'string') return <>{formatMoney(value)}</>;
   if (Array.isArray(value)) return <>{value.map((item,i) => <div key={i}><FieldValue value={item} /></div>)}</>;
   return <dl className="record-fields">{Object.entries(record(value)).map(([key,val]) => <div key={key}><dt>{key.replaceAll('_',' ')}</dt><dd><FieldValue value={val} /></dd></div>)}</dl>;
 }
