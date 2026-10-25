@@ -34,36 +34,89 @@ def _soffice() -> Optional[str]:
     return None
 
 
-def docx_to_pdf(src: Path, dst: Path) -> list[str]:
-    """Returns warnings. Prefers LibreOffice (keeps Word auto-numbering)."""
-    office = _soffice()
-    if office:
-        with tempfile.TemporaryDirectory() as td:
-            subprocess.run([office, "--headless", "--convert-to", "pdf", "--outdir", td, str(src)],
-                           check=True, capture_output=True, timeout=120)
-            shutil.move(str(Path(td) / (src.stem + ".pdf")), dst)
-        return []
-    from docx import Document  # fallback: re-render paragraph text
+def docx_text(src: Path) -> str:
+    """Body text in document order (paragraphs + tables), with Word auto-numbers written out literally."""
+    from docx import Document
+    from docx.table import Table
+    from docx.text.paragraph import Paragraph
 
     doc = Document(str(src))
-    paras = [p.text for p in doc.paragraphs]
-    for t in doc.tables:
-        for row in t.rows:
-            paras.append(" | ".join(c.text.strip() for c in row.cells))
-    body = "".join(f"<p>{html.escape(p) or '&nbsp;'}</p>" for p in paras)
-    story = fitz.Story(html=f"<body style='font-family:sans-serif;font-size:10pt'>{body}</body>")
-    writer = fitz.DocumentWriter(str(dst))
-    rect = fitz.paper_rect("a4")
-    where = rect + (54, 54, -54, -54)
-    more = 1
-    while more:
-        dev = writer.begin_page(rect)
-        more, _ = story.place(where)
-        story.draw(dev)
-        writer.end_page()
-    writer.close()
-    return ["LibreOffice not found: DOCX rendered from plain text; Word auto-numbering is lost — "
-            "type clause numbers literally (spec §3.1)."]
+    num_part = doc.part.numbering_part.element
+
+    def fmt(num_id: str, lvl: int) -> str:
+        if num_part is None:
+            return ""
+        r = num_part.xpath(f"w:abstractNum[@w:abstractNumId=//w:num[@w:numId='{num_id}']/w:abstractNumId/@w:val]"
+                           f"/w:lvl[@w:ilvl='{lvl}']/w:numFmt/@w:val")
+        return r[0] if r else ""
+
+    counters: dict[str, list[int]] = {}
+    out: list[str] = []
+    for el in doc.element.body.iterchildren():
+        if el.tag.endswith("}p"):
+            p = Paragraph(el, doc)
+            pr = el.pPr.numPr if el.pPr is not None else None
+            if pr is None and p.style is not None and p.style.element.pPr is not None:
+                pr = p.style.element.pPr.numPr   # numbering inherited from a style (e.g. "List Number")
+            prefix = ""
+            if pr is not None and pr.numId is not None and fmt(str(pr.numId.val), pr.ilvl.val if pr.ilvl is not None else 0) == "decimal":
+                lvl = pr.ilvl.val if pr.ilvl is not None else 0
+                c = counters.setdefault(str(pr.numId.val), [])
+                del c[lvl + 1:]
+                c.extend([0] * (lvl + 1 - len(c)))
+                c[lvl] += 1
+                prefix = ".".join(map(str, c)) + ("." if lvl == 0 else "") + " "
+                if p.text.lstrip()[:1].isdigit():   # already typed literally
+                    prefix = ""
+            out.append(prefix + p.text)
+        elif el.tag.endswith("}tbl"):
+            for row in Table(el, doc).rows:
+                out.append(" | ".join(c.text.strip() for c in row.cells))
+    return "\n".join(out)
+
+
+def docx_to_pdf(src: Path, dst: Path) -> list[str]:
+    """Viewer PDF for a DOCX. LibreOffice (exact rendering) when installed; otherwise rendered from the
+    python-docx text. Returns warnings."""
+    office = _soffice()
+    if office:
+        try:
+            with tempfile.TemporaryDirectory() as td:
+                subprocess.run([office, "--headless", "--convert-to", "pdf", "--outdir", td, str(src)],
+                               check=True, capture_output=True, timeout=120)
+                shutil.move(str(Path(td) / (src.stem + ".pdf")), dst)
+            return []
+        except (subprocess.SubprocessError, OSError):
+            pass   # fall back to python-docx text
+    text_to_pdf(docx_text(src), dst)
+    return []
+
+
+def image_to_pdf(content: bytes, ext: str, dst: Path) -> None:
+    with fitz.open(stream=content, filetype=ext.lstrip(".")) as img:
+        dst.write_bytes(img.convert_to_pdf())
+
+
+_OCR = None
+# OCR often drops the space after "1." and inside all-caps cover keys ("CONTRACTID:")
+_OCR_GLUE = re.compile(r"^(\d{1,3}(?:\.\d{1,3}){0,3}\.)(?=[A-Za-z])|^(CONTRACT|EFFECTIVE|GOVERNING)(?=ID|TITLE|TYPE|DATE|LAW)")
+
+
+def _ocr_page(page) -> tuple[list[tuple[str, float, tuple[float, float, float, float]]], float]:
+    """RapidOCR on one page → ([(text, conf, (x0,y0,x1,y1) in PDF points)], mean confidence)."""
+    global _OCR
+    if _OCR is None:
+        from rapidocr_onnxruntime import RapidOCR   # lazy: onnx model load is slow
+        _OCR = RapidOCR()
+    zoom = 2.0
+    pix = page.get_pixmap(matrix=fitz.Matrix(zoom, zoom), colorspace=fitz.csGRAY)
+    res, _ = _OCR(pix.tobytes("png"))
+    out = []
+    for box, txt, conf in res or []:
+        txt = _OCR_GLUE.sub(lambda m: m.group(0) + " ", txt)
+        xs, ys = [pt[0] for pt in box], [pt[1] for pt in box]
+        out.append((txt, float(conf), (min(xs) / zoom, min(ys) / zoom, max(xs) / zoom, max(ys) / zoom)))
+    return out, (sum(o[1] for o in out) / len(out) if out else 0.0)
 
 
 def text_to_pdf(text: str, dst: Path) -> None:
@@ -107,14 +160,20 @@ def clean_text(s: str) -> str:
     return "".join(ch for ch in s if not (0xD800 <= ord(ch) <= 0xDFFF or ch == "�"))
 
 
-def layout(pdf_path: Path) -> tuple[str, list[Line]]:
+def layout(pdf_path: Path, warnings: Optional[list[str]] = None) -> tuple[str, list[Line]]:
     """Rebuild reading-order text with a char→bbox map. Lines are grouped by visual baseline."""
     doc = fitz.open(str(pdf_path))
     lines: list[Line] = []
     parts: list[str] = []
     pos = 0
     for pno, page in enumerate(doc, start=1):
-        words = sorted(page.get_text("words"), key=lambda w: (round((w[1] + w[3]) / 2 / 3), w[0]))
+        words = page.get_text("words")
+        if not words and page.get_images():   # no text layer → OCR; one "word" per recognised line
+            found, conf = _ocr_page(page)
+            words = [(*bb, t, 0, 0, 0) for t, _, bb in found]
+            if words and warnings is not None:
+                warnings.append(f"Page {pno} text recovered by OCR (confidence {conf:.2f}).")
+        words = sorted(words, key=lambda w: (round((w[1] + w[3]) / 2 / 3), w[0]))
         cur: list = []
         cur_y = None
         groups = []
@@ -321,10 +380,10 @@ def _parse_cover(cover_lines: list[str], warnings: list[str]) -> CoverMeta | Non
 
 
 def parse_pdf(pdf_path: Path, fallback_id: str) -> ParsedDoc:
-    text, lines = layout(pdf_path)
     warnings: list[str] = []
+    text, lines = layout(pdf_path, warnings)
     if not text.strip():
-        raise ValueError("Document has no extractable text (scanned image PDF?) — OCR is not supported.")
+        raise ValueError("Document has no extractable text, even after OCR.")
     cover, clauses, w = segment(text, lines)
     warnings += w
     if cover is None:
