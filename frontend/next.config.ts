@@ -7,6 +7,8 @@ export default function config(phase: string): NextConfig {
   output: development ? undefined : 'export',
   trailingSlash: true,
   poweredByHeader: false,
+  // Dev proxy must not gzip: compression buffers the /api/stream SSE so the live feed never connects.
+  compress: false,
   images: { unoptimized: true },
   env: { NEXT_PUBLIC_API_BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL ?? (development ? '/' : '') },
   ...(development ? {

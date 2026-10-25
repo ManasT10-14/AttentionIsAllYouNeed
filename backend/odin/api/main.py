@@ -54,6 +54,7 @@ async def stream(request: Request, u: User = Depends(current_user)):
 
     async def gen():
         try:
+            yield {"event": "ping", "data": "{}"}    # flush headers now; proxies hold them until first bytes
             while True:
                 if await request.is_disconnected():
                     break
@@ -64,7 +65,8 @@ async def stream(request: Request, u: User = Depends(current_user)):
                     yield {"event": "ping", "data": "{}"}
         finally:
             bus.unsubscribe(u.company_id, q)
-    return EventSourceResponse(gen())
+    # no-transform: stops proxies (e.g. the Next.js dev server) from gzipping and buffering the stream
+    return EventSourceResponse(gen(), headers={"Cache-Control": "no-cache, no-transform"})
 
 
 dist = ROOT / "ui-dev" / "dist"          # placeholder UI build; the team UI lives in frontend/
