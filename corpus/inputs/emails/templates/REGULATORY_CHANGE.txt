@@ -6,4 +6,4 @@ OCCURRED_AT: 2027-02-11T09:00:00Z
 CONTRACT_ID: C07
 REFERENCE: DSB-27-A
 DESCRIPTION:
-Data Standards Board notice applies to DS-CEDAR in REGION-NORTH. Required safeguard: access-review attestation. Effective 2027-04-01T00:00:00Z; Processor received on 2027-03-20T09:00:00Z.
+Data Standards Board notice applies to DS-HOUSING in REGION-NORTH. Required safeguard: access-review attestation. Effective 2027-04-01T00:00:00Z; Processor received on 2027-03-20T09:00:00Z.

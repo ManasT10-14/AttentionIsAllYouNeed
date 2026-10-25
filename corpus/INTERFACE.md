@@ -28,7 +28,7 @@ EVENT_ID: EVT-DEMO-0001
 EVENT_TYPE: PAYMENT_MADE
 OCCURRED_AT: 2027-01-24T12:00:00Z
 CONTRACT_ID: C05
-COUNTERPARTY: Willow Estates Private Limited
+COUNTERPARTY: Willow Housing Private Limited
 AMOUNT: INR 60,000
 REFERENCE: RENT-2027-01
 DESCRIPTION:
@@ -59,7 +59,7 @@ For a recorded run, the trusted adapter releases only emails with received_at <=
 
 Deduplicate external EVENT_ID and Gmail message ID, then domain identities such as bank transaction and incident ID. A repeated message must not create another fee, ledger entry, transition or reply. Corrections supersede observations while preserving their audit record. Recompute affected history for late facts, preserving earlier as-known snapshots. At equal timestamps apply the released batch before checking deadlines.
 
-C08 is received January 25 and effective February 1. Its arrival must retain C02 and detect the separate C03 procurement restriction when C03 is loaded. Mark affected analysis pending until extraction and reassessment finish. The arrival email describes the document; the application ingestion path must actually provide the PDF. The full runner ZIP contains future bytes for the trusted loader, not for immediate agent ingestion.
+C08 is received January 25 and effective February 1. Its arrival links the Aurora/Willow pair to existing C04 and C05, preserves those agreements and unrelated C02, and detects the separate C03 procurement restriction when C03 is loaded. Mark affected analysis pending until extraction and reassessment finish. The arrival email describes the document; the application ingestion path must actually provide the PDF. The full runner ZIP contains future bytes for the trusted loader, not for immediate agent ingestion.
 
 Reset/backward travel restores documents, events, ledger and extraction visibility from the named baseline before replay. Do not retain future payments, approvals, fees or C08 knowledge. Repeated clock positions do not append duplicate daily accrual.
 
@@ -68,3 +68,15 @@ Reset/backward travel restores documents, events, ledger and extraction visibili
 Map actual agent output fields to oracle logical assertions; no particular backend response schema is imposed here. Retain workstream state, extracted fields/confidence, citations, timelines, directional money, uncertainties, transitions, rationale and approval-marked actions. Unknown remedies remain unquantified; receivables are separate from gross payables; future commitments are not counted twice. A completed analysis with unresolved terms differs from failed/incomplete processing.
 
 runtime_specs/gmail_integration.md records authlib OAuth scopes, encrypted Fernet refresh-token storage, 15-second polling, ODIN/processed labeling, rejection replies and acceptance tests. Nothing has been connected or sent.
+
+The only company identities are P01 Aurora Software, P02 Forge Electronics and P03 Willow Housing. Match contracts by service, invoice, order and scope as well as party IDs: Forge appears as hosting provider, application customer, component supplier and firmware vendor. C07 assigns Willow the Controller role and Aurora the Processor role. The Data Standards Board in a supplied notice is an authority reference, not a fourth contracting company.
+
+## Fifteen-contract update
+
+There are 15 manuscripts and 14 initially known contracts, with only C08 withheld. The three company IDs are unchanged. Context includes the 14 initial references, with no future C08 terms. DEMO-PORTFOLIO exercises the complete initial portfolio and subsequent arrival. All new observation payloads carry agreement_ref where a sender explicitly identifies the agreement; do not route on counterparty alone because each company participates in multiple independent scopes.
+
+C09-C15 use grouped articles rather than the flat section pattern in the earlier documents. C11 includes a 2.1.1 subclause. Four older manuscripts were reordered and all evaluator citation references were remapped. Do not hardcode the old clause positions. Schedule/annex rows are extracted in displayed cell order; numeric table values carry descriptive prefixes where needed to avoid false clause starts. A project demonstration is an operational deliverable, not a dataset watermark.
+
+Effective dates are all distinct. Several first billing periods are partial and expressly charged at the stated full fee; use the stated first due date rather than creating an overdue invoice before commencement. C10 monthly availability scoring starts with February 2027. C11 continues until milestone completion/acceptance or lawful termination. C15 coverage already earned survives the undertaking operating term. Do not treat every agreement end date as extinction of all accrued or surviving rights.
+
+The cover keys are still uniform for ingestion, while introductions, section order, grouped numbering, wording and schedules differ. External event syntax, UTC clocks, INR arithmetic, deduplication and human-approval requirements are unchanged.

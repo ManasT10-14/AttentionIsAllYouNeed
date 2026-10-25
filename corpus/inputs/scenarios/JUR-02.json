@@ -3,7 +3,7 @@
   "scenario_id": "JUR-02",
   "baseline_clock": "2027-01-25T09:00:00Z",
   "initial_contract_ids": [
-    "C02",
+    "C04",
     "C08"
   ],
   "events_file": "inputs/events/JUR-02.json",

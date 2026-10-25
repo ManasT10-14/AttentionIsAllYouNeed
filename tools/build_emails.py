@@ -69,10 +69,12 @@ def save_email(relative,subject,body):
 
 def route(event,default):
     p=event['payload'];kind=event['event_type']
+    if p.get('agreement_ref'):
+        return p['agreement_ref']
     if kind=='contract_received': return 'C08'
-    if kind=='payment_cleared' or p.get('recipient_party_id')=='P06': return 'C05'
-    if p.get('recipient_party_id')=='P07': return 'C06'
-    if p.get('recipient_party_id')=='P04': return 'C03'
+    if kind=='payment_cleared' or 'UNIT-5' in p.get('subject',''): return 'C05'
+    if p.get('subscription_id')=='TOOL-CIRCUIT': return 'C06'
+    if p.get('order_id')=='PO-AX7': return 'C03'
     if kind in ['service_restored','maintenance_approval_recorded']: return 'C01,C02'
     if kind in ['rule_change_published','safeguard_attested']: return 'C07'
     if kind in ['delivery_accepted','invoice_received']:
@@ -113,19 +115,19 @@ def build():
     observations={
         'PAYMENT_MADE':('C05','AMOUNT: INR 60,000\nREFERENCE: RENT-2027-01\n','Bank transaction BANK-DEMO-01 cleared for the January rent invoice.'),
         'PAYMENT_LATE':('C05','AMOUNT: INR 1,00,000\nREFERENCE: RENT-2027-01\n','The January rent balance remains unpaid at the recorded time.'),
-        'PAYMENT_MISSED':('C06','AMOUNT: INR 1,20,000\nREFERENCE: LUMEN-2027\n','No cleared payment is recorded for the annual invoice.'),
+        'PAYMENT_MISSED':('C06','AMOUNT: INR 1,20,000\nREFERENCE: CIRCUIT-2027\n','No cleared payment is recorded for the annual invoice.'),
         'INVOICE_RECEIVED':('C03','AMOUNT: INR 5,00,000\nREFERENCE: INV-AX7\n','Invoice received for PO-AX7. Delivery acceptance evidence is not included.'),
-        'SERVICE_OUTAGE':('C01,C02','COUNTERPARTY: Nimbus Harbor Private Limited\nREFERENCE: INC-DEMO-01\n','SVC-ATLAS and APP-ATLAS were unavailable from 2027-01-16T10:00:00Z through 2027-01-16T11:30:00Z. This incident was unscheduled.'),
+        'SERVICE_OUTAGE':('C01,C02','COUNTERPARTY: Forge Electronics Private Limited\nREFERENCE: INC-DEMO-01\n','SVC-ATLAS and APP-ATLAS were unavailable from 2027-01-16T10:00:00Z through 2027-01-16T11:30:00Z. This incident was unscheduled.'),
         'SLA_BREACH':('C01,C02','REFERENCE: INC-DEMO-02\nSEVERITY_HINT: high\n','Sender alleges an SLA breach after 45 minutes of APP-ATLAS unavailability; verify the allegation against the agreements.'),
         'DELIVERY_LATE':('C03','REFERENCE: PO-AX7\n','LOT-AX7 has not arrived at DEPOT-A as of 2027-02-11T09:00:00Z.'),
-        'DELIVERY_RECEIVED':('C04','REFERENCE: SO-AX7\n','Harbor accepted all 100 conforming units of LOT-AX7 at DEPOT-H at the recorded time.'),
-        'REGULATORY_CHANGE':('C07','REFERENCE: DSB-27-A\n','Data Standards Board notice applies to DS-CEDAR in REGION-NORTH. Required safeguard: access-review attestation. Effective 2027-04-01T00:00:00Z; Processor received on 2027-03-20T09:00:00Z.'),
+        'DELIVERY_RECEIVED':('C04','REFERENCE: SO-AX7\n','Willow accepted all 100 conforming units of LOT-AX7 at SITE-W at the recorded time.'),
+        'REGULATORY_CHANGE':('C07','REFERENCE: DSB-27-A\n','Data Standards Board notice applies to DS-HOUSING in REGION-NORTH. Required safeguard: access-review attestation. Effective 2027-04-01T00:00:00Z; Processor received on 2027-03-20T09:00:00Z.'),
         'PRICE_CHANGE':('C06','AMOUNT: INR 1,50,000\n','Vendor proposes an annual renewal price of INR 1,50,000. No signed price amendment is attached.'),
-        'TERMINATION_NOTICE_RECEIVED':('C03','COUNTERPARTY: Forge Vale Private Limited\n','Supplier received a notice asserting termination for delivery breach. Check prior breach notice, cure evidence and authority before accepting its effect.'),
+        'TERMINATION_NOTICE_RECEIVED':('C03','COUNTERPARTY: Forge Electronics Private Limited\n','Supplier received a notice asserting termination for delivery breach. Check prior breach notice, cure evidence and authority before accepting its effect.'),
         'RENEWAL_NOTICE_RECEIVED':('C05','REFERENCE: UNIT-5 NON-RENEWAL\n','Receipt addressed to notices@willow.example from authorized sender Mira Sen with subject UNIT-5 NON-RENEWAL.'),
-        'PARTY_CHANGE':('ALL','COUNTERPARTY: Nimbus Harbor Private Limited\n','Nimbus reports a proposed acquisition and asks to assign its agreement. No signed consent is attached.'),
-        'FORCE_MAJEURE':('ALL','COUNTERPARTY: Forge Vale Private Limited\n','Supplier reports a flood affecting its depot and asks for relief. Causation and mitigation evidence have not been supplied.'),
-        'DISPUTE_RAISED':('C02,C08','COUNTERPARTY: Cedar Market Private Limited\n','Cedar requests one Mumbai proceeding for APP-ATLAS and CAMP-SPRING claims. No joint forum agreement is attached.'),
+        'PARTY_CHANGE':('ALL','COUNTERPARTY: Forge Electronics Private Limited\n','Forge reports a proposed acquisition and asks to assign its agreement. No signed consent is attached.'),
+        'FORCE_MAJEURE':('ALL','COUNTERPARTY: Forge Electronics Private Limited\n','Supplier reports a flood affecting its depot and asks for relief. Causation and mitigation evidence have not been supplied.'),
+        'DISPUTE_RAISED':('C04,C08','COUNTERPARTY: Willow Housing Private Limited\n','Willow requests one Mumbai proceeding for SO-AX7 and PROJECT-HABITAT claims. No joint forum agreement is attached.'),
         'CUSTOM':('UNKNOWN','','A document mentioning an AX-7 procurement commitment has arrived; identify the relevant agreements from the observation.'),
     }
     for n,kind in enumerate(TYPES,1):

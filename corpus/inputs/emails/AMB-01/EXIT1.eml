@@ -15,6 +15,6 @@ DESCRIPTION:
   "observation_type": "early_exit_requested",
   "source_ref": "record:EXIT1",
   "requestor_id": "P01",
-  "subscription_id": "TOOL-LUMEN",
+  "subscription_id": "TOOL-CIRCUIT",
   "requested_exit_at": "2027-02-15T17:00:00Z"
 }

@@ -7,7 +7,7 @@
     "source_ref": "record:NOTICE1",
     "payload": {
       "sender_party_id": "P01",
-      "recipient_party_id": "P06",
+      "recipient_party_id": "P03",
       "recipient_address": "notices@willow.example",
       "subject": "UNIT-5 NON-RENEWAL",
       "authorized_sender": "Mira Sen",

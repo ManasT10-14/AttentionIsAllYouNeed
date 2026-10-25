@@ -1,0 +1,16 @@
+[
+  {
+    "event_id": "STATUS1",
+    "event_type": "milestone_status_recorded",
+    "occurred_at": "2027-02-03T09:00:00Z",
+    "received_at": "2027-02-03T09:00:00Z",
+    "source_ref": "record:STATUS1",
+    "payload": {
+      "agreement_ref": "C11",
+      "project_id": "INT-AX7",
+      "milestone_id": "M1",
+      "demonstration_received": false,
+      "recorded_by": "Anil Das"
+    }
+  }
+]

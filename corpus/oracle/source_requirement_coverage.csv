@@ -1,10 +1,10 @@
 requirement,source_page,corpus_support,runtime_evidence_needed
-FR1.1,1,company context and eight PDFs,actual input acceptance
+FR1.1,1,company context and fifteen PDFs,actual input acceptance
 FR1.2,1,C01-C02 and C03-C04 dependencies,per-contract and cross-contract plan
 FR1.3,1,independent scenarios,delegation and workstream status trace
 FR1.4,1,OUT-06 and AMB-01 uncertainty,coordination and honest synthesis status
-FR2.1,2,expected_terms.json across eight contracts,actual extracted fields
-FR2.2,2,152 body clauses and two schedule rows with verified pages,field confidence and correct citations
+FR2.1,2,expected_terms.json across fifteen contracts,actual extracted fields
+FR2.2,2,230 body clauses and 46 table rows with verified pages,field confidence and correct citations
 FR2.3,2,AMB-01 and OUT-06,explicit uncertainty instead of guessing
 FR2.4,2,C06:7.1 missing attachment,targeted re-extraction and shared-state update
 FR3.1,2,PAY and REN and CUR scenarios,obligation history and future projection

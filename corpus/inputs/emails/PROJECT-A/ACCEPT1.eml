@@ -1,0 +1,23 @@
+From: operations@aurora.example
+To: odin-inbox@aurora.example
+Subject: [ODIN-EVENT] CUSTOM C11
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+
+EVENT_ID: EVT-PROJECT-A-ACCEPT1
+EVENT_TYPE: CUSTOM
+OCCURRED_AT: 2027-01-31T12:00:00Z
+CONTRACT_ID: C11
+REFERENCE: record:ACCEPT1
+DESCRIPTION:
+{
+  "observation_type": "milestone_acceptance_recorded",
+  "source_ref": "record:ACCEPT1",
+  "agreement_ref": "C11",
+  "project_id": "INT-AX7",
+  "milestone_id": "M1",
+  "demonstration_delivered_at": "2027-01-31T11:00:00Z",
+  "signature_ref": "M1-ANIL-001",
+  "signed_by": "Anil Das"
+}

@@ -1,0 +1,18 @@
+[
+  {
+    "event_id": "REPORT1",
+    "event_type": "monthly_service_report",
+    "occurred_at": "2027-03-01T09:00:00Z",
+    "received_at": "2027-03-01T09:00:00Z",
+    "source_ref": "record:REPORT1",
+    "payload": {
+      "agreement_ref": "C10",
+      "application_id": "APP-HABITAT",
+      "period_start": "2027-02-01T00:00:00Z",
+      "period_end": "2027-03-01T00:00:00Z",
+      "calendar_minutes": "40320",
+      "unavailable_minutes": "240",
+      "report_ref": "PORTAL-FEB-2027"
+    }
+  }
+]

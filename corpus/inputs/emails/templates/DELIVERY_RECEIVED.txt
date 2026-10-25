@@ -6,4 +6,4 @@ OCCURRED_AT: 2027-02-11T09:00:00Z
 CONTRACT_ID: C04
 REFERENCE: SO-AX7
 DESCRIPTION:
-Harbor accepted all 100 conforming units of LOT-AX7 at DEPOT-H at the recorded time.
+Willow accepted all 100 conforming units of LOT-AX7 at SITE-W at the recorded time.

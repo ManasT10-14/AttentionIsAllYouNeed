@@ -1,19 +1,20 @@
-# Validation record - version 2, 2026-10-25
+# Validation record - 2026-10-25
 
 ## Performed
 
-- Rebuilt all eight PDFs without version labels, with exact seven-field first-page covers, uppercase headings, numeric clause starts and no fictional-data labels.
-- Checked the supplied clause and schedule regexes against extracted PDF lines, including uniqueness and absence of spurious starts from wrapping.
-- Matched 152 numbered body clauses and two Schedule A rows to final PDF text and exact one-based page locations; regenerated evaluator citations and manifest SHA-256 values.
-- Rendered and visually inspected all 24 final pages. No clipped text, overlapping elements, broken labels or missing glyphs was visible. Poppler emitted a missing Symbol display-font message but no Symbol glyphs are used.
-- Validated the ten company-context keys and the INR 10,00,000 approval threshold, with equivalent structured sidecar.
-- Authored 45 isolated scenarios including all requested traps and retained boundary/control cases. Inspected expected terms and references for changed clause identities. Oracle independence is source separation and manual constants, not an independent human review.
-- Built 64 paired .eml/.txt fixtures: 44 scenario observations, 16 enum templates and four parser-edge examples. Checked strict syntax, timezone-bearing timestamps, enum coverage, globally unique explicit email IDs, optional missing EVENT_ID, and expected fallback cases.
-- Checked scenario visibility/reference rules, selected independent date/decimal calculations, all 37 source requirements, and 13 runtime acceptance specifications. PDF regeneration produces identical hashes.
-- Packaging checks archive CRCs, exactly seven initial PDFs, one held-back PDF, and absence of evaluator material from input ZIPs. Distribution SHA-256 checksums accompany the ZIPs.
+- Built exactly 15 PDFs between exactly three registered companies: eight Aurora/Forge and seven Aurora/Willow. No self-contracts or additional contracting entities occur.
+- Rewrote openings and subject-specific language; reordered C02, C05, C07 and C08; introduced grouped and nested articles in C09-C15. Checked 15 distinct first headings, drafting forms and effective dates. Required cover keys remain consistent; no visible document versions or fictional-data labels occur.
+- Added and verified 15 commercial/operational tables, including purchase orders, rent/notice calendars, processing instructions, milestone billing, equipment registers, dispatch cards and warranty handling.
+- Verified 230 numbered body clauses and 46 schedule/annex rows against the final PDF text and one-based page locations. Updated hashes and evaluator evidence after renumbering.
+- Rendered and visually inspected the 43 pages. No clipping, missing characters, overlapping blocks or broken tables was seen. Dedicated final signature pages are retained where the execution block does not fit the preceding page. Poppler reports its unused Symbol display-font warning; the document characters render correctly.
+- Updated Markdown/structured company context, 64 resettable scenarios, 94 paired .eml/.txt fixtures, expected terms/cases, coverage, 12 trap entries, eight conflict-matrix entries and a 15-contract remedy catalog. All 15 documents appear in scenario assertions. DEMO-PORTFOLIO loads the same 14 initial IDs as the global manifest and later introduces C08.
+- Checked clause/schedule regexes without spurious numeric starts, legal-party/signatory references, timestamp order, event enums, source/evaluator isolation, input paths and absence of future C08 details from the initial registry.
+- Independently checked selected monetary/date constants, including notice cutoffs, partial-payment fees, outage thresholds/caps, project payment and delay dates, equipment hand-back charges, recovery credits, warranty delay and the 17-date hosting gap. Byte-identical PDF regeneration passes.
+- Packaging verifies ZIP CRCs, 14 initial PDFs, one arrival PDF, and no evaluator files in input archives. SHA256SUMS.txt accompanies the distribution.
+- Golden dataset validation verifies 384 role/scenario vectors, 15 contract extraction records, 114 typed facts, 276 citation units and 36 worked agent examples. Checks include source hashes, evidence references, agent-specific inputs, clock visibility and separation of expected answers from proposed inputs. No actual agents are executed by this validation.
 
-## Not performed
+## Practical limits
 
-No Odin agent pipeline, UI, Gmail connection, OAuth flow, token encryption operation, 15-second poller, actual Groq fallback, rejection auto-reply, external notice, live rehearsal or latency measurement was executed. The expected outcomes are not passing Odin results. No independent human evaluator review or OCR benchmark was performed. No commit or push was made.
+The 64 cases are authored expectations, not executed Odin results. Real agent extraction/replay, API/Gmail integration, LLM fallback, dashboard behavior, legal enforceability, independent human oracle review, live rehearsal and latency measurements were not verified. The 13 runtime fault cases remain specifications. No external mail or notice has been sent.
 
-Run the five commands in the repository README to reproduce authoring checks. Machine-readable results are stored in ignored work/validation.json. Re-render affected PDF pages after changes to document text, typography or pagination.
+Use the eight root README commands to reproduce checks. Company grouping verifies the three party-based memberships (15/8/7) and byte equality with canonical PDFs. Machine corpus results are in ignored work/validation.json; golden checks print their counts and status. Re-render affected PDFs after any content or layout change.

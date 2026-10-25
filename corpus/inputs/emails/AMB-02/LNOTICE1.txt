@@ -10,9 +10,9 @@ DESCRIPTION:
   "observation_type": "notice_received",
   "source_ref": "record:LNOTICE1",
   "sender_party_id": "P01",
-  "recipient_party_id": "P07",
-  "recipient_address": "notices@lumen.example",
-  "subject": "TOOL-LUMEN non-renewal",
-  "subscription_id": "TOOL-LUMEN",
-  "delivery_receipt": "record-lumen-receipt"
+  "recipient_party_id": "P02",
+  "recipient_address": "notices@forge.example",
+  "subject": "TOOL-CIRCUIT non-renewal",
+  "subscription_id": "TOOL-CIRCUIT",
+  "delivery_receipt": "record-circuit-receipt"
 }

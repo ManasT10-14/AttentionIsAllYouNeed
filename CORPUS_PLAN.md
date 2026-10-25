@@ -80,3 +80,11 @@ The user supplied `C:\Users\hrutu\Downloads\Odin_PS.pdf`. All four pages were re
 The user supplied sections 3.1-3.4. All eight PDFs now use Key: Value covers, numeric clauses, uppercase headings and version 2; document labels were removed. Context includes the requested business and approval fields. External events use the exact email enum and syntax. C08 remains held back and now also seeds a second supply commitment conflicting with C03 exclusivity. Gmail/OAuth requirements are documented, with no backend implementation or external operation performed. Prior v1 files are archived under ignored work/archive-v1.
 
 Latest user override: remove document versions. Omit VERSION from PDF covers, footer labels, document manifest entries and extraction expectations; preserve contract IDs and numeric clauses.
+
+## Current three-company override
+
+The user now requires exactly three companies: Aurora Software (P01), Forge Electronics (P02), and Willow Housing (P03). Eight contracts remain, four for each Aurora/counterparty pair. C07 makes Willow the Controller and Aurora the Processor; C08 links to C04/C05 and conflicts with C03 exclusive sourcing. This supersedes the earlier multi-counterparty allocation. Eight professional PDF layouts are applied; visible document versions remain absent. Updated local PDFs, 45 cases, 64 emails, citations and packages require real agent/evaluation integration before claiming runtime acceptance.
+
+## Final user scope: fifteen individually drafted contracts
+
+Exactly 15 contracts and three companies supersede the earlier counts. Four manuscripts were reordered with citations remapped; seven new grouped-article manuscripts complete the portfolio. Each has its own effective date, form and table. Contractual consequences, exclusions, eight conflict/timeline issues, 64 scenarios, 94 emails and a full-portfolio arrival demo are supplied. There are 14 initial documents plus withheld C08. Current results and validation limits are in corpus/README.md and VALIDATION.md.

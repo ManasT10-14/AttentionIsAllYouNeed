@@ -1,0 +1,21 @@
+Subject: [ODIN-EVENT] CUSTOM C12
+
+EVENT_ID: EVT-MAINT-B-COST1
+EVENT_TYPE: CUSTOM
+OCCURRED_AT: 2027-02-01T13:00:00Z
+CONTRACT_ID: C12
+AMOUNT: INR 12,000
+REFERENCE: record:COST1
+DESCRIPTION:
+{
+  "observation_type": "emergency_cost_recorded",
+  "source_ref": "record:COST1",
+  "agreement_ref": "C12",
+  "ticket_id": "T-UNIT5-001",
+  "amount": "12000",
+  "currency": "INR",
+  "receipt_ref": "REPAIR-001",
+  "approved_by": "Kavya Paul",
+  "approved_at": "2027-02-01T12:15:00Z",
+  "incurred_by": "P01"
+}

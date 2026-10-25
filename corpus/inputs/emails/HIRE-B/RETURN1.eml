@@ -1,0 +1,25 @@
+From: operations@aurora.example
+To: odin-inbox@aurora.example
+Subject: [ODIN-EVENT] CUSTOM C09
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+
+EVENT_ID: EVT-HIRE-B-RETURN1
+EVENT_TYPE: CUSTOM
+OCCURRED_AT: 2027-07-03T12:00:00Z
+CONTRACT_ID: C09
+REFERENCE: record:RETURN1
+DESCRIPTION:
+{
+  "observation_type": "equipment_return_received",
+  "source_ref": "record:RETURN1",
+  "agreement_ref": "C09",
+  "asset_ids": [
+    "EQ-DR01",
+    "EQ-DR02"
+  ],
+  "destination": "DEPOT-F",
+  "receipt_ref": "EQ-RETURN-001",
+  "recipient_party_id": "P02"
+}

@@ -7,7 +7,7 @@
     "source_ref": "record:EXIT1",
     "payload": {
       "requestor_id": "P01",
-      "subscription_id": "TOOL-LUMEN",
+      "subscription_id": "TOOL-CIRCUIT",
       "requested_exit_at": "2027-02-15T17:00:00Z"
     }
   }

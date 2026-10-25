@@ -11,7 +11,7 @@ DESCRIPTION:
   "observation_type": "payment_cleared",
   "source_ref": "record:PAY1",
   "payer_id": "P01",
-  "payee_id": "P06",
+  "payee_id": "P03",
   "invoice_id": "RENT-2027-01",
   "amount": "60000",
   "currency": "INR",

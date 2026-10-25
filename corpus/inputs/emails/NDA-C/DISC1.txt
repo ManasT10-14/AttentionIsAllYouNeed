@@ -1,0 +1,20 @@
+Subject: [ODIN-EVENT] CUSTOM C13
+
+EVENT_ID: EVT-NDA-C-DISC1
+EVENT_TYPE: CUSTOM
+OCCURRED_AT: 2027-05-03T10:00:00Z
+CONTRACT_ID: C13
+REFERENCE: record:DISC1
+DESCRIPTION:
+{
+  "observation_type": "disclosure_recorded",
+  "source_ref": "record:DISC1",
+  "agreement_ref": "C13",
+  "material_ref": "AX-7 interface drawings",
+  "disclosed_by": "P01",
+  "recipient_party_id": "P03",
+  "authorisation_status": "not_granted",
+  "material_public": false,
+  "verified_by": "Mira Sen",
+  "record_ref": "DISC-001"
+}

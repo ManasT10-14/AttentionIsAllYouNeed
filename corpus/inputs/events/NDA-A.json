@@ -1,0 +1,39 @@
+[
+  {
+    "event_id": "REQ1",
+    "event_type": "material_return_requested",
+    "occurred_at": "2027-05-01T09:00:00Z",
+    "received_at": "2027-05-01T09:00:00Z",
+    "source_ref": "record:REQ1",
+    "payload": {
+      "agreement_ref": "C13",
+      "request_id": "RETURN-ENG-001",
+      "sender_party_id": "P02",
+      "recipient_party_id": "P01",
+      "material_refs": [
+        "AX-7 interface drawings",
+        "Connector source specification"
+      ],
+      "receipt_ref": "NDA-REQUEST-001"
+    }
+  },
+  {
+    "event_id": "ATTEST1",
+    "event_type": "return_attestation_received",
+    "occurred_at": "2027-05-11T17:00:00Z",
+    "received_at": "2027-05-11T17:00:00Z",
+    "source_ref": "record:ATTEST1",
+    "payload": {
+      "agreement_ref": "C13",
+      "request_id": "RETURN-ENG-001",
+      "material_refs": [
+        "AX-7 interface drawings",
+        "Connector source specification"
+      ],
+      "signed_by": "Mira Sen",
+      "signature_ref": "RETURN-ATTEST-001",
+      "method": "destroyed",
+      "retained_copies": []
+    }
+  }
+]

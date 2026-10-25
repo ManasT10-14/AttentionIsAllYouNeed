@@ -1,0 +1,33 @@
+[
+  {
+    "event_id": "ACCEPT1",
+    "event_type": "milestone_acceptance_recorded",
+    "occurred_at": "2027-01-31T12:00:00Z",
+    "received_at": "2027-01-31T12:00:00Z",
+    "source_ref": "record:ACCEPT1",
+    "payload": {
+      "agreement_ref": "C11",
+      "project_id": "INT-AX7",
+      "milestone_id": "M1",
+      "demonstration_delivered_at": "2027-01-31T11:00:00Z",
+      "signature_ref": null,
+      "signed_by": null
+    }
+  },
+  {
+    "event_id": "INVOICE1",
+    "event_type": "invoice_received",
+    "occurred_at": "2027-01-31T12:30:00Z",
+    "received_at": "2027-01-31T12:30:00Z",
+    "source_ref": "record:INVOICE1",
+    "payload": {
+      "agreement_ref": "C11",
+      "project_id": "INT-AX7",
+      "milestone_id": "M1",
+      "invoice_id": "INT-M1-2027",
+      "amount": "600000",
+      "currency": "INR",
+      "recipient_id": "P02"
+    }
+  }
+]

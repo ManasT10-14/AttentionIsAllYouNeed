@@ -107,7 +107,7 @@
       "file": "inputs/emails/templates/DISPUTE_RAISED.eml",
       "strict_result": "parsed",
       "event_type": "DISPUTE_RAISED",
-      "contract_id": "C02,C08"
+      "contract_id": "C04,C08"
     },
     {
       "file": "inputs/emails/templates/CUSTOM.eml",

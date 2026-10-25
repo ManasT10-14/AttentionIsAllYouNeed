@@ -42,7 +42,7 @@
       "trap_id": "exclusive_procurement_conflict",
       "evidence": [
         "C03:17.1",
-        "C08:20.1"
+        "C08:3.1"
       ],
       "case_ids": [
         "TRAP-04",
@@ -52,8 +52,8 @@
     {
       "trap_id": "jurisdiction_scope",
       "evidence": [
-        "C02:7.1",
-        "C08:6.1"
+        "C04:8.1",
+        "C08:7.1"
       ],
       "case_ids": [
         "JUR-01",
@@ -64,7 +64,7 @@
       "trap_id": "stricter_downstream_sla",
       "evidence": [
         "C01:3.1",
-        "C02:3.1"
+        "C02:5.1"
       ],
       "case_ids": [
         "OUT-02",
@@ -75,9 +75,9 @@
     {
       "trap_id": "office_term_before_service_term",
       "evidence": [
-        "C02:19.1",
+        "C02:7.1",
         "C05:2.1",
-        "C05:6.1"
+        "C05:3.1"
       ],
       "case_ids": [
         "TRAP-05"
@@ -91,6 +91,40 @@
       "case_ids": [
         "AMB-01",
         "AMB-02"
+      ]
+    },
+    {
+      "trap_id": "hosting_end_before_application_end",
+      "evidence": [
+        "C01:2.1",
+        "C02:1.1",
+        "C02:3.1"
+      ],
+      "case_ids": [
+        "LINK-02"
+      ]
+    },
+    {
+      "trap_id": "equipment_hire_before_recovery_end",
+      "evidence": [
+        "C09:2.1",
+        "C14:1.2",
+        "C14:5.1"
+      ],
+      "case_ids": [
+        "LINK-01"
+      ]
+    },
+    {
+      "trap_id": "disclosure_damages_need_disclosure_evidence",
+      "evidence": [
+        "C13:5.1",
+        "C13:6.1",
+        "C13:6.2"
+      ],
+      "case_ids": [
+        "NDA-B",
+        "NDA-C"
       ]
     }
   ]

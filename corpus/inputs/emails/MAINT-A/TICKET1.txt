@@ -1,0 +1,18 @@
+Subject: [ODIN-EVENT] CUSTOM C12
+
+EVENT_ID: EVT-MAINT-A-TICKET1
+EVENT_TYPE: CUSTOM
+OCCURRED_AT: 2027-02-01T08:00:00Z
+CONTRACT_ID: C12
+REFERENCE: record:TICKET1
+DESCRIPTION:
+{
+  "observation_type": "helpdesk_ticket_received",
+  "source_ref": "record:TICKET1",
+  "agreement_ref": "C12",
+  "ticket_id": "T-UNIT5-001",
+  "location_id": "UNIT-5",
+  "priority": "urgent",
+  "provider_received_at": "2027-02-01T08:00:00Z",
+  "recipient_party_id": "P03"
+}

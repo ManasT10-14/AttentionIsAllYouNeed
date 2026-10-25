@@ -14,5 +14,5 @@ DESCRIPTION:
   "order_id": "SO-AX7",
   "amount": "650000",
   "currency": "INR",
-  "recipient_id": "P05"
+  "recipient_id": "P03"
 }

@@ -1,0 +1,15 @@
+Subject: [ODIN-EVENT] CUSTOM C12
+
+EVENT_ID: EVT-MAINT-A-ACK1
+EVENT_TYPE: CUSTOM
+OCCURRED_AT: 2027-02-01T12:00:00Z
+CONTRACT_ID: C12
+REFERENCE: record:ACK1
+DESCRIPTION:
+{
+  "observation_type": "ticket_acknowledged",
+  "source_ref": "record:ACK1",
+  "agreement_ref": "C12",
+  "ticket_id": "T-UNIT5-001",
+  "dispatch_contact": "Willow facilities desk"
+}

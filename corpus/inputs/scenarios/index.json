@@ -178,5 +178,81 @@
   {
     "scenario_id": "TRAP-06",
     "file": "inputs/scenarios/TRAP-06.json"
+  },
+  {
+    "scenario_id": "HIRE-A",
+    "file": "inputs/scenarios/HIRE-A.json"
+  },
+  {
+    "scenario_id": "HIRE-B",
+    "file": "inputs/scenarios/HIRE-B.json"
+  },
+  {
+    "scenario_id": "PORTAL-A",
+    "file": "inputs/scenarios/PORTAL-A.json"
+  },
+  {
+    "scenario_id": "PORTAL-B",
+    "file": "inputs/scenarios/PORTAL-B.json"
+  },
+  {
+    "scenario_id": "PROJECT-A",
+    "file": "inputs/scenarios/PROJECT-A.json"
+  },
+  {
+    "scenario_id": "PROJECT-B",
+    "file": "inputs/scenarios/PROJECT-B.json"
+  },
+  {
+    "scenario_id": "PROJECT-C",
+    "file": "inputs/scenarios/PROJECT-C.json"
+  },
+  {
+    "scenario_id": "MAINT-A",
+    "file": "inputs/scenarios/MAINT-A.json"
+  },
+  {
+    "scenario_id": "MAINT-B",
+    "file": "inputs/scenarios/MAINT-B.json"
+  },
+  {
+    "scenario_id": "NDA-A",
+    "file": "inputs/scenarios/NDA-A.json"
+  },
+  {
+    "scenario_id": "NDA-B",
+    "file": "inputs/scenarios/NDA-B.json"
+  },
+  {
+    "scenario_id": "NDA-C",
+    "file": "inputs/scenarios/NDA-C.json"
+  },
+  {
+    "scenario_id": "RECOVERY-A",
+    "file": "inputs/scenarios/RECOVERY-A.json"
+  },
+  {
+    "scenario_id": "RECOVERY-B",
+    "file": "inputs/scenarios/RECOVERY-B.json"
+  },
+  {
+    "scenario_id": "WARRANTY-A",
+    "file": "inputs/scenarios/WARRANTY-A.json"
+  },
+  {
+    "scenario_id": "WARRANTY-B",
+    "file": "inputs/scenarios/WARRANTY-B.json"
+  },
+  {
+    "scenario_id": "LINK-01",
+    "file": "inputs/scenarios/LINK-01.json"
+  },
+  {
+    "scenario_id": "LINK-02",
+    "file": "inputs/scenarios/LINK-02.json"
+  },
+  {
+    "scenario_id": "DEMO-PORTFOLIO",
+    "file": "inputs/scenarios/DEMO-PORTFOLIO.json"
   }
 ]

@@ -1,0 +1,46 @@
+[
+  {
+    "event_id": "TICKET1",
+    "event_type": "helpdesk_ticket_received",
+    "occurred_at": "2027-02-01T08:00:00Z",
+    "received_at": "2027-02-01T08:00:00Z",
+    "source_ref": "record:TICKET1",
+    "payload": {
+      "agreement_ref": "C12",
+      "ticket_id": "T-UNIT5-001",
+      "location_id": "UNIT-5",
+      "priority": "urgent",
+      "provider_received_at": "2027-02-01T08:00:00Z",
+      "recipient_party_id": "P03"
+    }
+  },
+  {
+    "event_id": "ACK1",
+    "event_type": "ticket_acknowledged",
+    "occurred_at": "2027-02-01T12:00:01Z",
+    "received_at": "2027-02-01T12:00:01Z",
+    "source_ref": "record:ACK1",
+    "payload": {
+      "agreement_ref": "C12",
+      "ticket_id": "T-UNIT5-001",
+      "dispatch_contact": "Willow facilities desk"
+    }
+  },
+  {
+    "event_id": "COST1",
+    "event_type": "emergency_cost_recorded",
+    "occurred_at": "2027-02-01T13:00:00Z",
+    "received_at": "2027-02-01T13:00:00Z",
+    "source_ref": "record:COST1",
+    "payload": {
+      "agreement_ref": "C12",
+      "ticket_id": "T-UNIT5-001",
+      "amount": "12000",
+      "currency": "INR",
+      "receipt_ref": "REPAIR-001",
+      "approved_by": "Kavya Paul",
+      "approved_at": "2027-02-01T12:15:00Z",
+      "incurred_by": "P01"
+    }
+  }
+]

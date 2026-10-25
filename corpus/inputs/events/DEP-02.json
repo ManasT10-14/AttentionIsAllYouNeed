@@ -25,7 +25,7 @@
       "lot_id": "LOT-AX7",
       "quantity": 100,
       "conforming": true,
-      "destination": "DEPOT-H",
+      "destination": "SITE-W",
       "acceptance_ref": "record-receipt-DEL2"
     }
   }

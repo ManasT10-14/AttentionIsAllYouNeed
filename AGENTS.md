@@ -1,2 +1,6 @@
+# Active corpus constraints
 
-Latest user override: remove document versions. Omit VERSION from PDF covers, footer labels, document manifest entries and extraction expectations; preserve contract IDs and numeric clauses.
+All work stays under Desktop RAGNAROK; repository branch: corpus.
+The user requires 15 contracts, overriding historical eight/twenty-contract plans. Exactly three companies: P01 Aurora Software, P02 Forge Electronics, P03 Willow Housing. Eight documents pair P01-P02 (C01/C02/C03/C06/C09/C11/C13/C15); seven pair P01-P03 (C04/C05/C07/C08/C10/C12/C14). Willow is Controller and Aurora Processor under C07.
+Preserve 14 initial documents plus C08 live arrival. Do not expose C08 terms before receipt. All 15 PDFs have different effective dates, individual introductions/forms, subject-specific drafting and tables. Preserve numeric clause parsing, required cover keys, and the user's removal of document versions and fictional-data labels.
+Keep capped remedies, proof requirements, deliberate contradictions, uncertainty and timeline gaps consistent with evaluator keys. Four earlier manuscripts were renumbered; never assume old clause locations. Refresh page citations and hashes after changes. Evaluator catalogs and answer keys must never enter agent context. Runtime specifications are not execution proof. No external notice or email is authorized by corpus preparation.

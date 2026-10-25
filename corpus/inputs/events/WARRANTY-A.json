@@ -1,0 +1,35 @@
+[
+  {
+    "event_id": "CLAIM1",
+    "event_type": "warranty_claim_received",
+    "occurred_at": "2027-05-01T09:00:00Z",
+    "received_at": "2027-05-01T09:00:00Z",
+    "source_ref": "record:CLAIM1",
+    "payload": {
+      "agreement_ref": "C15",
+      "claim_id": "RMA-001",
+      "serial_number": "AX7-SN001",
+      "order_id": "PO-AX7",
+      "original_acceptance_at": "2027-02-07T12:00:00Z",
+      "defect": "manufacturing solder failure",
+      "normal_use": true,
+      "unauthorised_modification": false,
+      "recipient_party_id": "P02",
+      "receipt_ref": "RMA-RECEIPT-001"
+    }
+  },
+  {
+    "event_id": "REPLACE1",
+    "event_type": "replacement_received",
+    "occurred_at": "2027-05-11T17:00:00Z",
+    "received_at": "2027-05-11T17:00:00Z",
+    "source_ref": "record:REPLACE1",
+    "payload": {
+      "agreement_ref": "C15",
+      "claim_id": "RMA-001",
+      "conforming": true,
+      "recipient_party_id": "P01",
+      "receipt_ref": "REPLACEMENT-001"
+    }
+  }
+]

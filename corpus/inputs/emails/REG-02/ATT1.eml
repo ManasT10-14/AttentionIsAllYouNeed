@@ -14,9 +14,9 @@ DESCRIPTION:
 {
   "observation_type": "safeguard_attested",
   "source_ref": "record:ATT1",
-  "processor_id": "P08",
+  "processor_id": "P01",
   "rule_id": "FDB-27-A",
-  "dataset_id": "DS-CEDAR",
+  "dataset_id": "DS-HOUSING",
   "region_id": "REGION-NORTH",
   "safeguards": [
     "access-review-attestation"
