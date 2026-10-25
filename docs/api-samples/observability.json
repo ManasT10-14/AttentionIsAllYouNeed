@@ -1,0 +1,216 @@
+{
+  "runs": [
+    {
+      "id": "adfae031-c9c0-45e9-891b-b7b2d329644a",
+      "kind": "event",
+      "status": "partial",
+      "workplan": {},
+      "budget": {
+        "usd": 0.041,
+        "run_id": "adfae031-c9c0-45e9-891b-b7b2d329644a",
+        "max_usd": 5.0,
+        "fallbacks": 0,
+        "per_agent": {
+          "tyr": {
+            "usd": 0.020011,
+            "calls": 1,
+            "tokens": 31493,
+            "providers": {
+              "openai": 1
+            },
+            "latency_ms": 53389.90690000355
+          },
+          "loki": {
+            "usd": 0.010338,
+            "calls": 1,
+            "tokens": 18148,
+            "providers": {
+              "openai": 1
+            },
+            "latency_ms": 26703.96339998115
+          },
+          "heimdall": {
+            "usd": 0.010652,
+            "calls": 2,
+            "tokens": 14249,
+            "providers": {
+              "openai": 2
+            },
+            "latency_ms": 61667.280299938284
+          }
+        },
+        "tokens_in": 51019,
+        "max_tokens": 2000000,
+        "tokens_out": 12871,
+        "tool_calls": 70,
+        "agent_calls": 4,
+        "max_agent_calls": 200
+      },
+      "trace_url": "",
+      "error": "",
+      "scenario_id": null,
+      "started_at": "2026-10-25T09:23:14.888986",
+      "finished_at": "2026-10-25T09:25:38.318686"
+    },
+    {
+      "id": "053598cc-c09a-4c64-a489-66b08a190888",
+      "kind": "analysis",
+      "status": "partial",
+      "workplan": {
+        "workstreams": [
+          {
+            "id": "ws:LEASE-2025-001",
+            "tasks": [
+              "thor:extract",
+              "norns:timeline",
+              "loki:attack"
+            ],
+            "reason": "",
+            "status": "done",
+            "contract_id": "LEASE-2025-001",
+            "evidence_score": 0.942
+          },
+          {
+            "id": "ws:MSA-2026-001",
+            "tasks": [
+              "thor:extract",
+              "norns:timeline",
+              "loki:attack"
+            ],
+            "reason": "",
+            "status": "done",
+            "contract_id": "MSA-2026-001",
+            "evidence_score": 0.935
+          },
+          {
+            "id": "ws:CSA-2026-004",
+            "tasks": [
+              "thor:extract",
+              "norns:timeline",
+              "loki:attack"
+            ],
+            "reason": "",
+            "status": "done",
+            "contract_id": "CSA-2026-004",
+            "evidence_score": 0.76
+          }
+        ]
+      },
+      "budget": {
+        "usd": 0.45245,
+        "run_id": "053598cc-c09a-4c64-a489-66b08a190888",
+        "max_usd": 5.0,
+        "fallbacks": 0,
+        "per_agent": {
+          "tyr": {
+            "usd": 0.197065,
+            "calls": 9,
+            "tokens": 299240,
+            "providers": {
+              "openai": 9
+            },
+            "latency_ms": 594646.9022000674
+          },
+          "loki": {
+            "usd": 0.132965,
+            "calls": 15,
+            "tokens": 237945,
+            "providers": {
+              "openai": 15
+            },
+            "latency_ms": 345397.1427001525
+          },
+          "thor": {
+            "usd": 0.04938,
+            "calls": 15,
+            "tokens": 88028,
+            "providers": {
+              "openai": 15
+            },
+            "latency_ms": 147314.19859983725
+          },
+          "norns": {
+            "usd": 0.001711,
+            "calls": 2,
+            "tokens": 1715,
+            "providers": {
+              "openai": 2
+            },
+            "latency_ms": 32715.269300038926
+          },
+          "synth": {
+            "usd": 0.0239,
+            "calls": 7,
+            "tokens": 35804,
+            "providers": {
+              "openai": 7
+            },
+            "latency_ms": 161555.2055000444
+          },
+          "heimdall": {
+            "usd": 0.047424,
+            "calls": 11,
+            "tokens": 55556,
+            "providers": {
+              "openai": 11
+            },
+            "latency_ms": 310011.0364999855
+          }
+        },
+        "tokens_in": 580679,
+        "max_tokens": 2000000,
+        "tokens_out": 137609,
+        "tool_calls": 388,
+        "agent_calls": 59,
+        "max_agent_calls": 200
+      },
+      "trace_url": "",
+      "error": "",
+      "scenario_id": null,
+      "started_at": "2026-10-25T09:12:57.343047",
+      "finished_at": "2026-10-25T09:22:51.641773"
+    }
+  ],
+  "tool_usage": [
+    {
+      "agent": "heimdall",
+      "tool": "hybrid_search",
+      "calls": 1
+    },
+    {
+      "agent": "loki",
+      "tool": "save_dependency",
+      "calls": 14
+    },
+    {
+      "agent": "tyr",
+      "tool": "get_clause",
+      "calls": 42
+    }
+  ],
+  "blocked_tool_calls": 0,
+  "citation_guard": {
+    "stored_citations": 168,
+    "stored_unverified": 0
+  },
+  "limits": {
+    "max_clarify_rounds": 2,
+    "max_debate_rounds": 2,
+    "max_agent_calls": 200,
+    "max_tokens": 2000000,
+    "max_usd": 5.0,
+    "max_tool_steps": 2,
+    "confidence_threshold": 0.7,
+    "evidence_threshold": 0.75
+  },
+  "providers": {
+    "provider": "openai",
+    "fallback": [
+      "bedrock",
+      "anthropic",
+      "groq"
+    ],
+    "temperature": 0,
+    "max_retries": 2
+  }
+}

@@ -61,12 +61,12 @@ export default function App() {
   useEffect(() => {
     if (!me) return;
     const es = new EventSource("/api/stream", { withCredentials: true });
-    es.addEventListener("odin", (e) => {
-      const msg = JSON.parse((e as MessageEvent).data);
+    es.onmessage = (e) => {
+      const msg = JSON.parse(e.data);
       setLast((l) => [msg, ...l].slice(0, 200));
       window.clearTimeout(bump.current);                 // coalesce bursts → one refetch
       bump.current = window.setTimeout(() => setVersion((v) => v + 1), 600);
-    });
+    };
     return () => es.close();
   }, [me]);
 

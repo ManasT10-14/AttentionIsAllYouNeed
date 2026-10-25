@@ -1,0 +1,153 @@
+{
+  "as_of": "2026-11-02",
+  "exposure": {
+    "as_of": "2026-11-02",
+    "expected": 34430000.0,
+    "worst_case": 42160000.0,
+    "currency": "INR",
+    "contracts": [
+      {
+        "contract_id": "CSA-2026-004",
+        "expected": 0.0,
+        "worst_case": 0.0,
+        "currency": "INR",
+        "term_end": "2028-03-31",
+        "notice_deadline": null,
+        "assumptions": []
+      },
+      {
+        "contract_id": "LEASE-2025-001",
+        "expected": 10800000.0,
+        "worst_case": 13500000.0,
+        "currency": "INR",
+        "term_end": "2026-12-31",
+        "notice_deadline": "2026-10-30",
+        "assumptions": [
+          "LEASE-2025-001: no non-renewal notice is sent before 2026-10-30.",
+          "LEASE-2025-001: worst case assumes every quantified penalty fires once and suspected breaches are upheld."
+        ]
+      },
+      {
+        "contract_id": "MSA-2026-001",
+        "expected": 14430000.0,
+        "worst_case": 14460000.0,
+        "currency": "INR",
+        "term_end": "2027-01-31",
+        "notice_deadline": "2026-12-31",
+        "assumptions": [
+          "MSA-2026-001: no non-renewal notice is sent before 2026-12-31.",
+          "MSA-2026-001: worst case assumes every quantified penalty fires once and suspected breaches are upheld."
+        ]
+      }
+    ],
+    "note": "Single-currency sum; FX conversion not applied."
+  },
+  "heatmap": {
+    "as_of": "2026-11-02",
+    "cells": [
+      {
+        "contract_id": "LEASE-2025-001",
+        "clause_type": "payment",
+        "month": "2026-11",
+        "amount": 450000.0
+      },
+      {
+        "contract_id": "LEASE-2025-001",
+        "clause_type": "payment",
+        "month": "2026-12",
+        "amount": 450000.0
+      },
+      {
+        "contract_id": "LEASE-2025-001",
+        "clause_type": "payment",
+        "month": "2027-01",
+        "amount": 450000.0
+      }
+    ]
+  },
+  "alerts": [
+    {
+      "id": "al-d517e3ca7d7b",
+      "dedupe_key": "LEASE-2025-001:notice_deadline:2026-10-30",
+      "severity": "critical",
+      "kind": "notice_deadline",
+      "title": "Last day to send non-renewal notice (60 days before 2026-12-31, business-day adjusted, IN)",
+      "why": "Last day to send non-renewal notice (60 days before 2026-12-31, business-day adjusted, IN) was missed on 2026-10-30.",
+      "contract_id": "LEASE-2025-001",
+      "due_date": "2026-10-30",
+      "citations": [
+        {
+          "contract_id": "LEASE-2025-001",
+          "clause_number": "2.2",
+          "quote": "2.2 The lease shall renew automatically for successive periods of 12 months unless the Tenant gives the Landlord written notice of non-renewal at least 60 days before the expiry of the then-current term.",
+          "page": 1,
+          "version": 1,
+          "verified": true
+        }
+      ],
+      "event_id": null,
+      "violation_id": null,
+      "status": "open",
+      "snooze_until": null,
+      "created_at": "2026-11-02T00:00:00"
+    },
+    {
+      "id": "al-b395a24a392d",
+      "dedupe_key": "MSA-2026-001:penalty_trigger:2026-11-02",
+      "severity": "critical",
+      "kind": "penalty_trigger",
+      "title": "Breach exposure: SLA non-compliance",
+      "why": "penalty trigger in 0 days (2026-11-02). Amount INR 30,000.",
+      "contract_id": "MSA-2026-001",
+      "due_date": "2026-11-02",
+      "citations": [
+        {
+          "contract_id": "MSA-2026-001",
+          "clause_number": "5.1",
+          "quote": "The Provider shall ensure monthly availability of 99.5%.",
+          "page": 1,
+          "version": 1,
+          "verified": true
+        }
+      ],
+      "event_id": null,
+      "violation_id": null,
+      "status": "open",
+      "snooze_until": null,
+      "created_at": "2026-11-02T00:00:00"
+    },
+    {
+      "id": "al-7ac606e47491",
+      "dedupe_key": "LEASE-2025-001:payment:2026-11-05",
+      "severity": "medium",
+      "kind": "payment",
+      "title": "Payment to Skyline Realty LLP",
+      "why": "payment in 3 days (2026-11-05). Amount INR 450,000.",
+      "contract_id": "LEASE-2025-001",
+      "due_date": "2026-11-05",
+      "citations": [
+        {
+          "contract_id": "LEASE-2025-001",
+          "clause_number": "3.1",
+          "quote": "3.1 The Tenant shall pay a monthly rent of INR 4,50,000 in advance on or before the 5th day of each month, the first payment being due on 5 January 2025.",
+          "page": 1,
+          "version": 1,
+          "verified": true
+        }
+      ],
+      "event_id": null,
+      "violation_id": null,
+      "status": "open",
+      "snooze_until": null,
+      "created_at": "2026-11-02T00:00:00"
+    }
+  ],
+  "health": {
+    "CSA-2026-004": 65,
+    "LEASE-2025-001": 62,
+    "MSA-2026-001": 56,
+    "NDA-2026-003": 83,
+    "SUP-2025-007": 66,
+    "SUP-2026-002": 66
+  }
+}

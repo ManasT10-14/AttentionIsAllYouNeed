@@ -1,0 +1,60 @@
+{
+  "nodes": [
+    {
+      "id": "c:CSA-2026-004",
+      "type": "contract",
+      "label": "Customer Services Agreement",
+      "contract_id": "CSA-2026-004",
+      "contract_type": "saas",
+      "version": 1
+    },
+    {
+      "id": "p:0",
+      "type": "party",
+      "label": "Acme Analytics Pvt Ltd",
+      "role": "company"
+    },
+    {
+      "id": "p:1",
+      "type": "party",
+      "label": "BigRetail India Ltd",
+      "role": "counterparty"
+    }
+  ],
+  "edges": [
+    {
+      "source": "p:0",
+      "target": "c:CSA-2026-004",
+      "kind": "party_to"
+    },
+    {
+      "source": "p:1",
+      "target": "c:CSA-2026-004",
+      "kind": "party_to"
+    },
+    {
+      "source": "c:CSA-2026-004",
+      "target": "cl:CSA-2026-004:1.1",
+      "kind": "contains"
+    }
+  ],
+  "cascades": {
+    "CSA-2026-004": [
+      "LEASE-2025-001",
+      "MSA-2026-001"
+    ],
+    "LEASE-2025-001": [
+      "CSA-2026-004",
+      "MSA-2026-001"
+    ],
+    "MSA-2026-001": [
+      "LEASE-2025-001",
+      "CSA-2026-004"
+    ],
+    "NDA-2026-003": [
+      "CSA-2026-004",
+      "LEASE-2025-001",
+      "MSA-2026-001"
+    ]
+  }
+}

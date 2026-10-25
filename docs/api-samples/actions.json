@@ -1,0 +1,152 @@
+[
+  {
+    "id": "act-d011bfcd67",
+    "to": "cfo@acme-analytics.example; legal@acme-analytics.example",
+    "kind": "escalation_memo",
+    "source": "analysis",
+    "status": "draft",
+    "body_md": "**INTERNAL ESCALATION MEMO – IMMEDIATE ACTION REQUIRED**\n\n**TO:** CFO (cfo@acme-analytics.example), Legal (legal@acme-analytics.example)  \n**FROM:** TYR Contract Intelligence  \n**DATE:** 20 October 2026  \n**RE:** CRITICAL DECISION REQUIRED – Bengaluru Office Lease (LEASE-2025-001) – 10 Days to Deadline\n\n---\n\n## EXECUTIVE SUMMARY\n\nThe Bengaluru office lease (LEASE-2025-001) expires 31 December 2026…",
+    "subject": "URGENT: Critical Decision Required - LEASE-2025-001 Non-Renewal Deadline 30 Oct 2026",
+    "deadline": "2026-10-21",
+    "event_id": null,
+    "priority": 16.98,
+    "redlines": [],
+    "citations": [
+      {
+        "page": 1,
+        "quote": "The lease shall renew automatically for successive periods of 12 months unless the Tenant gives the Landlord written notice of non-renewal at least 60 days before the expiry of the then-current term.",
+        "version": 1,
+        "verified": true,
+        "contract_id": "LEASE-2025-001",
+        "clause_number": "2.2"
+      },
+      {
+        "page": 1,
+        "quote": "On each renewal the monthly rent shall increase by 10% over the rent payable immediately before renewal.",
+        "version": 1,
+        "verified": true,
+        "contract_id": "LEASE-2025-001",
+        "clause_number": "2.3"
+      }
+    ],
+    "confidence": 0.98,
+    "contract_id": "LEASE-2025-001",
+    "leverage_notes": "Critical dependency: BigRetail operations team is housed in this office. Any disruption risks 40% of revenue. Non-renewal decision MUST be paired with secured alternative premises. Landlord has no leverage if Acme has viable alternatives – market conditions may favor tenants.",
+    "related_finding_ids": [
+      "fd-b11a720226",
+      "fd-03ac4d566b",
+      "fd-d5b6896b19"
+    ],
+    "est_exposure_avoided": {
+      "amount": 9900000.0,
+      "currency": "INR"
+    },
+    "needs_human_approval": true,
+    "related_violation_ids": []
+  },
+  {
+    "id": "act-8a41358c5d",
+    "to": "Risk Committee, Acme Analytics Pvt Ltd (legal@acme-analytics.example, cfo@acme-analytics.example)",
+    "kind": "escalation_memo",
+    "source": "analysis",
+    "status": "draft",
+    "body_md": "**ESCALATION MEMO – CONTRACTUAL RISK EXPOSURE**\n\n**To:** Risk Committee, Acme Analytics Pvt Ltd  \n**From:** Legal/Contracts Function  \n**Date:** 20 October 2026  \n**Re:** Critical Risk Exposure in CSA-2026-004 (BigRetail India Ltd) – Immediate Action Required\n\n---\n\n**1. EXECUTIVE SUMMARY**\n\nCSA-2026-004 with BigRetail India Ltd (~40% of revenue) contains **seven verified structural deficiencies** …",
+    "subject": "URGENT: Critical Contractual Risk Exposure in CSA-2026-004 – Risk Committee Action Required",
+    "deadline": "2026-10-21",
+    "event_id": null,
+    "priority": 16.98,
+    "redlines": [],
+    "citations": [
+      {
+        "page": 1,
+        "quote": "For each month in which availability is below 99.9%, the Provider shall pay the Client a penalty of 10% of the monthly fee, without any cap.",
+        "version": 1,
+        "verified": true,
+        "contract_id": "CSA-2026-004",
+        "clause_number": "4.2"
+      },
+      {
+        "page": 1,
+        "quote": "Three consecutive months below the guaranteed availability entitle the Client to terminate immediately and claim damages.",
+        "version": 1,
+        "verified": true,
+        "contract_id": "CSA-2026-004",
+        "clause_number": "4.3"
+      },
+      {
+        "page": 1,
+        "quote": "The Client may terminate for convenience on 30 days notice.",
+        "version": 1,
+        "verified": true,
+        "contract_id": "CSA-2026-004",
+        "clause_number": "5.1"
+      }
+    ],
+    "confidence": 0.98,
+    "contract_id": "CSA-2026-004",
+    "leverage_notes": "BigRetail represents ~40% of revenue; losing this customer would be catastrophic, but current contract terms could bankrupt Acme. The amendment package is designed to be reasonable and industry-standard. If BigRetail refuses, Acme must consider: (a) procuring backup infrastructure to close 0.4% SLA gap, (b) increasing insurance coverage, (c) renegotiating Nimbus SLA, or (d) strategic discussion ab…",
+    "related_finding_ids": [
+      "fd-be64354beb",
+      "fd-995713b5b5",
+      "fd-1c236c7929"
+    ],
+    "est_exposure_avoided": {
+      "amount": 100000000.0,
+      "currency": "INR"
+    },
+    "needs_human_approval": true,
+    "related_violation_ids": []
+  },
+  {
+    "id": "act-ddfdf3ee88",
+    "to": "cfo@acme-analytics.example; legal@acme-analytics.example",
+    "kind": "escalation_memo",
+    "source": "analysis",
+    "status": "draft",
+    "body_md": "**ESCALATION MEMO – CONTRACTUAL CONFLICT EXPOSURE**\n\n**To:** CFO (cfo@acme-analytics.example), Legal (legal@acme-analytics.example)  \n**From:** TYR Contract Intelligence  \n**Date:** 20 October 2026  \n**Priority:** HIGH  \n**Re:** Impossible Contractual Position – SUP-2025-007 (Orion) vs. SUP-2026-002 (Vega)\n\n**Executive Summary**\n\nAcme Analytics is in an impossible contractual position. We are simu…",
+    "subject": "URGENT: Contractual Conflict Exposure – SUP-2025-007 vs. SUP-2026-002",
+    "deadline": "2026-10-21",
+    "event_id": null,
+    "priority": 16.95,
+    "redlines": [],
+    "citations": [
+      {
+        "page": 1,
+        "quote": "During the term the Buyer shall purchase IoT sensors exclusively from the Supplier and shall not procure equivalent products from any third party.",
+        "version": 1,
+        "verified": true,
+        "contract_id": "SUP-2025-007",
+        "clause_number": "2.1"
+      },
+      {
+        "page": 1,
+        "quote": "The Buyer shall purchase sensors worth at least INR 20,00,000 in each calendar quarter.",
+        "version": 1,
+        "verified": true,
+        "contract_id": "SUP-2025-007",
+        "clause_number": "4.1"
+      },
+      {
+        "page": 1,
+        "quote": "The Buyer shall pay INR 6,00,000 per quarter for the committed volume, payable on the first day of each quarter starting 1 July 2026.",
+        "version": 1,
+        "verified": true,
+        "contract_id": "SUP-2026-002",
+        "clause_number": "3.1"
+      }
+    ],
+    "confidence": 0.95,
+    "contract_id": "SUP-2026-002",
+    "leverage_notes": "Internal escalation for immediate executive action. Combined minimum exposure of INR 44,00,000 over next 8 months. Worst case includes uncapped damages, litigation costs, and reputational harm with BigRetail (40% revenue customer).",
+    "related_finding_ids": [
+      "fd-59b46884fe",
+      "fd-61f75f213a"
+    ],
+    "est_exposure_avoided": {
+      "amount": 4400000.0,
+      "currency": "INR"
+    },
+    "needs_human_approval": true,
+    "related_violation_ids": []
+  }
+]

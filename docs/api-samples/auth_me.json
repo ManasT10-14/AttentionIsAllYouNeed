@@ -1,0 +1,40 @@
+{
+  "user": {
+    "id": "usr-213129ddf1",
+    "email": "judges@acme.example",
+    "name": "Acme Analytics Pvt Ltd",
+    "role": "admin"
+  },
+  "company": {
+    "id": "co-3bf464ac6d",
+    "name": "Acme Analytics Pvt Ltd",
+    "context": {
+      "name": "Acme Analytics Pvt Ltd",
+      "contacts": [
+        "legal@acme-analytics.example",
+        "cfo@acme-analytics.example"
+      ],
+      "industry": "B2B retail analytics SaaS + IoT footfall sensors",
+      "raw_text": "COMPANY NAME: Acme Analytics Pvt Ltd\nINDUSTRY: B2B retail analytics SaaS + IoT footfall sensors\nHQ / JURISDICTIONS: Bengaluru, India; IN, SG, UK\nFISCAL YEAR START: 04-01\nBASE CURRENCY: INR\nRISK APPETITE: low\nAPPROVAL THRESHOLD: INR 10,00,000\nKEY CONTACTS: legal@acme-analytics.example, cfo@acme-analytics.example\nSTRATEGIC PRIORITIES: Keep BigRetail (largest customer, ~40% revenue) happy; reduce ven…",
+      "priorities": "Keep BigRetail (largest customer, ~40% revenue) happy; reduce vendor lock-in; move to a second sensor supplier to cut costs.",
+      "base_currency": "INR",
+      "critical_deps": "Nimbus Cloud hosts the platform delivered to BigRetail; the Bengaluru office houses the operations team that runs the BigRetail service.",
+      "jurisdictions": [
+        "Bengaluru",
+        "India",
+        "IN"
+      ],
+      "risk_appetite": "low",
+      "fiscal_year_start": "04-01",
+      "approval_threshold": {
+        "amount": 1000000.0,
+        "currency": "INR"
+      }
+    },
+    "sim_now": "2026-11-02"
+  },
+  "gmail_connected": false,
+  "gmail_address": null,
+  "google_configured": true,
+  "dev_login": true
+}

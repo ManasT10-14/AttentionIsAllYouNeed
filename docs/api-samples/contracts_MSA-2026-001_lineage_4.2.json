@@ -1,0 +1,36 @@
+{
+  "versions": [
+    {
+      "id": "co-3bf464ac6d:MSA-2026-001:v1:4.2",
+      "number": "4.2",
+      "heading": "PAYMENT",
+      "text": "4.2 Invoices are payable within 30 days of the invoice date.",
+      "page": 1,
+      "clause_type": "payment",
+      "version": 1,
+      "bboxes": [
+        [
+          1,
+          64.0,
+          516.25
+        ]
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "id": "fd-d06719dee9",
+      "claim": "Acme faces catastrophic uncapped liability to BigRetail for Nimbus failures due to SLA mismatch: Nimbus promises 99.5% availability with 10% monthly cap, but Acme must deliver 99.9% to BigRetail with uncapped 10% monthly penalties and immediate termination rights",
+      "severity": 5,
+      "status": "verified",
+      "created_at": null
+    },
+    {
+      "id": "fd-ccce4a326b",
+      "claim": "Contradictory payment terms: Clause 4.2 says 30 days, Schedule A says 15 days - Nimbus can enforce the shorter period and claim earlier default",
+      "severity": 3,
+      "status": "verified",
+      "created_at": null
+    }
+  ]
+}

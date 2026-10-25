@@ -1,0 +1,130 @@
+[
+  {
+    "name": "get_clause",
+    "scope": "read_contract",
+    "side_effect": false,
+    "requires_approval": false,
+    "pii": false,
+    "llm_visible": true,
+    "allowed_agents": [
+      "ask",
+      "heimdall",
+      "loki"
+    ],
+    "description": "Exact text of one clause by contract id + clause number (no retrieval).",
+    "args_schema": {
+      "properties": {
+        "contract_id": {
+          "title": "Contract Id",
+          "type": "string"
+        },
+        "clause_number": {
+          "title": "Clause Number",
+          "type": "string"
+        },
+        "version": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Version"
+        }
+      },
+      "required": [
+        "contract_id",
+        "clause_number"
+      ],
+      "title": "GetClauseArgs",
+      "type": "object"
+    }
+  },
+  {
+    "name": "hybrid_search",
+    "scope": "retrieval",
+    "side_effect": false,
+    "requires_approval": false,
+    "pii": false,
+    "llm_visible": true,
+    "allowed_agents": [
+      "ask",
+      "heimdall",
+      "loki"
+    ],
+    "description": "Hybrid (BM25 + dense) search over current clauses of the company's contracts.",
+    "args_schema": {
+      "properties": {
+        "query": {
+          "description": "Natural-language or keyword query, e.g. 'auto renewal notice period'",
+          "title": "Query",
+          "type": "string"
+        },
+        "contract_ids": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Restrict to these CONTRACT IDs",
+          "title": "Contract Ids"
+        },
+        "clause_types": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "e.g. ['payment','penalty','termination']",
+          "title": "Clause Types"
+        },
+        "top_k": {
+          "default": 8,
+          "title": "Top K",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "title": "SearchArgs",
+      "type": "object"
+    }
+  },
+  {
+    "name": "list_contracts",
+    "scope": "read_state",
+    "side_effect": false,
+    "requires_approval": false,
+    "pii": false,
+    "llm_visible": true,
+    "allowed_agents": [
+      "ask",
+      "heimdall",
+      "loki"
+    ],
+    "description": "All contracts: id, title, type, parties, version, effective date, governing law.",
+    "args_schema": {
+      "properties": {},
+      "title": "NoArgs",
+      "type": "object"
+    }
+  }
+]

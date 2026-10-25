@@ -1,0 +1,30 @@
+[
+  {
+    "id": "vio-0e20ff2c2c",
+    "page": 1,
+    "quote": "The Provider shall ensure monthly availability of 99.5%.",
+    "bboxes": [
+      [
+        1.0,
+        64.0,
+        594.25
+      ]
+    ],
+    "source": "analysis",
+    "status": "confirmed",
+    "version": 1,
+    "event_id": "evt-2265bb3219",
+    "exposure": {
+      "amount": 30000.0,
+      "currency": "INR"
+    },
+    "clause_id": "co-3bf464ac6d:MSA-2026-001:v1:5.1",
+    "ruling_id": "rul-8a7608b2d7",
+    "breach_type": "SLA non-compliance",
+    "breached_by": "counterparty",
+    "contract_id": "MSA-2026-001",
+    "explanation": "The provider failed to meet the contractual 99.5% monthly availability threshold, delivering only 98.7% due to a 9-hour outage. This triggers entitlement to service credits under clause 5.2. Per clause 5.3, service credits are the sole and exclusive remedy for SLA failures.",
+    "clause_number": "5.1",
+    "ruling_rationale": "The event confirms a 9-hour outage on 2026-11-02 resulting in projected monthly availability of 98.7%. Clause 5.1 states: 'The Provider shall ensure monthly availability of 99.5%.' The 0.8 percentage point shortfall (99.5% - 98.7% = 0.8%) constitutes a clear breach of the contractual availability requirement. The breach is mathematical and unambiguous."
+  }
+]

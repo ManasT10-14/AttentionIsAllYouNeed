@@ -59,7 +59,7 @@ async def stream(request: Request, u: User = Depends(current_user)):
                     break
                 try:
                     msg = await asyncio.wait_for(q.get(), timeout=15)
-                    yield {"event": "odin", "data": msg}
+                    yield {"data": msg}          # unnamed → EventSource.onmessage
                 except asyncio.TimeoutError:
                     yield {"event": "ping", "data": "{}"}
         finally:

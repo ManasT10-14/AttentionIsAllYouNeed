@@ -1,0 +1,145 @@
+{
+  "as_of": "2026-11-02",
+  "contracts": [
+    {
+      "contract_id": "MSA-2026-001",
+      "term_end": "2027-01-31",
+      "notice_deadline": "2026-12-31",
+      "entries": [
+        {
+          "id": "tl-0988e3c145a0",
+          "contract_id": "MSA-2026-001",
+          "date": "2026-02-01",
+          "kind": "payment",
+          "title": "Payment to Nimbus Cloud Ltd",
+          "status": "past",
+          "amount": {
+            "amount": 300000.0,
+            "currency": "INR"
+          },
+          "citation": {
+            "contract_id": "MSA-2026-001",
+            "clause_number": "3.1",
+            "quote": "The Customer shall pay monthly fees of INR 3,00,000, invoiced on the 1st of each month starting 1 February 2026.",
+            "page": 1,
+            "version": 1,
+            "verified": true
+          },
+          "owner": "",
+          "source": "analysis"
+        },
+        {
+          "id": "tl-8f16fd70653c",
+          "contract_id": "MSA-2026-001",
+          "date": "2026-02-01",
+          "kind": "payment",
+          "title": "Payment to Nimbus Cloud Ltd",
+          "status": "past",
+          "amount": {
+            "amount": 300000.0,
+            "currency": "INR"
+          },
+          "citation": {
+            "contract_id": "MSA-2026-001",
+            "clause_number": "4.2",
+            "quote": "Invoices are payable within 30 days of the invoice date.",
+            "page": 1,
+            "version": 1,
+            "verified": true
+          },
+          "owner": "",
+          "source": "analysis"
+        },
+        {
+          "id": "tl-cca5c87272a7",
+          "contract_id": "MSA-2026-001",
+          "date": "2026-03-01",
+          "kind": "payment",
+          "title": "Payment to Nimbus Cloud Ltd",
+          "status": "past",
+          "amount": {
+            "amount": 300000.0,
+            "currency": "INR"
+          },
+          "citation": {
+            "contract_id": "MSA-2026-001",
+            "clause_number": "3.1",
+            "quote": "The Customer shall pay monthly fees of INR 3,00,000, invoiced on the 1st of each month starting 1 February 2026.",
+            "page": 1,
+            "version": 1,
+            "verified": true
+          },
+          "owner": "",
+          "source": "analysis"
+        }
+      ],
+      "exposure": {
+        "as_of": "2026-11-02",
+        "expected": 14430000.0,
+        "worst_case": 14460000.0,
+        "currency": "INR",
+        "lines": [
+          {
+            "contract_id": "MSA-2026-001",
+            "label": "Locked-in renewal if no notice sent",
+            "amount": {
+              "amount": 7200000.0,
+              "currency": "INR"
+            },
+            "month": "2027-01",
+            "clause_type": "renewal",
+            "citation": {
+              "contract_id": "MSA-2026-001",
+              "clause_number": "2.2",
+              "quote": "This Agreement renews automatically for further 12-month periods unless either party gives written notice of non-renewal at least 30 days before the end of the current term.",
+              "page": 1,
+              "version": 1,
+              "verified": true
+            }
+          },
+          {
+            "contract_id": "MSA-2026-001",
+            "label": "Scheduled: payment",
+            "amount": {
+              "amount": 300000.0,
+              "currency": "INR"
+            },
+            "month": "2026-12",
+            "clause_type": "payment",
+            "citation": {
+              "contract_id": "MSA-2026-001",
+              "clause_number": "3.1",
+              "quote": "The Customer shall pay monthly fees of INR 3,00,000, invoiced on the 1st of each month starting 1 February 2026.",
+              "page": 1,
+              "version": 1,
+              "verified": true
+            }
+          },
+          {
+            "contract_id": "MSA-2026-001",
+            "label": "Scheduled: payment",
+            "amount": {
+              "amount": 300000.0,
+              "currency": "INR"
+            },
+            "month": "2027-01",
+            "clause_type": "payment",
+            "citation": {
+              "contract_id": "MSA-2026-001",
+              "clause_number": "3.1",
+              "quote": "The Customer shall pay monthly fees of INR 3,00,000, invoiced on the 1st of each month starting 1 February 2026.",
+              "page": 1,
+              "version": 1,
+              "verified": true
+            }
+          }
+        ],
+        "assumptions": [
+          "MSA-2026-001: no non-renewal notice is sent before 2026-12-31.",
+          "MSA-2026-001: worst case assumes every quantified penalty fires once and suspected breaches are upheld."
+        ],
+        "source": "analysis"
+      }
+    }
+  ]
+}

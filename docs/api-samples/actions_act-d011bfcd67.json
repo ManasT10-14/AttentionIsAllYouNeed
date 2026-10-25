@@ -1,0 +1,51 @@
+{
+  "id": "act-d011bfcd67",
+  "to": "cfo@acme-analytics.example; legal@acme-analytics.example",
+  "kind": "escalation_memo",
+  "source": "analysis",
+  "status": "draft",
+  "body_md": "**INTERNAL ESCALATION MEMO – IMMEDIATE ACTION REQUIRED**\n\n**TO:** CFO (cfo@acme-analytics.example), Legal (legal@acme-analytics.example)  \n**FROM:** TYR Contract Intelligence  \n**DATE:** 20 October 2026  \n**RE:** CRITICAL DECISION REQUIRED – Bengaluru Office Lease (LEASE-2025-001) – 10 Days to Deadline\n\n---\n\n## EXECUTIVE SUMMARY\n\nThe Bengaluru office lease (LEASE-2025-001) expires 31 December 2026…",
+  "subject": "URGENT: Critical Decision Required - LEASE-2025-001 Non-Renewal Deadline 30 Oct 2026",
+  "deadline": "2026-10-21",
+  "event_id": null,
+  "priority": 16.98,
+  "redlines": [],
+  "citations": [
+    {
+      "page": 1,
+      "quote": "The lease shall renew automatically for successive periods of 12 months unless the Tenant gives the Landlord written notice of non-renewal at least 60 days before the expiry of the then-current term.",
+      "version": 1,
+      "verified": true,
+      "contract_id": "LEASE-2025-001",
+      "clause_number": "2.2"
+    },
+    {
+      "page": 1,
+      "quote": "On each renewal the monthly rent shall increase by 10% over the rent payable immediately before renewal.",
+      "version": 1,
+      "verified": true,
+      "contract_id": "LEASE-2025-001",
+      "clause_number": "2.3"
+    }
+  ],
+  "confidence": 0.98,
+  "contract_id": "LEASE-2025-001",
+  "leverage_notes": "Critical dependency: BigRetail operations team is housed in this office. Any disruption risks 40% of revenue. Non-renewal decision MUST be paired with secured alternative premises. Landlord has no leverage if Acme has viable alternatives – market conditions may favor tenants.",
+  "related_finding_ids": [
+    "fd-b11a720226",
+    "fd-03ac4d566b",
+    "fd-d5b6896b19"
+  ],
+  "est_exposure_avoided": {
+    "amount": 9900000.0,
+    "currency": "INR"
+  },
+  "needs_human_approval": true,
+  "related_violation_ids": [],
+  "counterfactual": {
+    "without_action": 13500000.0,
+    "with_action": 13500000.0,
+    "avoided": 0.0,
+    "currency": "INR"
+  }
+}

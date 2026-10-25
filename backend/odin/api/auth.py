@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from authlib.integrations.starlette_client import OAuth
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 from sqlalchemy import select
@@ -90,7 +90,12 @@ def logout(request: Request):
 
 
 @router.get("/me")
-def me(u: User = Depends(current_user)):
+def me(request: Request):
+    flags = {"google_configured": bool(settings().google_client_id), "dev_login": settings().dev_login}
+    try:
+        u = current_user(request)
+    except HTTPException as e:
+        raise HTTPException(401, {"error": e.detail, **flags})
     with db() as s:
         c = s.get(Company, u.company_id)
         tok = s.get(OAuthToken, u.id)
@@ -98,4 +103,4 @@ def me(u: User = Depends(current_user)):
             "company": {"id": c.id, "name": c.name, "context": c.context, "sim_now": c.sim_now},
             "gmail_connected": bool(tok and tok.enc_refresh),
             "gmail_address": u.gmail_address or (u.email if tok and tok.enc_refresh else None),
-            "google_configured": bool(settings().google_client_id), "dev_login": settings().dev_login}
+            **flags}

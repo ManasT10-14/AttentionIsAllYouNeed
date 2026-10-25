@@ -1,0 +1,25 @@
+[
+  {
+    "id": "evt-2265bb3219",
+    "raw": "EVENT_ID: EVT-0002\nEVENT_TYPE: SERVICE_OUTAGE\nOCCURRED_AT: 2026-11-02T03:00:00+05:30\nCONTRACT_ID: MSA-2026-001\nCOUNTERPARTY: Nimbus Cloud Ltd\nREFERENCE: Nimbus incident INC-7781\nSEVERITY_HINT: high\nDESCRIPTION:\nNimbus Cloud had a 9-hour outage of the hosting cluster. Monthly availability for November is now projected\nat 98.7%. The analytics platform delivered to BigRetail India was unavailable for…",
+    "amount": null,
+    "sender": "judge@x.com",
+    "status": "processed",
+    "subject": "[ODIN-EVENT] SERVICE_OUTAGE MSA-2026-001",
+    "reference": "Nimbus incident INC-7781",
+    "event_type": "SERVICE_OUTAGE",
+    "description": "Nimbus Cloud had a 9-hour outage of the hosting cluster. Monthly availability for November is now projected\nat 98.7%. The analytics platform delivered to BigRetail India was unavailable for the same 9 hours.",
+    "external_id": "EVT-0002",
+    "occurred_at": "2026-11-02T03:00:00+05:30",
+    "scenario_id": null,
+    "contract_ids": [
+      "MSA-2026-001"
+    ],
+    "counterparty": "Nimbus Cloud Ltd",
+    "gmail_msg_id": "1fd0b73bb4c89200",
+    "parse_method": "manual",
+    "reject_reason": "",
+    "severity_hint": "high",
+    "parse_confidence": 1.0
+  }
+]

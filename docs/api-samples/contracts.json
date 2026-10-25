@@ -1,0 +1,110 @@
+[
+  {
+    "contract_id": "CSA-2026-004",
+    "title": "Customer Services Agreement",
+    "type": "saas",
+    "version": 1,
+    "parties": [
+      {
+        "name": "Acme Analytics Pvt Ltd",
+        "role": "company",
+        "alias": "Provider"
+      },
+      {
+        "name": "BigRetail India Ltd",
+        "role": "counterparty",
+        "alias": "Client"
+      }
+    ],
+    "effective_date": "2026-04-01",
+    "governing_law": "India",
+    "status": "ingested",
+    "warnings": [
+      "LibreOffice not found: DOCX rendered from plain text; Word auto-numbering is lost — type clause numbers literally (spec §3.1)."
+    ],
+    "health": {
+      "contract_id": "CSA-2026-004",
+      "score": 65,
+      "breakdown": {
+        "ambiguity_flags": 0,
+        "unverified_fields": -5,
+        "open_findings": -30,
+        "confirmed_violations": 0,
+        "missed_deadlines": 0
+      }
+    },
+    "analysed": true
+  },
+  {
+    "contract_id": "LEASE-2025-001",
+    "title": "Oﬃce Lease Agreement",
+    "type": "lease",
+    "version": 1,
+    "parties": [
+      {
+        "name": "Acme Analytics Pvt Ltd",
+        "role": "company",
+        "alias": "Tenant"
+      },
+      {
+        "name": "Skyline Realty LLP",
+        "role": "counterparty",
+        "alias": "Landlord"
+      }
+    ],
+    "effective_date": "2025-01-01",
+    "governing_law": "India",
+    "status": "ingested",
+    "warnings": [
+      "LibreOffice not found: DOCX rendered from plain text; Word auto-numbering is lost — type clause numbers literally (spec §3.1)."
+    ],
+    "health": {
+      "contract_id": "LEASE-2025-001",
+      "score": 62,
+      "breakdown": {
+        "ambiguity_flags": 0,
+        "unverified_fields": 0,
+        "open_findings": -28,
+        "confirmed_violations": 0,
+        "missed_deadlines": -10
+      }
+    },
+    "analysed": true
+  },
+  {
+    "contract_id": "MSA-2026-001",
+    "title": "Master Cloud Services Agreement",
+    "type": "saas",
+    "version": 1,
+    "parties": [
+      {
+        "name": "Acme Analytics Pvt Ltd",
+        "role": "company",
+        "alias": "Customer"
+      },
+      {
+        "name": "Nimbus Cloud Ltd",
+        "role": "counterparty",
+        "alias": "Provider"
+      }
+    ],
+    "effective_date": "2026-02-01",
+    "governing_law": "Singapore",
+    "status": "ingested",
+    "warnings": [
+      "LibreOffice not found: DOCX rendered from plain text; Word auto-numbering is lost — type clause numbers literally (spec §3.1)."
+    ],
+    "health": {
+      "contract_id": "MSA-2026-001",
+      "score": 56,
+      "breakdown": {
+        "ambiguity_flags": -4,
+        "unverified_fields": 0,
+        "open_findings": -30,
+        "confirmed_violations": -10,
+        "missed_deadlines": 0
+      }
+    },
+    "analysed": true
+  }
+]

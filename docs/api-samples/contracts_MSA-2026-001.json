@@ -1,0 +1,388 @@
+{
+  "contract_id": "MSA-2026-001",
+  "title": "Master Cloud Services Agreement",
+  "type": "saas",
+  "meta": {
+    "type": "saas",
+    "title": "Master Cloud Services Agreement",
+    "parties": [
+      {
+        "name": "Acme Analytics Pvt Ltd",
+        "role": "company",
+        "alias": "Customer"
+      },
+      {
+        "name": "Nimbus Cloud Ltd",
+        "role": "counterparty",
+        "alias": "Provider"
+      }
+    ],
+    "version": 1,
+    "supersedes": null,
+    "contract_id": "MSA-2026-001",
+    "governing_law": "Singapore",
+    "effective_date": "2026-02-01"
+  },
+  "version": 1,
+  "versions": [
+    {
+      "version": 1,
+      "created_at": "2026-10-25T09:12:55.736436",
+      "warnings": [
+        "LibreOffice not found: DOCX rendered from plain text; Word auto-numbering is lost — type clause numbers literally (spec §3.1)."
+      ],
+      "file": "original.docx"
+    }
+  ],
+  "extraction": {
+    "parties": [
+      {
+        "name": "Acme Analytics Pvt Ltd",
+        "role": "company",
+        "alias": "Customer"
+      },
+      {
+        "name": "Nimbus Cloud Ltd",
+        "role": "counterparty",
+        "alias": "Provider"
+      }
+    ],
+    "term": {
+      "confidence": 0.95,
+      "citation": {
+        "contract_id": "MSA-2026-001",
+        "clause_number": "2.1",
+        "quote": "This Agreement starts on the Effective Date and continues for 12 months.",
+        "page": 1,
+        "version": 1,
+        "verified": true
+      },
+      "status": "found",
+      "note": "",
+      "source": "sourced",
+      "effective_date": "2026-02-01",
+      "term_months": 12,
+      "end_date": "2027-02-01"
+    },
+    "renewal": {
+      "confidence": 0.95,
+      "citation": {
+        "contract_id": "MSA-2026-001",
+        "clause_number": "2.2",
+        "quote": "This Agreement renews automatically for further 12-month periods unless either party gives written notice of non-renewal at least 30 days before the end of the current term.",
+        "page": 1,
+        "version": 1,
+        "verified": true
+      },
+      "status": "found",
+      "note": "",
+      "source": "sourced",
+      "auto_renew": true,
+      "renewal_period_months": 12,
+      "notice_days": 30,
+      "renewal_value": null
+    },
+    "payments": [
+      {
+        "confidence": 0.95,
+        "citation": {
+          "contract_id": "MSA-2026-001",
+          "clause_number": "3.1",
+          "quote": "The Customer shall pay monthly fees of INR 3,00,000, invoiced on the 1st of each month starting 1 February 2026.",
+          "page": 1,
+          "version": 1,
+          "verified": true
+        },
+        "status": "found",
+        "note": "",
+        "source": "sourced",
+        "description": "",
+        "payer": "Acme Analytics Pvt Ltd",
+        "payee": "Nimbus Cloud Ltd",
+        "amount": {
+          "amount": 300000.0,
+          "currency": "INR"
+        },
+        "frequency": "monthly",
+        "first_due": "2026-02-01",
+        "due_rule": "invoiced on the 1st of each month starting 1 February 2026",
+        "late_fee_pct_per_month": 2.0,
+        "late_fee_flat": null
+      },
+      {
+        "confidence": 0.95,
+        "citation": {
+          "contract_id": "MSA-2026-001",
+          "clause_number": "4.2",
+          "quote": "Invoices are payable within 30 days of the invoice date.",
+          "page": 1,
+          "version": 1,
+          "verified": true
+        },
+        "status": "found",
+        "note": "",
+        "source": "sourced",
+        "description": "",
+        "payer": "Acme Analytics Pvt Ltd",
+        "payee": "Nimbus Cloud Ltd",
+        "amount": {
+          "amount": 300000.0,
+          "currency": "INR"
+        },
+        "frequency": "monthly",
+        "first_due": "2026-02-01",
+        "due_rule": "invoices are payable within 30 days of the invoice date",
+        "late_fee_pct_per_month": 2.0,
+        "late_fee_flat": null
+      }
+    ],
+    "obligations": [
+      {
+        "confidence": 0.95,
+        "citation": {
+          "contract_id": "MSA-2026-001",
+          "clause_number": "1.1",
+          "quote": "The Provider shall provide managed cloud hosting for the Customer's analytics platform, which the Customer uses to deliver services to its own customers.",
+          "page": 1,
+          "version": 1,
+          "verified": true
+        },
+        "status": "found",
+        "note": "",
+        "source": "sourced",
+        "owner": "Nimbus Cloud Ltd",
+        "description": "Provider shall provide managed cloud hosting for the Customer's analytics platform",
+        "due_rule": "",
+        "due_date": null,
+        "recurring": true
+      },
+      {
+        "confidence": 0.95,
+        "citation": {
+          "contract_id": "MSA-2026-001",
+          "clause_number": "5.1",
+          "quote": "The Provider shall ensure monthly availability of 99.5%.",
+          "page": 1,
+          "version": 1,
+          "verified": true
+        },
+        "status": "found",
+        "note": "",
+        "source": "sourced",
+        "owner": "Nimbus Cloud Ltd",
+        "description": "Provider shall ensure monthly availability of 99.5%",
+        "due_rule": "",
+        "due_date": null,
+        "recurring": true
+      },
+      {
+        "confidence": 0.95,
+        "citation": {
+          "contract_id": "MSA-2026-001",
+          "clause_number": "3.1",
+          "quote": "The Customer shall pay monthly fees of INR 3,00,000, invoiced on the 1st of each month starting 1 February 2026.",
+          "page": 1,
+          "version": 1,
+          "verified": true
+        },
+        "status": "found",
+        "note": "",
+        "source": "sourced",
+        "owner": "Acme Analytics Pvt Ltd",
+        "description": "Customer shall pay monthly fees of INR 3,00,000",
+        "due_rule": "invoiced on the 1st of each month starting 1 February 2026",
+        "due_date": null,
+        "recurring": true
+      }
+    ],
+    "penalties": [
+      {
+        "confidence": 0.95,
+        "citation": {
+          "contract_id": "MSA-2026-001",
+          "clause_number": "4.1",
+          "quote": "Late payments attract interest at 2% per month on the overdue amount.",
+          "page": 1,
+          "version": 1,
+          "verified": true
+        },
+        "status": "found",
+        "note": "",
+        "source": "sourced",
+        "trigger": "Late payment on overdue amount",
+        "amount": null,
+        "pct": 2.0,
+        "pct_base": "overdue amount",
+        "cap": null
+      },
+      {
+        "confidence": 0.75,
+        "citation": {
+          "contract_id": "MSA-2026-001",
+          "clause_number": "5.2",
+          "quote": "For each 0.5% (or part) by which availability falls below 99.5%, the Customer is entitled to a service credit of 5% of the monthly fee, capped at 10% of the monthly fee.",
+          "page": 1,
+          "version": 1,
+          "verified": true
+        },
+        "status": "ambiguous",
+        "note": "Cap scope ambiguous: contract does not specify if 10% cap applies per incident or per month aggregate. Threshold calculation: 99.4% = 1.0% below SLA = two 0.5% 'parts' = two 5% credits = 10% total, hitting cap. But 'or part' wording suggests partial thresholds round up, so 0.6% below = two credits, etc.",
+        "source": "sourced",
+        "trigger": "Service level failure - availability falls below 99.5%",
+        "amount": null,
+        "pct": 5.0,
+        "pct_base": "monthly fee",
+        "cap": {
+          "amount": 30000.0,
+          "currency": "INR"
+        }
+      }
+    ],
+    "compliance": [],
+    "termination": [
+      {
+        "confidence": 0.95,
+        "citation": {
+          "contract_id": "MSA-2026-001",
+          "clause_number": "2.2",
+          "quote": "This Agreement renews automatically for further 12-month periods unless either party gives written notice of non-renewal at least 30 days before the end of the current term.",
+          "page": 1,
+          "version": 1,
+          "verified": true
+        },
+        "status": "found",
+        "note": "Termination by non-renewal at end of term",
+        "source": "sourced",
+        "who": "either party",
+        "kind": "convenience",
+        "notice_days": 30,
+        "conditions": "written notice of non-renewal at least 30 days before the end of the current term"
+      },
+      {
+        "confidence": 0.95,
+        "citation": {
+          "contract_id": "MSA-2026-001",
+          "clause_number": "4.3",
+          "quote": "If any amount remains unpaid for more than 45 days the Provider may suspend the Services without further notice.",
+          "page": 1,
+          "version": 1,
+          "verified": true
+        },
+        "status": "found",
+        "note": "Provider may suspend services; termination for cause implied",
+        "source": "sourced",
+        "who": "Provider",
+        "kind": "cause",
+        "notice_days": null,
+        "conditions": "any amount remains unpaid for more than 45 days"
+      }
+    ],
+    "liability_cap": {
+      "confidence": 0.95,
+      "citation": {
+        "contract_id": "MSA-2026-001",
+        "clause_number": "6.1",
+        "quote": "The Provider's total liability under this Agreement shall not exceed the fees paid by the Customer in the 3 months preceding the claim.",
+        "page": 1,
+        "version": 1,
+        "verified": true
+      },
+      "status": "found",
+      "note": "",
+      "source": "sourced",
+      "value": "fees paid by the Customer in the 3 months preceding the claim"
+    },
+    "governing_law": {
+      "confidence": 0.95,
+      "citation": {
+        "contract_id": "MSA-2026-001",
+        "clause_number": "8.1",
+        "quote": "This Agreement is governed by the laws of Singapore and disputes shall be referred to arbitration seated in Singapore.",
+        "page": 2,
+        "version": 1,
+        "verified": true
+      },
+      "status": "found",
+      "note": "",
+      "source": "sourced",
+      "value": "Singapore"
+    },
+    "flags": [
+      {
+        "clause_number": "SCHEDULE A",
+        "kind": "contradictory",
+        "note": "SCHEDULE A states invoices payable within 15 days, but clause 4.2 states 30 days. These are contradictory payment terms.",
+        "related_clauses": [
+          "4.2",
+          "SCHEDULE A"
+        ]
+      }
+    ]
+  },
+  "health": {
+    "contract_id": "MSA-2026-001",
+    "score": 56,
+    "breakdown": {
+      "ambiguity_flags": -4,
+      "unverified_fields": 0,
+      "open_findings": -30,
+      "confirmed_violations": -10,
+      "missed_deadlines": 0
+    }
+  },
+  "clauses": [
+    {
+      "id": "co-3bf464ac6d:MSA-2026-001:v1:1",
+      "number": "1",
+      "heading": "SERVICES",
+      "text": "1. SERVICES",
+      "page": 1,
+      "clause_type": "general",
+      "version": 1,
+      "bboxes": [
+        [
+          1,
+          64.0,
+          260.25
+        ]
+      ]
+    },
+    {
+      "id": "co-3bf464ac6d:MSA-2026-001:v1:1.1",
+      "number": "1.1",
+      "heading": "SERVICES",
+      "text": "1.1 The Provider shall provide managed cloud hosting for the Customer's analytics platform, which the\nCustomer uses to deliver services to its own customers.",
+      "page": 1,
+      "clause_type": "delivery",
+      "version": 1,
+      "bboxes": [
+        [
+          1,
+          64.0,
+          282.25
+        ],
+        [
+          1,
+          64.0,
+          294.25
+        ]
+      ]
+    },
+    {
+      "id": "co-3bf464ac6d:MSA-2026-001:v1:2",
+      "number": "2",
+      "heading": "TERM AND RENEWAL",
+      "text": "2. TERM AND RENEWAL",
+      "page": 1,
+      "clause_type": "renewal",
+      "version": 1,
+      "bboxes": [
+        [
+          1,
+          64.0,
+          316.25
+        ]
+      ]
+    }
+  ]
+}

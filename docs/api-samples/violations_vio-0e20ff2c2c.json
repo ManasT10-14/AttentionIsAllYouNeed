@@ -1,0 +1,198 @@
+{
+  "id": "vio-0e20ff2c2c",
+  "page": 1,
+  "quote": "The Provider shall ensure monthly availability of 99.5%.",
+  "bboxes": [
+    [
+      1.0,
+      64.0,
+      594.25
+    ]
+  ],
+  "source": "analysis",
+  "status": "confirmed",
+  "version": 1,
+  "event_id": "evt-2265bb3219",
+  "exposure": {
+    "amount": 30000.0,
+    "currency": "INR"
+  },
+  "clause_id": "co-3bf464ac6d:MSA-2026-001:v1:5.1",
+  "ruling_id": "rul-8a7608b2d7",
+  "breach_type": "SLA non-compliance",
+  "breached_by": "counterparty",
+  "contract_id": "MSA-2026-001",
+  "explanation": "The provider failed to meet the contractual 99.5% monthly availability threshold, delivering only 98.7% due to a 9-hour outage. This triggers entitlement to service credits under clause 5.2. Per clause 5.3, service credits are the sole and exclusive remedy for SLA failures.",
+  "clause_number": "5.1",
+  "ruling_rationale": "The event confirms a 9-hour outage on 2026-11-02 resulting in projected monthly availability of 98.7%. Clause 5.1 states: 'The Provider shall ensure monthly availability of 99.5%.' The 0.8 percentage point shortfall (99.5% - 98.7% = 0.8%) constitutes a clear breach of the contractual availability requirement. The breach is mathematical and unambiguous.",
+  "event": {
+    "id": "evt-2265bb3219",
+    "event_type": "SERVICE_OUTAGE",
+    "occurred_at": "2026-11-02T03:00:00+05:30",
+    "description": "Nimbus Cloud had a 9-hour outage of the hosting cluster. Monthly availability for November is now projected\nat 98.7%. The analytics platform delivered to BigRetail India was unavailable for the same 9 hours.",
+    "amount": null,
+    "sender": "judge@x.com",
+    "subject": "[ODIN-EVENT] SERVICE_OUTAGE MSA-2026-001"
+  },
+  "ruling": {
+    "status": "confirmed",
+    "rationale": "The event confirms a 9-hour outage on 2026-11-02 resulting in projected monthly availability of 98.7%. Clause 5.1 states: 'The Provider shall ensure monthly availability of 99.5%.' The 0.8 percentage point shortfall (99.5% - 98.7% = 0.8%) constitutes a clear breach of the contractual availability requirement. The breach is mathematical and unambiguous."
+  },
+  "pdf_url": "/api/contracts/MSA-2026-001/versions/1/pdf",
+  "actions": [
+    {
+      "id": "act-e4167e277b",
+      "to": "Nimbus Cloud",
+      "kind": "breach_notice",
+      "source": "analysis",
+      "status": "draft",
+      "body_md": "Dear Nimbus Cloud Team,\n\n**Re: Service Credit Claim under MSA-2026-001**\n\nWe write to formally notify you of a breach of the Service Level Agreement and to claim service credits as provided under Clause 5.2 of our Master Services Agreement dated 1 February 2026 (\"Agreement\").\n\n**Breach Details:**\n- **Date of Incident:** 2 November 2026, 03:00 IST\n- **Duration:** 9 hours\n- **Affected Service:** Hos…",
+      "subject": "Service Credit Claim — SLA Breach November 2026 (MSA-2026-001)",
+      "deadline": "2026-11-09",
+      "event_id": "evt-2265bb3219",
+      "priority": 11.25,
+      "redlines": [],
+      "citations": [
+        {
+          "page": 1,
+          "quote": "The Provider shall ensure monthly availability of 99.5%.",
+          "version": 1,
+          "verified": true,
+          "contract_id": "MSA-2026-001",
+          "clause_number": "5.1"
+        },
+        {
+          "page": 1,
+          "quote": "For each 0.5% (or part) by which availability falls below 99.5%, the Customer is entitled to a service credit of 5% of the monthly fee, capped at 10% of the monthly fee.",
+          "version": 1,
+          "verified": true,
+          "contract_id": "MSA-2026-001",
+          "clause_number": "5.2"
+        },
+        {
+          "page": 1,
+          "quote": "Service credits are the Customer's sole and exclusive remedy for any failure to meet service levels.",
+          "version": 1,
+          "verified": true,
+          "contract_id": "MSA-2026-001",
+          "clause_number": "5.3"
+        }
+      ],
+      "confidence": 0.95,
+      "contract_id": "MSA-2026-001",
+      "leverage_notes": "",
+      "related_finding_ids": [
+        "fd-c2144767ce",
+        "fd-912c9c35c6"
+      ],
+      "est_exposure_avoided": {
+        "amount": 30000.0,
+        "currency": "INR"
+      },
+      "needs_human_approval": true,
+      "related_violation_ids": [
+        "vio-0e20ff2c2c"
+      ]
+    },
+    {
+      "id": "act-243d0b2fd5",
+      "to": "legal@acme-analytics.example, cfo@acme-analytics.example",
+      "kind": "escalation_memo",
+      "source": "analysis",
+      "status": "draft",
+      "body_md": "**CONFIDENTIAL — EXECUTIVE SUMMARY**\n\n**Incident:** 9-hour Nimbus Cloud outage; 98.7% vs. 99.5% SLA; BigRetail India platform affected (~40% revenue exposure)\n**Immediate Financial Impact:** INR 30,000 service credit claimable\n**Strategic Risk:** HIGH — Contract structure severely limits remedies and exit options\n\n---\n\n**1. CONFIRMED BREACH**\n\n| Element | Finding |\n|---------|---------|\n| Contract…",
+      "subject": "URGENT: Nimbus Cloud SLA Breach + Strategic Contract Exposure Assessment",
+      "deadline": "2026-11-09",
+      "event_id": "evt-2265bb3219",
+      "priority": 11.2,
+      "redlines": [],
+      "citations": [
+        {
+          "page": 1,
+          "quote": "The Provider shall ensure monthly availability of 99.5%.",
+          "version": 1,
+          "verified": true,
+          "contract_id": "MSA-2026-001",
+          "clause_number": "5.1"
+        },
+        {
+          "page": 1,
+          "quote": "For each 0.5% (or part) by which availability falls below 99.5%, the Customer is entitled to a service credit of 5% of the monthly fee, capped at 10% of the monthly fee.",
+          "version": 1,
+          "verified": true,
+          "contract_id": "MSA-2026-001",
+          "clause_number": "5.2"
+        },
+        {
+          "page": 1,
+          "quote": "Service credits are the Customer's sole and exclusive remedy for any failure to meet service levels.",
+          "version": 1,
+          "verified": true,
+          "contract_id": "MSA-2026-001",
+          "clause_number": "5.3"
+        }
+      ],
+      "confidence": 0.9,
+      "contract_id": "MSA-2026-001",
+      "leverage_notes": "Critical dependency on Nimbus for BigRetail (40% revenue). Contract lacks termination-for-cause. Auto-renewal locks in INR 36L unless non-renewal notice served by 2 Jan 2027. Recommend immediate commercial discussions for contract amendment adding termination rights and accelerating second supplier evaluation.",
+      "related_finding_ids": [
+        "fd-c2144767ce",
+        "fd-912c9c35c6",
+        "fd-e5de9436ec"
+      ],
+      "est_exposure_avoided": {
+        "amount": 30000.0,
+        "currency": "INR"
+      },
+      "needs_human_approval": false,
+      "related_violation_ids": [
+        "vio-0e20ff2c2c"
+      ]
+    },
+    {
+      "id": "act-73ce0a538e",
+      "to": "cfo@acme-analytics.example",
+      "kind": "payment_instruction",
+      "source": "analysis",
+      "status": "draft",
+      "body_md": "**PAYMENT HOLD INSTRUCTION**\n\n**Vendor:** Nimbus Cloud  \n**Contract:** MSA-2026-001  \n**Invoice Period:** November 2026  \n**Invoice Amount:** INR 3,00,000  \n**Payment Due:** Per Clause 4.2 (30 days from invoice date, approximately 31 December 2026)\n\n---\n\n**INSTRUCTION:**\n\n1. **HOLD** the November 2026 invoice payment pending resolution of service credit claim\n2. **DEDUCT** INR 30,000 service credi…",
+      "subject": "HOLD PAYMENT — Pending Service Credit Offset (Nimbus Cloud November 2026 Invoice)",
+      "deadline": "2026-12-31",
+      "event_id": "evt-2265bb3219",
+      "priority": 6.2,
+      "redlines": [],
+      "citations": [
+        {
+          "page": 1,
+          "quote": "For each 0.5% (or part) by which availability falls below 99.5%, the Customer is entitled to a service credit of 5% of the monthly fee, capped at 10% of the monthly fee.",
+          "version": 1,
+          "verified": true,
+          "contract_id": "MSA-2026-001",
+          "clause_number": "5.2"
+        },
+        {
+          "page": 1,
+          "quote": "Invoices are payable within 30 days of the invoice date.",
+          "version": 1,
+          "verified": true,
+          "contract_id": "MSA-2026-001",
+          "clause_number": "4.2"
+        }
+      ],
+      "confidence": 0.9,
+      "contract_id": "MSA-2026-001",
+      "leverage_notes": "",
+      "related_finding_ids": [
+        "fd-c2144767ce"
+      ],
+      "est_exposure_avoided": {
+        "amount": 30000.0,
+        "currency": "INR"
+      },
+      "needs_human_approval": true,
+      "related_violation_ids": [
+        "vio-0e20ff2c2c"
+      ]
+    }
+  ]
+}

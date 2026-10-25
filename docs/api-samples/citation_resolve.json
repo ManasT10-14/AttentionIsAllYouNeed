@@ -1,0 +1,18 @@
+{
+  "id": "co-3bf464ac6d:MSA-2026-001:v1:4.2",
+  "number": "4.2",
+  "heading": "PAYMENT",
+  "text": "4.2 Invoices are payable within 30 days of the invoice date.",
+  "page": 1,
+  "clause_type": "payment",
+  "version": 1,
+  "bboxes": [
+    [
+      1,
+      64.0,
+      516.25
+    ]
+  ],
+  "contract_id": "MSA-2026-001",
+  "pdf_url": "/api/contracts/MSA-2026-001/versions/1/pdf"
+}

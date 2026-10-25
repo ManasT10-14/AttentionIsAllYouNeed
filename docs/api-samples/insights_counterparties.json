@@ -1,0 +1,29 @@
+[
+  {
+    "name": "Nimbus Cloud Ltd",
+    "contracts": [
+      "MSA-2026-001"
+    ],
+    "worst_case": 14460000.0,
+    "violations": 1,
+    "late_payment_events": 0
+  },
+  {
+    "name": "Skyline Realty LLP",
+    "contracts": [
+      "LEASE-2025-001"
+    ],
+    "worst_case": 13500000.0,
+    "violations": 0,
+    "late_payment_events": 0
+  },
+  {
+    "name": "Orion Components Pvt Ltd",
+    "contracts": [
+      "SUP-2025-007"
+    ],
+    "worst_case": 8000000.0,
+    "violations": 0,
+    "late_payment_events": 0
+  }
+]

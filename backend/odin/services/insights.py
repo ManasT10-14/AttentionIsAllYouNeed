@@ -243,7 +243,8 @@ def graph() -> dict:
         for a, b in zip(cids, cids[1:]):
             edges.append({"source": f"c:{a}", "target": f"c:{b}", "kind": "conflicts_with", "reason": f["claim"],
                           "severity": f["severity"], "finding_id": f["id"]})
-    return {"nodes": nodes, "edges": edges}
+    cascades = {c.contract_id: cascade(c.contract_id) for c in repo.contracts()}
+    return {"nodes": nodes, "edges": edges, "cascades": {k: v for k, v in cascades.items() if v}}
 
 
 def cascade(contract_id: str) -> list[str]:

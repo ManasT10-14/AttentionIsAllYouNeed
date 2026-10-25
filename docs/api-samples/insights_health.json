@@ -1,0 +1,35 @@
+[
+  {
+    "contract_id": "CSA-2026-004",
+    "score": 65,
+    "breakdown": {
+      "ambiguity_flags": 0,
+      "unverified_fields": -5,
+      "open_findings": -30,
+      "confirmed_violations": 0,
+      "missed_deadlines": 0
+    }
+  },
+  {
+    "contract_id": "LEASE-2025-001",
+    "score": 62,
+    "breakdown": {
+      "ambiguity_flags": 0,
+      "unverified_fields": 0,
+      "open_findings": -28,
+      "confirmed_violations": 0,
+      "missed_deadlines": -10
+    }
+  },
+  {
+    "contract_id": "MSA-2026-001",
+    "score": 56,
+    "breakdown": {
+      "ambiguity_flags": -4,
+      "unverified_fields": 0,
+      "open_findings": -30,
+      "confirmed_violations": -10,
+      "missed_deadlines": 0
+    }
+  }
+]

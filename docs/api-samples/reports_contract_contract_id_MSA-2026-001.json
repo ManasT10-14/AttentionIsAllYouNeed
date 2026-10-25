@@ -1,0 +1,765 @@
+{
+  "id": "report:MSA-2026-001",
+  "gaps": "",
+  "kind": "contract",
+  "as_of": "2026-10-20",
+  "risks": [
+    {
+      "id": "fd-06c386de3d",
+      "kind": "hidden_liability",
+      "claim": "Nimbus can unilaterally increase fees by 30 days email notice, creating unpredictable cost escalation with no cap or negotiation requirement",
+      "debate": [
+        {
+          "by": "heimdall",
+          "verdict": "support",
+          "rationale": "Clause 3.2 explicitly states 'The Provider may revise the fees at any time on 30 days notice by email.' This confirms Nimbus can unilaterally increase fees with only 30 days notice. The claim is accurate - there is no cap on fee increases and no negotiation requirement in the clause."
+        }
+      ],
+      "source": "analysis",
+      "status": "verified",
+      "event_id": null,
+      "severity": 5,
+      "citations": [
+        {
+          "page": 1,
+          "quote": "The Provider may revise the fees at any time on 30 days notice by email.",
+          "version": 1,
+          "verified": true,
+          "contract_id": "MSA-2026-001",
+          "clause_number": "3.2"
+        }
+      ],
+      "likelihood": 0.7,
+      "attack_path": "1. Nimbus sends email notice of fee increase (e.g., 50% or 100% increase) 30 days before next invoice. 2. Acme has no right to reject or negotiate - the clause says 'may revise... at any time'. 3. Acme must either accept the increase or exercise termination rights (but only if within the 30-day non-renewal window). 4. If outside the renewal window, Acme is locked into higher fees for up to 11 more…",
+      "contract_id": "MSA-2026-001",
+      "other_contract_ids": []
+    },
+    {
+      "id": "fd-d06719dee9",
+      "kind": "conflict",
+      "claim": "Acme faces catastrophic uncapped liability to BigRetail for Nimbus failures due to SLA mismatch: Nimbus promises 99.5% availability with 10% monthly cap, but Acme must deliver 99.9% to BigRetail with uncapped 10% monthly penalties and immediate termination rights",
+      "debate": [
+        {
+          "by": "loki",
+          "argument": "THOR's clarification reveals that the Nimbus cap (10% of monthly fee) is likely a monthly aggregate cap, not per-incident. The phrase 'For each 0.5% (or part)...' with the cap at the end of the clause structure suggests credits accumulate but are capped at 10% total per month. This means at 99.4% availability (1.0% below SLA), Acme would receive TWO credits of 5% each = 10%, hitting the cap. This …",
+          "position": "revise"
+        },
+        {
+          "by": "heimdall",
+          "verdict": "support",
+          "rationale": "The clause text confirms the SLA mismatch: Nimbus (MSA-2026-001) promises 99.5% availability (clause 5.1) with credits capped at 10% (clause 5.2), while Acme must deliver 99.9% to BigRetail (CSA-2026-004 clause 4.1) with uncapped 10% penalties (clause 4.2) and termination rights (clause 4.3). The liability cap in clause 6.1 (3 months fees) further compounds this mismatch. The claim accurately desc…"
+        }
+      ],
+      "source": "analysis",
+      "status": "verified",
+      "event_id": null,
+      "severity": 5,
+      "citations": [
+        {
+          "page": 1,
+          "quote": "The Provider shall ensure monthly availability of 99.5%.",
+          "version": 1,
+          "verified": true,
+          "contract_id": "MSA-2026-001",
+          "clause_number": "5.1"
+        },
+        {
+          "page": 1,
+          "quote": "For each 0.5% (or part) by which availability falls below 99.5%, the Customer is entitled to a service credit of 5% of the monthly fee, capped at 10% of the monthly fee.",
+          "version": 1,
+          "verified": true,
+          "contract_id": "MSA-2026-001",
+          "clause_number": "5.2"
+        },
+        {
+          "page": 1,
+          "quote": "The Provider's total liability under this Agreement shall not exceed the fees paid by the Customer in the 3 months preceding the claim.",
+          "version": 1,
+          "verified": true,
+          "contract_id": "MSA-2026-001",
+          "clause_number": "6.1"
+        }
+      ],
+      "likelihood": 0.6,
+      "attack_path": "1. Nimbus provides 99.4% availability (0.1% below their SLA, 0.5% below Acme's commitment). 2. Acme owes BigRetail: 10% penalty = INR 1,20,000/month (no cap), plus potential damages claim. 3. Acme can only recover from Nimbus: maximum 10% of monthly fee = INR 30,000. 4. Net exposure: INR 90,000+/month uncovered. 5. If this continues for 3 consecutive months, BigRetail can terminate immediately and…",
+      "contract_id": "MSA-2026-001",
+      "other_contract_ids": [
+        "CSA-2026-004"
+      ]
+    },
+    {
+      "id": "fd-470b95c159",
+      "kind": "hidden_liability",
+      "claim": "Nimbus can suspend services after just 45 days non-payment without prior notice, potentially causing immediate catastrophic breach of Acme's BigRetail commitments with no opportunity to cure",
+      "debate": [
+        {
+          "by": "heimdall",
+          "verdict": "support",
+          "rationale": "Clause 4.3 states 'If any amount remains unpaid for more than 45 days the Provider may suspend the Services without further notice.' This confirms Nimbus can suspend services after 45 days non-payment with no prior notice required. The claim accurately describes this hidden liability."
+        }
+      ],
+      "source": "analysis",
+      "status": "verified",
+      "event_id": null,
+      "severity": 5,
+      "citations": [
+        {
+          "page": 1,
+          "quote": "If any amount remains unpaid for more than 45 days the Provider may suspend the Services without further notice.",
+          "version": 1,
+          "verified": true,
+          "contract_id": "MSA-2026-001",
+          "clause_number": "4.3"
+        }
+      ],
+      "likelihood": 0.5,
+      "attack_path": "1. Acme faces temporary cash flow issue (e.g., BigRetail delays payment). 2. Acme's payment to Nimbus is 15+ days late. 3. Nimbus immediately suspends services 'without further notice' upon day 46. 4. BigRetail platform goes down. 5. BigRetail invokes immediate termination and damages under CSA-2026-004 clause 4.3. 6. Acme has no recourse - Nimbus had right to suspend, and no cure period is requir…",
+      "contract_id": "MSA-2026-001",
+      "other_contract_ids": []
+    }
+  ],
+  "title": "Master Cloud Services Agreement",
+  "health": {
+    "score": 66,
+    "breakdown": {
+      "open_findings": -30,
+      "ambiguity_flags": -4,
+      "missed_deadlines": 0,
+      "unverified_fields": 0,
+      "confirmed_violations": 0
+    },
+    "contract_id": "MSA-2026-001"
+  },
+  "actions": [
+    {
+      "id": "act-413a91c2f4",
+      "to": "Nimbus Cloud Ltd",
+      "kind": "amendment",
+      "source": "analysis",
+      "status": "draft",
+      "body_md": "**CONFIDENTIAL - CONTRACT AMENDMENT REQUEST**\n\n**To:** Nimbus Cloud Ltd  \n**From:** Acme Analytics Pvt Ltd  \n**Date:** 2026-10-20  \n**Re:** Proposed Amendment to Master Services Agreement MSA-2026-001\n\nDear Nimbus Legal Team,\n\nWe write to formally request urgent amendments to MSA-2026-001 to address critical misalignments between your service commitments and our downstream obligations to our large…",
+      "subject": "URGENT: Proposed Amendment to MSA-2026-001 - SLA Alignment and Liability Protection Required",
+      "deadline": "2026-11-15",
+      "event_id": null,
+      "priority": 14.95,
+      "redlines": [
+        {
+          "after": "The Provider shall ensure monthly availability of 99.9%, measured as the percentage of time the Services are available excluding scheduled maintenance windows agreed in writing at least 7 days in advance.",
+          "before": "The Provider shall ensure monthly availability of 99.5%.",
+          "reason": "Align Nimbus SLA with Acme's downstream commitment to BigRetail; 99.5% is insufficient for our business requirements",
+          "clause_number": "5.1"
+        },
+        {
+          "after": "For each 0.1% (or part) by which availability falls below 99.9%, the Customer is entitled to a service credit of 10% of the monthly fee, with no monthly cap. In any month where availability falls below 99.5%, the Customer may additionally terminate this Agreement for convenience with 30 days notice.",
+          "before": "For each 0.5% (or part) by which availability falls below 99.5%, the Customer is entitled to a service credit of 5% of the monthly fee, capped at 10% of the monthly fee.",
+          "reason": "Match credit structure to BigRetail penalty structure; remove cap that leaves Acme bearing uncovered liability; provide exit right for severe failures",
+          "clause_number": "5.2"
+        },
+        {
+          "after": "The Provider's total liability under this Agreement shall not exceed the fees paid by the Customer in the 12 months preceding the claim, or INR 50,00,000, whichever is higher. This cap shall not apply to: (a) death or personal injury caused by negligence; (b) fraud or fraudulent misrepresentation; (c) breaches of data protection obligations; or (d) indemnification obligations under Clause 6.2 (Ind…",
+          "before": "The Provider's total liability under this Agreement shall not exceed the fees paid by the Customer in the 3 months preceding the claim.",
+          "reason": "3-month cap (INR 9,00,000) is grossly inadequate for consequential damages from platform failure; 12-month standard aligns with market practice; carve-outs preserve essential protections",
+          "clause_number": "6.1"
+        }
+      ],
+      "citations": [
+        {
+          "page": 1,
+          "quote": "The Provider shall ensure monthly availability of 99.5%.",
+          "version": 1,
+          "verified": true,
+          "contract_id": "MSA-2026-001",
+          "clause_number": "5.1"
+        },
+        {
+          "page": 1,
+          "quote": "For each 0.5% (or part) by which availability falls below 99.5%, the Customer is entitled to a service credit of 5% of the monthly fee, capped at 10% of the monthly fee.",
+          "version": 1,
+          "verified": true,
+          "contract_id": "MSA-2026-001",
+          "clause_number": "5.2"
+        },
+        {
+          "page": 1,
+          "quote": "Service credits are the Customer's sole and exclusive remedy for any failure to meet service levels.",
+          "version": 1,
+          "verified": true,
+          "contract_id": "MSA-2026-001",
+          "clause_number": "5.3"
+        }
+      ],
+      "confidence": 0.95,
+      "contract_id": "MSA-2026-001",
+      "leverage_notes": "BigRetail represents ~40% revenue; SLA mismatch creates existential risk; 30-day non-renewal deadline creates time pressure; Acme has been reliable paying customer; evaluating multi-cloud strategy per strategic priorities; Nimbus has no termination for convenience right while Acme does (if notice given)",
+      "related_finding_ids": [
+        "fd-d06719dee9",
+        "fd-06c386de3d",
+        "fd-470b95c159"
+      ],
+      "est_exposure_avoided": {
+        "amount": 7200000.0,
+        "currency": "INR"
+      },
+      "needs_human_approval": true,
+      "related_violation_ids": []
+    },
+    {
+      "id": "act-1fa173b120",
+      "to": "Board of Directors / Executive Committee",
+      "kind": "escalation_memo",
+      "source": "analysis",
+      "status": "draft",
+      "body_md": "**CONFIDENTIAL - EXECUTIVE ESCALATION**\n\n**TO:** Board of Directors / Executive Committee  \n**FROM:** Legal & Risk Management  \n**DATE:** 2026-10-20  \n**RE:** CRITICAL DECISION REQUIRED - Nimbus Cloud MSA-2026-001 Renewal Strategy\n\n**EXECUTIVE SUMMARY**\n\nWe face an existential contract decision with a **hard deadline of December 31, 2026**. Our Master Services Agreement with Nimbus Cloud Ltd (MSA-…",
+      "subject": "URGENT DECISION REQUIRED: Nimbus Cloud MSA Renewal Strategy - Non-Renewal Notice Deadline December 31, 2026",
+      "deadline": "2026-12-01",
+      "event_id": null,
+      "priority": 12.98,
+      "redlines": [],
+      "citations": [
+        {
+          "page": 1,
+          "quote": "This Agreement renews automatically for further 12-month periods unless either party gives written notice of non-renewal at least 30 days before the end of the current term.",
+          "version": 1,
+          "verified": true,
+          "contract_id": "MSA-2026-001",
+          "clause_number": "2.2"
+        },
+        {
+          "page": 1,
+          "quote": "The Provider may revise the fees at any time on 30 days notice by email.",
+          "version": 1,
+          "verified": true,
+          "contract_id": "MSA-2026-001",
+          "clause_number": "3.2"
+        },
+        {
+          "page": 1,
+          "quote": "If any amount remains unpaid for more than 45 days the Provider may suspend the Services without further notice.",
+          "version": 1,
+          "verified": true,
+          "contract_id": "MSA-2026-001",
+          "clause_number": "4.3"
+        }
+      ],
+      "confidence": 0.98,
+      "contract_id": "MSA-2026-001",
+      "leverage_notes": "Board fiduciary duty requires action on known existential risks; 72-day hard deadline creates urgency; BigRetail concentration (40% revenue) makes this business-critical; low risk appetite is incompatible with current terms; strategic priority to reduce vendor lock-in",
+      "related_finding_ids": [
+        "fd-d06719dee9",
+        "fd-06c386de3d",
+        "fd-470b95c159"
+      ],
+      "est_exposure_avoided": {
+        "amount": 7200000.0,
+        "currency": "INR"
+      },
+      "needs_human_approval": true,
+      "related_violation_ids": []
+    },
+    {
+      "id": "act-b1bbafbce4",
+      "to": "Nimbus Cloud Ltd",
+      "kind": "non_renewal_notice",
+      "source": "analysis",
+      "status": "draft",
+      "body_md": "**OFFICIAL NOTICE OF NON-RENEWAL**\n\n**To:** Nimbus Cloud Ltd  \n**From:** Acme Analytics Pvt Ltd  \n**Date:** [TO BE COMPLETED: December 15, 2026 or earlier]  \n**Re:** Notice of Non-Renewal - Master Services Agreement dated February 1, 2026 (MSA-2026-001)\n\nDear Nimbus Cloud Ltd,\n\n**OFFICIAL NOTICE OF NON-RENEWAL**\n\nPlease be advised that Acme Analytics Pvt Ltd hereby gives formal written notice of n…",
+      "subject": "NOTICE OF NON-RENEWAL - Master Services Agreement MSA-2026-001",
+      "deadline": "2026-12-15",
+      "event_id": null,
+      "priority": 12.92,
+      "redlines": [],
+      "citations": [
+        {
+          "page": 1,
+          "quote": "This Agreement renews automatically for further 12-month periods unless either party gives written notice of non-renewal at least 30 days before the end of the current term.",
+          "version": 1,
+          "verified": true,
+          "contract_id": "MSA-2026-001",
+          "clause_number": "2.2"
+        }
+      ],
+      "confidence": 0.92,
+      "contract_id": "MSA-2026-001",
+      "leverage_notes": "Hard contractual right under Clause 2.2; no cause required; 30-day notice is minimum - this notice provides 47+ days; transition period proposal offers Nimbus 3 months additional revenue in exchange for cooperation",
+      "related_finding_ids": [
+        "fd-181e4a4110",
+        "fd-d06719dee9",
+        "fd-06c386de3d"
+      ],
+      "est_exposure_avoided": {
+        "amount": 7200000.0,
+        "currency": "INR"
+      },
+      "needs_human_approval": true,
+      "related_violation_ids": []
+    }
+  ],
+  "summary": {
+    "key_risks": [
+      "SLA Mismatch: Nimbus guarantees 99.5% availability (10% monthly cap) but Acme must deliver 99.9% to BigRetail with uncapped penalties and termination rights",
+      "Unilateral Fee Increase: Nimbus can raise fees by 30 days' email notice with no cap or negotiation",
+      "Auto-Renewal Trap: 30-day notice requirement means Acme must decide by Dec 31, 2026 or face 12-month lock-in at potentially higher rates (Clause 2.2)"
+    ],
+    "executive_summary": "The Master Cloud Services Agreement (MSA-2026-001) with Nimbus Cloud Ltd carries a total financial exposure of ₹14.4–14.43 crore through February 2027, comprising monthly fees of ₹3 lakh (Clause 3.1) and a locked-in renewal of ₹72 lakh if no non-renewal notice is sent by December 31, 2026 (Clause 2.2). The contract has a health score of 66/100, with significant open findings including ambiguous pa…",
+    "recommended_next_steps": [
+      "URGENT: Send amendment request for SLA alignment and liability protection by November 15, 2026 (Priority 14.95)",
+      "Prepare escalation memo on renewal strategy for executive decision by December 1, 2026",
+      "Calendar deadline: Send non-renewal notice by December 15, 2026 if not proceeding with amendment"
+    ]
+  },
+  "version": 1,
+  "exposure": {
+    "as_of": "2026-10-20",
+    "lines": [
+      {
+        "label": "Locked-in renewal if no notice sent",
+        "month": "2027-02",
+        "amount": {
+          "amount": 7200000.0,
+          "currency": "INR"
+        },
+        "citation": {
+          "page": 1,
+          "quote": "This Agreement renews automatically for further 12-month periods unless either party gives written notice of non-renewal at least 30 days before the end of the current term.",
+          "version": 1,
+          "verified": true,
+          "contract_id": "MSA-2026-001",
+          "clause_number": "2.2"
+        },
+        "clause_type": "renewal",
+        "contract_id": "MSA-2026-001"
+      },
+      {
+        "label": "Scheduled: payment",
+        "month": "2026-11",
+        "amount": {
+          "amount": 300000.0,
+          "currency": "INR"
+        },
+        "citation": {
+          "page": 1,
+          "quote": "The Customer shall pay monthly fees of INR 3,00,000, invoiced on the 1st of each month starting 1 February 2026.",
+          "version": 1,
+          "verified": true,
+          "contract_id": "MSA-2026-001",
+          "clause_number": "3.1"
+        },
+        "clause_type": "payment",
+        "contract_id": "MSA-2026-001"
+      },
+      {
+        "label": "Scheduled: payment",
+        "month": "2026-12",
+        "amount": {
+          "amount": 300000.0,
+          "currency": "INR"
+        },
+        "citation": {
+          "page": 1,
+          "quote": "The Customer shall pay monthly fees of INR 3,00,000, invoiced on the 1st of each month starting 1 February 2026.",
+          "version": 1,
+          "verified": true,
+          "contract_id": "MSA-2026-001",
+          "clause_number": "3.1"
+        },
+        "clause_type": "payment",
+        "contract_id": "MSA-2026-001"
+      }
+    ],
+    "source": "analysis",
+    "currency": "INR",
+    "expected": 14400000.0,
+    "worst_case": 14430000.0,
+    "assumptions": [
+      "MSA-2026-001: no non-renewal notice is sent before 2026-12-31.",
+      "MSA-2026-001: worst case assumes every quantified penalty fires once and suspected breaches are upheld."
+    ]
+  },
+  "timeline": [
+    {
+      "id": "tl-0988e3c145a0",
+      "date": "2026-02-01",
+      "kind": "payment",
+      "owner": "",
+      "title": "Payment to Nimbus Cloud Ltd",
+      "amount": {
+        "amount": 300000.0,
+        "currency": "INR"
+      },
+      "source": "analysis",
+      "status": "past",
+      "citation": {
+        "page": 1,
+        "quote": "The Customer shall pay monthly fees of INR 3,00,000, invoiced on the 1st of each month starting 1 February 2026.",
+        "version": 1,
+        "verified": true,
+        "contract_id": "MSA-2026-001",
+        "clause_number": "3.1"
+      },
+      "contract_id": "MSA-2026-001"
+    },
+    {
+      "id": "tl-8f16fd70653c",
+      "date": "2026-02-01",
+      "kind": "payment",
+      "owner": "",
+      "title": "Payment to Nimbus Cloud Ltd",
+      "amount": {
+        "amount": 300000.0,
+        "currency": "INR"
+      },
+      "source": "analysis",
+      "status": "past",
+      "citation": {
+        "page": 1,
+        "quote": "Invoices are payable within 30 days of the invoice date.",
+        "version": 1,
+        "verified": true,
+        "contract_id": "MSA-2026-001",
+        "clause_number": "4.2"
+      },
+      "contract_id": "MSA-2026-001"
+    },
+    {
+      "id": "tl-cca5c87272a7",
+      "date": "2026-03-01",
+      "kind": "payment",
+      "owner": "",
+      "title": "Payment to Nimbus Cloud Ltd",
+      "amount": {
+        "amount": 300000.0,
+        "currency": "INR"
+      },
+      "source": "analysis",
+      "status": "past",
+      "citation": {
+        "page": 1,
+        "quote": "The Customer shall pay monthly fees of INR 3,00,000, invoiced on the 1st of each month starting 1 February 2026.",
+        "version": 1,
+        "verified": true,
+        "contract_id": "MSA-2026-001",
+        "clause_number": "3.1"
+      },
+      "contract_id": "MSA-2026-001"
+    }
+  ],
+  "key_terms": {
+    "term": {
+      "note": "",
+      "source": "sourced",
+      "status": "found",
+      "citation": {
+        "page": 1,
+        "quote": "This Agreement starts on the Effective Date and continues for 12 months.",
+        "version": 1,
+        "verified": true,
+        "contract_id": "MSA-2026-001",
+        "clause_number": "2.1"
+      },
+      "end_date": "2027-02-01",
+      "confidence": 0.95,
+      "term_months": 12,
+      "effective_date": "2026-02-01"
+    },
+    "flags": [
+      {
+        "kind": "contradictory",
+        "note": "SCHEDULE A states invoices payable within 15 days, but clause 4.2 states 30 days. These are contradictory payment terms.",
+        "clause_number": "SCHEDULE A",
+        "related_clauses": [
+          "4.2",
+          "SCHEDULE A"
+        ]
+      }
+    ],
+    "parties": [
+      {
+        "name": "Acme Analytics Pvt Ltd",
+        "role": "company",
+        "alias": "Customer"
+      },
+      {
+        "name": "Nimbus Cloud Ltd",
+        "role": "counterparty",
+        "alias": "Provider"
+      }
+    ],
+    "renewal": {
+      "note": "",
+      "source": "sourced",
+      "status": "found",
+      "citation": {
+        "page": 1,
+        "quote": "This Agreement renews automatically for further 12-month periods unless either party gives written notice of non-renewal at least 30 days before the end of the current term.",
+        "version": 1,
+        "verified": true,
+        "contract_id": "MSA-2026-001",
+        "clause_number": "2.2"
+      },
+      "auto_renew": true,
+      "confidence": 0.95,
+      "notice_days": 30,
+      "renewal_value": null,
+      "renewal_period_months": 12
+    },
+    "payments": [
+      {
+        "note": "",
+        "payee": "Nimbus Cloud Ltd",
+        "payer": "Acme Analytics Pvt Ltd",
+        "amount": {
+          "amount": 300000.0,
+          "currency": "INR"
+        },
+        "source": "sourced",
+        "status": "found",
+        "citation": {
+          "page": 1,
+          "quote": "The Customer shall pay monthly fees of INR 3,00,000, invoiced on the 1st of each month starting 1 February 2026.",
+          "version": 1,
+          "verified": true,
+          "contract_id": "MSA-2026-001",
+          "clause_number": "3.1"
+        },
+        "due_rule": "invoiced on the 1st of each month starting 1 February 2026",
+        "first_due": "2026-02-01",
+        "frequency": "monthly",
+        "confidence": 0.95,
+        "description": "",
+        "late_fee_flat": null,
+        "late_fee_pct_per_month": 2.0
+      },
+      {
+        "note": "",
+        "payee": "Nimbus Cloud Ltd",
+        "payer": "Acme Analytics Pvt Ltd",
+        "amount": {
+          "amount": 300000.0,
+          "currency": "INR"
+        },
+        "source": "sourced",
+        "status": "found",
+        "citation": {
+          "page": 1,
+          "quote": "Invoices are payable within 30 days of the invoice date.",
+          "version": 1,
+          "verified": true,
+          "contract_id": "MSA-2026-001",
+          "clause_number": "4.2"
+        },
+        "due_rule": "invoices are payable within 30 days of the invoice date",
+        "first_due": "2026-02-01",
+        "frequency": "monthly",
+        "confidence": 0.95,
+        "description": "",
+        "late_fee_flat": null,
+        "late_fee_pct_per_month": 2.0
+      }
+    ],
+    "penalties": [
+      {
+        "cap": null,
+        "pct": 2.0,
+        "note": "",
+        "amount": null,
+        "source": "sourced",
+        "status": "found",
+        "trigger": "Late payment on overdue amount",
+        "citation": {
+          "page": 1,
+          "quote": "Late payments attract interest at 2% per month on the overdue amount.",
+          "version": 1,
+          "verified": true,
+          "contract_id": "MSA-2026-001",
+          "clause_number": "4.1"
+        },
+        "pct_base": "overdue amount",
+        "confidence": 0.95
+      },
+      {
+        "cap": {
+          "amount": 30000.0,
+          "currency": "INR"
+        },
+        "pct": 5.0,
+        "note": "Cap scope ambiguous: contract does not specify if 10% cap applies per incident or per month aggregate. Threshold calculation: 99.4% = 1.0% below SLA = two 0.5% 'parts' = two 5% credits = 10% total, hitting cap. But 'or part' wording suggests partial thresholds round up, so 0.6% below = two credits, etc.",
+        "amount": null,
+        "source": "sourced",
+        "status": "ambiguous",
+        "trigger": "Service level failure - availability falls below 99.5%",
+        "citation": {
+          "page": 1,
+          "quote": "For each 0.5% (or part) by which availability falls below 99.5%, the Customer is entitled to a service credit of 5% of the monthly fee, capped at 10% of the monthly fee.",
+          "version": 1,
+          "verified": true,
+          "contract_id": "MSA-2026-001",
+          "clause_number": "5.2"
+        },
+        "pct_base": "monthly fee",
+        "confidence": 0.75
+      }
+    ],
+    "compliance": [],
+    "obligations": [
+      {
+        "note": "",
+        "owner": "Nimbus Cloud Ltd",
+        "source": "sourced",
+        "status": "found",
+        "citation": {
+          "page": 1,
+          "quote": "The Provider shall provide managed cloud hosting for the Customer's analytics platform, which the Customer uses to deliver services to its own customers.",
+          "version": 1,
+          "verified": true,
+          "contract_id": "MSA-2026-001",
+          "clause_number": "1.1"
+        },
+        "due_date": null,
+        "due_rule": "",
+        "recurring": true,
+        "confidence": 0.95,
+        "description": "Provider shall provide managed cloud hosting for the Customer's analytics platform"
+      },
+      {
+        "note": "",
+        "owner": "Nimbus Cloud Ltd",
+        "source": "sourced",
+        "status": "found",
+        "citation": {
+          "page": 1,
+          "quote": "The Provider shall ensure monthly availability of 99.5%.",
+          "version": 1,
+          "verified": true,
+          "contract_id": "MSA-2026-001",
+          "clause_number": "5.1"
+        },
+        "due_date": null,
+        "due_rule": "",
+        "recurring": true,
+        "confidence": 0.95,
+        "description": "Provider shall ensure monthly availability of 99.5%"
+      },
+      {
+        "note": "",
+        "owner": "Acme Analytics Pvt Ltd",
+        "source": "sourced",
+        "status": "found",
+        "citation": {
+          "page": 1,
+          "quote": "The Customer shall pay monthly fees of INR 3,00,000, invoiced on the 1st of each month starting 1 February 2026.",
+          "version": 1,
+          "verified": true,
+          "contract_id": "MSA-2026-001",
+          "clause_number": "3.1"
+        },
+        "due_date": null,
+        "due_rule": "invoiced on the 1st of each month starting 1 February 2026",
+        "recurring": true,
+        "confidence": 0.95,
+        "description": "Customer shall pay monthly fees of INR 3,00,000"
+      }
+    ],
+    "termination": [
+      {
+        "who": "either party",
+        "kind": "convenience",
+        "note": "Termination by non-renewal at end of term",
+        "source": "sourced",
+        "status": "found",
+        "citation": {
+          "page": 1,
+          "quote": "This Agreement renews automatically for further 12-month periods unless either party gives written notice of non-renewal at least 30 days before the end of the current term.",
+          "version": 1,
+          "verified": true,
+          "contract_id": "MSA-2026-001",
+          "clause_number": "2.2"
+        },
+        "conditions": "written notice of non-renewal at least 30 days before the end of the current term",
+        "confidence": 0.95,
+        "notice_days": 30
+      },
+      {
+        "who": "Provider",
+        "kind": "cause",
+        "note": "Provider may suspend services; termination for cause implied",
+        "source": "sourced",
+        "status": "found",
+        "citation": {
+          "page": 1,
+          "quote": "If any amount remains unpaid for more than 45 days the Provider may suspend the Services without further notice.",
+          "version": 1,
+          "verified": true,
+          "contract_id": "MSA-2026-001",
+          "clause_number": "4.3"
+        },
+        "conditions": "any amount remains unpaid for more than 45 days",
+        "confidence": 0.95,
+        "notice_days": null
+      }
+    ],
+    "governing_law": {
+      "note": "",
+      "value": "Singapore",
+      "source": "sourced",
+      "status": "found",
+      "citation": {
+        "page": 2,
+        "quote": "This Agreement is governed by the laws of Singapore and disputes shall be referred to arbitration seated in Singapore.",
+        "version": 1,
+        "verified": true,
+        "contract_id": "MSA-2026-001",
+        "clause_number": "8.1"
+      },
+      "confidence": 0.95
+    },
+    "liability_cap": {
+      "note": "",
+      "value": "fees paid by the Customer in the 3 months preceding the claim",
+      "source": "sourced",
+      "status": "found",
+      "citation": {
+        "page": 1,
+        "quote": "The Provider's total liability under this Agreement shall not exceed the fees paid by the Customer in the 3 months preceding the claim.",
+        "version": 1,
+        "verified": true,
+        "contract_id": "MSA-2026-001",
+        "clause_number": "6.1"
+      },
+      "confidence": 0.95
+    }
+  },
+  "references": [
+    {
+      "link": "/viewer?contract=MSA-2026-001&v=1&clause=3.2",
+      "page": 1,
+      "quote": "The Provider may revise the fees at any time on 30 days notice by email.",
+      "version": 1,
+      "verified": true,
+      "contract_id": "MSA-2026-001",
+      "clause_number": "3.2"
+    },
+    {
+      "link": "/viewer?contract=MSA-2026-001&v=1&clause=5.1",
+      "page": 1,
+      "quote": "The Provider shall ensure monthly availability of 99.5%.",
+      "version": 1,
+      "verified": true,
+      "contract_id": "MSA-2026-001",
+      "clause_number": "5.1"
+    },
+    {
+      "link": "/viewer?contract=MSA-2026-001&v=1&clause=5.2",
+      "page": 1,
+      "quote": "For each 0.5% (or part) by which availability falls below 99.5%, the Customer is entitled to a service credit of 5% of the monthly fee, capped at 10% of the monthly fee.",
+      "version": 1,
+      "verified": true,
+      "contract_id": "MSA-2026-001",
+      "clause_number": "5.2"
+    }
+  ],
+  "violations": [],
+  "contract_id": "MSA-2026-001",
+  "completeness": "done",
+  "generated_at": "2026-10-25T09:20:25.407735",
+  "evidence_score": 0.935
+}
