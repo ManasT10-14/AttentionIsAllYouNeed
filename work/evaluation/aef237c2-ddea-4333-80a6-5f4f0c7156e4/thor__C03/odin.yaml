@@ -1,0 +1,91 @@
+agents:
+  ask: {}
+  email_parse: {}
+  heimdall: {}
+  loki:
+    models:
+      bedrock: moonshotai.kimi-k2.5
+      openai: moonshotai.kimi-k2.5
+  norns: {}
+  odin: {}
+  synth: {}
+  thor:
+    models:
+      bedrock: moonshotai.kimi-k2.5
+      openai: moonshotai.kimi-k2.5
+  tyr:
+    models:
+      bedrock: moonshotai.kimi-k2.5
+      openai: moonshotai.kimi-k2.5
+alerts:
+  horizon_days: 45
+  min_severity: low
+defaults:
+  fallback:
+  - bedrock
+  - anthropic
+  - groq
+  max_retries: 2
+  provider: openai
+  temperature: 0
+email:
+  auto_reply_on_reject: false
+  poll_seconds: 15
+  processed_label: ODIN/processed
+  subject_prefix: '[ODIN-EVENT]'
+limits:
+  confidence_threshold: 0.7
+  evidence_threshold: 0.75
+  max_agent_calls: 200
+  max_clarify_rounds: 2
+  max_debate_rounds: 2
+  max_tokens: 2000000
+  max_tool_steps: 2
+  max_usd: 5.0
+providers:
+  anthropic:
+    api_key: ${ANTHROPIC_API_KEY}
+    kind: anthropic
+    model: ${ANTHROPIC_MODEL}
+    price_per_mtok:
+      in: 3.0
+      out: 15.0
+  bedrock:
+    api_key: ${BEDROCK_API_KEY}
+    base_url: ${BEDROCK_OPENAI_BASE_URL}
+    kind: openai
+    model: ${BEDROCK_MODEL}
+    price_per_mtok:
+      in: 0.15
+      out: 0.6
+  fake:
+    kind: fake
+    model: fake
+    price_per_mtok:
+      in: 0
+      out: 0
+  groq:
+    api_key: ${GROQ_API_KEY}
+    kind: groq
+    model: ${GROQ_MODEL}
+    price_per_mtok:
+      in: 0.59
+      out: 0.79
+  openai:
+    api_key: ${OPENAI_API_KEY}
+    base_url: ${OPENAI_BASE_URL}
+    kind: openai
+    model: ${OPENAI_MODEL}
+    price_per_mtok:
+      in: 0.4
+      out: 1.6
+    project: ${OPENAI_PROJECT_ID}
+retrieval:
+  candidate_k: 50
+  dense_backend: memory
+  dense_enabled: false
+  embed_model: BAAI/bge-small-en-v1.5
+  multi_query: false
+  reranker: none
+  rrf_k: 60
+  top_k: 8

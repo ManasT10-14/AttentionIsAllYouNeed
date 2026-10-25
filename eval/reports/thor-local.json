@@ -1,0 +1,19 @@
+{
+  "adapter": "corpus",
+  "dataset": "../datasets/corpus/thor.json",
+  "report": "corpus-thor-after.json",
+  "concurrency": 2,
+  "case_timeout_s": 300,
+  "corpus": {
+    "mode": "thor",
+    "product_tracing": false
+  },
+  "judge": {
+    "enabled": true,
+    "model": "odin:openai",
+    "timeout_s": 180
+  },
+  "tracing": {
+    "enabled": false
+  }
+}

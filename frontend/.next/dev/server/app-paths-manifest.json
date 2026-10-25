@@ -1,0 +1,8 @@
+{
+  "/viewer/page": "app/viewer/page.js",
+  "/dashboard/contracts/page": "app/dashboard/contracts/page.js",
+  "/dashboard/events/page": "app/dashboard/events/page.js",
+  "/dashboard/risk-map/page": "app/dashboard/risk-map/page.js",
+  "/dashboard/agent-review/page": "app/dashboard/agent-review/page.js",
+  "/dashboard/actions/page": "app/dashboard/actions/page.js"
+}

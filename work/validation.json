@@ -1,0 +1,42 @@
+{
+  "status": "PASS",
+  "companies": 3,
+  "sectors": [
+    "software",
+    "electronics",
+    "housing"
+  ],
+  "document_layouts": 15,
+  "document_forms": 15,
+  "distinct_effective_dates": 15,
+  "contracts": 15,
+  "pages": 43,
+  "verified_citation_units": 276,
+  "scenarios": 64,
+  "email_fixtures": 94,
+  "email_event_types": 16,
+  "extraction_field_assertions": 114,
+  "source_requirements_mapped": 37,
+  "runtime_specifications": 13,
+  "checks": [
+    "15 agreements across three companies with distinct forms and effective dates",
+    "exact cover keys and absence of document versions",
+    "user clause and schedule regex without spurious starts",
+    "PDF source text and page citations",
+    "15 contract-specific tables",
+    "remedy and conflict catalogs",
+    "removed document labels",
+    "company context keys and approval amount",
+    "email syntax and all event enums",
+    "input path allowlist",
+    "event identities, times and oracle isolation",
+    "scenario and evidence references",
+    "independent date and decimal arithmetic",
+    "deterministic PDF rebuild"
+  ],
+  "limitations": [
+    "No Odin agents, UI, actual event replay or API fault recovery executed.",
+    "No independent human evaluator review.",
+    "Visual inspection recorded separately after rendering."
+  ]
+}
