@@ -78,6 +78,11 @@ class DevLogin(BaseModel):
 def dev_login(body: DevLogin, request: Request):
     if not settings().dev_login:
         raise HTTPException(403, "dev login disabled")
+    with db() as s:
+        linked = s.scalar(select(User).where(User.email == body.email, User.google_sub.is_not(None)))
+    if linked:
+        # Dev login has no password: never let it open an account that is protected by Google sign-in.
+        raise HTTPException(403, "this account signs in with Google")
     u = _upsert_user(body.email, body.name)
     request.session["user_id"] = u.id
     return {"ok": True, "user_id": u.id}
