@@ -1,0 +1,7 @@
+Subject: [ODIN-EVENT] PAYMNT_LATE LEASE-2025-001
+
+EVENT_TYPE: PAYMNT_LATE
+CONTRACT_ID: LEASE-2025-001
+DESCRIPTION:
+Rent for November is late. (This email is deliberately malformed: bad event type and no OCCURRED_AT —
+Heimdall should reject it and reply with the template.)

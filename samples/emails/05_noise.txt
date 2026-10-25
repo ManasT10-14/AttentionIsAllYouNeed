@@ -1,0 +1,7 @@
+Subject: [ODIN-EVENT] CUSTOM ALL
+
+EVENT_TYPE: CUSTOM
+OCCURRED_AT: 2026-11-06T13:00:00+05:30
+CONTRACT_ID: UNKNOWN
+DESCRIPTION:
+Reminder: team lunch on Friday at 1pm in the cafeteria. Please RSVP.

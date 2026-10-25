@@ -1,0 +1,11 @@
+Subject: [ODIN-EVENT] DELIVERY_LATE SUP-2026-002
+
+EVENT_ID: EVT-0003
+EVENT_TYPE: DELIVERY_LATE
+OCCURRED_AT: 2026-11-05T12:00:00+05:30
+CONTRACT_ID: SUP-2026-002
+COUNTERPARTY: Vega Electronics Ltd
+REFERENCE: PO-4410
+DESCRIPTION:
+Purchase order PO-4410 for 500 sensors, placed on 1 October 2026, has still not been delivered (21 days late).
+Orion Components has also asked why our Q3 sensor purchases from them dropped.

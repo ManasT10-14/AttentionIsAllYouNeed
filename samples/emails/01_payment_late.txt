@@ -1,0 +1,13 @@
+Subject: [ODIN-EVENT] PAYMENT_LATE MSA-2026-001
+
+EVENT_ID: EVT-0001
+EVENT_TYPE: PAYMENT_LATE
+OCCURRED_AT: 2026-10-28T10:30:00+05:30
+CONTRACT_ID: MSA-2026-001
+COUNTERPARTY: Nimbus Cloud Ltd
+AMOUNT: INR 3,00,000
+REFERENCE: Invoice NIM-2026-09
+SEVERITY_HINT: medium
+DESCRIPTION:
+Nimbus Cloud reports that invoice NIM-2026-09 dated 1 September 2026 (INR 3,00,000) is still unpaid.
+They state that services may be suspended if not paid this week.

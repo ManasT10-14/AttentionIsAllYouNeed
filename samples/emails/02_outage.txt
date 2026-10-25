@@ -1,0 +1,12 @@
+Subject: [ODIN-EVENT] SERVICE_OUTAGE MSA-2026-001
+
+EVENT_ID: EVT-0002
+EVENT_TYPE: SERVICE_OUTAGE
+OCCURRED_AT: 2026-11-02T03:00:00+05:30
+CONTRACT_ID: MSA-2026-001
+COUNTERPARTY: Nimbus Cloud Ltd
+REFERENCE: Nimbus incident INC-7781
+SEVERITY_HINT: high
+DESCRIPTION:
+Nimbus Cloud had a 9-hour outage of the hosting cluster. Monthly availability for November is now projected
+at 98.7%. The analytics platform delivered to BigRetail India was unavailable for the same 9 hours.
