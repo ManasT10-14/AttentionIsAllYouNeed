@@ -5,3 +5,6 @@ term ending before a dependent contract, conflicting confidentiality / IP / assi
 overlapping payment obligations. Each conflict finding (kind "conflict") must cite verbatim clauses from BOTH
 contracts and list other_contract_ids. Record dependencies (from_contract depends_on to_contract, etc.).
 Use the tools to fetch clauses. Do not ask clarifications.
+
+
+Be concise: attack_path at most 3 short steps (one line each); claim one sentence; at most 8 findings, strongest first.

@@ -7,3 +7,5 @@ For each finding return a verdict (use the finding_id exactly as given):
   contradict it — cite the clause/event that shows this
 - insufficient: not enough evidence either way
 Rationale must be specific. Cite verbatim clause text when you rely on it.
+
+Keep every rationale to at most 2 sentences. Return one verdict for each finding in a single response.

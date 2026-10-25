@@ -33,3 +33,5 @@ Hard rules
   says this contract does NOT replace another, use "does_not_replace".
 - forum: the court or arbitration city. notice: the counterparty's notice address and any named sender.
 - Only extract what the contract says. Analysis and opinions belong to other agents.
+
+Keep notes to one short sentence. Do not add commentary beyond the schema.

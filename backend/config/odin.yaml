@@ -36,22 +36,23 @@ defaults:
   max_retries: 2
 
 # Per-agent overrides: provider / fallback / models (model per provider).
-# Default model = OPENAI_MODEL (Mantle) / BEDROCK_MODEL (minimax.minimax-m2.5: fast + cheap, good tool calling).
+# Default model (unlisted agents) = OPENAI_MODEL (Mantle) / BEDROCK_MODEL (minimax.minimax-m2.5: fast + cheap, good tool calling).
 # Heavy-reasoning agents use Kimi K2.5 (long context, strong structured tool calls).
 agents:
-  odin: {}
-  thor: {models: {openai: moonshotai.kimi-k2.5, bedrock: moonshotai.kimi-k2.5}}       # big nested extraction schema + verbatim quotes
-  norns: {}
-  loki: {models: {openai: moonshotai.kimi-k2.5, bedrock: moonshotai.kimi-k2.5}}       # adversarial reasoning, cross-contract
-  heimdall: {}
-  tyr: {models: {openai: moonshotai.kimi-k2.5, bedrock: moonshotai.kimi-k2.5}}        # rulings + ready-to-send drafts
-  synth: {}
-  email_parse: {}
-  ask: {}
+  odin: {models: {openai: moonshotai.kimi-k2.5, bedrock: moonshotai.kimi-k2.5}, max_tokens: 1500}
+  thor: {models: {openai: moonshotai.kimi-k2.5, bedrock: moonshotai.kimi-k2.5}, max_tokens: 8000}       # big nested extraction schema + verbatim quotes
+  norns: {max_tokens: 1000}
+  loki: {models: {openai: moonshotai.kimi-k2.5, bedrock: moonshotai.kimi-k2.5}, max_tokens: 4000}       # adversarial reasoning, cross-contract
+  heimdall: {models: {openai: moonshotai.kimi-k2.5, bedrock: moonshotai.kimi-k2.5}, max_tokens: 3000}   # was the slow MiniMax thinking model (~43 s/call)
+  tyr: {models: {openai: moonshotai.kimi-k2.5, bedrock: moonshotai.kimi-k2.5}, max_tokens: 4000}        # rulings + ready-to-send drafts
+  synth: {models: {openai: moonshotai.kimi-k2.5, bedrock: moonshotai.kimi-k2.5}, max_tokens: 1500}
+  email_parse: {models: {openai: moonshotai.kimi-k2.5, bedrock: moonshotai.kimi-k2.5}, max_tokens: 1500}
+  ask: {models: {openai: moonshotai.kimi-k2.5, bedrock: moonshotai.kimi-k2.5}, max_tokens: 2000}
 
 limits:
   max_clarify_rounds: 2
-  max_debate_rounds: 2
+  max_debate_rounds: 1
+  debate_min_severity: 3     # only findings at/above this severity go to Loki<->Heimdall debate
   max_agent_calls: 200
   max_tokens: 2000000
   max_usd: 5.0
