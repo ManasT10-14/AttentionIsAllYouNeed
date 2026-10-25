@@ -37,7 +37,7 @@ class TracingConfig(Model):
 
 
 class OdinConfig(Model):
-    backend_path: str = "../backend"
+    backend_path: str = "../../backend"
     company_id: str = Field(min_length=1)
     operation: Literal["ask", "retrieval", "analysis", "event", "update", "tool_probe"] = "ask"
     parameters: dict = Field(default_factory=dict)
@@ -83,9 +83,9 @@ class RunConfig(Model):
 
 
 class CorpusConfig(Model):
-    root: str = "../corpus"
-    workspace: str = "../work/evaluation"
-    backend_path: str = "../backend"
+    root: str = "../../corpus"
+    workspace: str = "../../work/evaluation"
+    backend_path: str = "../../backend"
     mode: Literal["agent", "thor", "rag", "retrieval", "security"]
     dense: bool = False
     allow_fake_provider: bool = False

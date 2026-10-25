@@ -1,7 +1,7 @@
 {
   "adapter": "corpus",
   "dataset": "../datasets/corpus/thor.json",
-  "report": "../reports/corpus-thor.json",
+  "report": "../../reports/corpus-thor.json",
   "concurrency": 2,
   "case_timeout_s": 300,
   "corpus": {"mode": "thor", "product_tracing": true},

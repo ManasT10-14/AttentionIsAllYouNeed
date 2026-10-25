@@ -1,7 +1,7 @@
 {
   "adapter": "corpus",
   "dataset": "../datasets/corpus/agent.json",
-  "report": "../reports/corpus-agent.json",
+  "report": "../../reports/corpus-agent.json",
   "concurrency": 1,
   "case_timeout_s": 1200,
   "corpus": {"mode": "agent", "product_tracing": true},

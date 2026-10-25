@@ -1,6 +1,6 @@
 {
   "dataset": "../datasets/odin/synthetic.json",
-  "report": "../reports/http.json",
+  "report": "../../reports/http.json",
   "adapter": "http",
   "http": {
     "base_url": "http://127.0.0.1:8000",

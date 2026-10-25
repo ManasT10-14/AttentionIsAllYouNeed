@@ -1,7 +1,7 @@
 {
   "adapter": "corpus",
   "dataset": "../datasets/corpus/rag.json",
-  "report": "../reports/corpus-rag.json",
+  "report": "../../reports/corpus-rag.json",
   "concurrency": 2,
   "case_timeout_s": 300,
   "corpus": {"mode": "rag", "product_tracing": true},

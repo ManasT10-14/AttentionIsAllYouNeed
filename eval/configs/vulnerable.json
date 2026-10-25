@@ -2,7 +2,7 @@
   "dataset": "../datasets/odin/synthetic.json",
   "fixtures": "../datasets/odin/vulnerable-results.json",
   "adapter": "fixture",
-  "report": "../reports/vulnerable.json",
+  "report": "../../reports/vulnerable.json",
   "judge": {
     "enabled": false
   },

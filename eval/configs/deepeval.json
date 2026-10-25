@@ -2,7 +2,7 @@
   "dataset": "../datasets/odin/synthetic.json",
   "fixtures": "../datasets/odin/safe-results.json",
   "adapter": "fixture",
-  "report": "../reports/deepeval.json",
+  "report": "../../reports/deepeval.json",
   "judge": {
     "enabled": true,
     "model": "gpt-4.1-mini",

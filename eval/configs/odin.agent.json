@@ -1,10 +1,10 @@
 {
   "adapter": "odin",
   "dataset": "../datasets/golden/agent.json",
-  "report": "../reports/odin-agent-golden.json",
+  "report": "../../reports/odin-agent-golden.json",
   "case_timeout_s": 900,
   "odin": {
-    "backend_path": "../backend",
+    "backend_path": "../../backend",
     "company_id": "SET_YOUR_DISPOSABLE_EVALUATION_COMPANY_ID",
     "operation": "analysis",
     "disposable_database": true,
