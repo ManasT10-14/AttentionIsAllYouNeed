@@ -244,7 +244,10 @@ def graph() -> dict:
         for a, b in zip(cids, cids[1:]):
             edges.append({"source": f"c:{a}", "target": f"c:{b}", "kind": "conflicts_with", "reason": f["claim"],
                           "severity": f["severity"], "finding_id": f["id"]})
-    cascades = {c.contract_id: cascade(c.contract_id) for c in repo.contracts()}
+    ids = {n["id"] for n in nodes}  # drop links to contracts referenced in text but never uploaded
+    edges = [e for e in edges if e["source"] in ids and e["target"] in ids]
+    known = {c.contract_id for c in repo.contracts()}
+    cascades = {c: [x for x in cascade(c) if x in known] for c in known}
     return {"nodes": nodes, "edges": edges, "cascades": {k: v for k, v in cascades.items() if v}}
 
 
