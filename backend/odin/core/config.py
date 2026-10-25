@@ -1,4 +1,4 @@
-"""Env settings + config/odin.yaml loader (with ${VAR} expansion)."""
+"""Env settings + backend/config/odin.yaml loader (with ${VAR} expansion)."""
 from __future__ import annotations
 
 import os
@@ -26,7 +26,7 @@ class Settings(BaseSettings):
     dev_login: bool = True
     webhook_url: str = ""
     odin_force_provider: str = ""
-    odin_config: str = str(ROOT / "config" / "odin.yaml")
+    odin_config: str = str(ROOT / "backend" / "config" / "odin.yaml")
 
 
 @lru_cache

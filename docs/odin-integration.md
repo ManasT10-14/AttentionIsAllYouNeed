@@ -14,7 +14,7 @@ pushed to GitHub.
 uv sync --locked --all-extras
 uv run --locked --all-extras pytest -q
 uv run --locked --all-extras pytest backend/backend/tests -q
-uv run --env-file .env --all-extras ragnarok run --config configs/odin.security.json
+uv run --env-file .env --all-extras ragnarok run --config eval/configs/odin.security.json
 ```
 
 The supplied LangSmith credential is in ignored `.env` and `backend/.env` files.
@@ -97,22 +97,22 @@ Both product/feedback uploads and readback were verified with a synthetic-only
 LangSmith smoke test; no contract data or model calls were needed:
 
 ```powershell
-uv run --env-file .env --all-extras python examples/langsmith_smoke.py
+uv run --env-file .env --all-extras python eval/examples/langsmith_smoke.py
 ```
 
 ## Golden runs
 
-Schema and authoring instructions are in `datasets/golden/README.md`. Configs
+Schema and authoring instructions are in `eval/datasets/golden/README.md`. Configs
 deliberately await real dataset files; they do not use fake expected answers.
 Replace the company placeholders and seed matching contract versions in the
 disposable database, then:
 
 ```powershell
-uv run --all-extras ragnarok validate datasets/golden/rag.json
-uv run --env-file .env --all-extras ragnarok run --config configs/odin.retrieval.json
-uv run --env-file .env --all-extras ragnarok run --config configs/odin.rag.json
-uv run --env-file .env --all-extras ragnarok run --config configs/odin.agent.json
-uv run --env-file .env --all-extras ragnarok run --config configs/odin.rag-security.json
+uv run --all-extras ragnarok validate eval/datasets/golden/rag.json
+uv run --env-file .env --all-extras ragnarok run --config eval/configs/odin.retrieval.json
+uv run --env-file .env --all-extras ragnarok run --config eval/configs/odin.rag.json
+uv run --env-file .env --all-extras ragnarok run --config eval/configs/odin.agent.json
+uv run --env-file .env --all-extras ragnarok run --config eval/configs/odin.rag-security.json
 ```
 
 Existing five DeepEval RAG metrics use real question/answer/context mappings.

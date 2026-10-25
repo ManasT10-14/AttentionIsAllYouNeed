@@ -12,16 +12,16 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Golden dataset compilation failed' }
     uv run --locked --all-extras pytest -q
     if ($LASTEXITCODE -ne 0) { throw 'Offline tests failed' }
-    uv run --locked --all-extras ruff check src tests examples
+    uv run --locked --all-extras ruff check eval
     if ($LASTEXITCODE -ne 0) { throw 'Lint failed' }
-    uv run --locked --all-extras ruff format --check src tests examples
+    uv run --locked --all-extras ruff format --check eval
     if ($LASTEXITCODE -ne 0) { throw 'Formatting check failed' }
     $resultCode = 0
     if ($Live) {
         if (-not (Test-Path -LiteralPath '.env')) { throw 'Live evaluation needs a local .env file' }
         foreach ($stage in @('retrieval', 'thor', 'rag', 'agent', 'security')) {
             Write-Host "Running live corpus stage: $stage"
-            uv run --env-file .env --locked --all-extras ragnarok run --config "configs/corpus.$stage.json"
+            uv run --env-file .env --locked --all-extras ragnarok run --config "eval/configs/corpus.$stage.json"
             $stageCode = $LASTEXITCODE
             if ($stageCode -eq 2) { $resultCode = 2 }
             elseif ($stageCode -eq 1 -and $resultCode -ne 2) { $resultCode = 1 }

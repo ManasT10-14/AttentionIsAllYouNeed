@@ -6,7 +6,7 @@ from pathlib import Path
 from datetime import datetime
 import re
 
-ROOT=Path(__file__).resolve().parents[1]/'corpus'
+ROOT=Path(__file__).resolve().parents[2]/'corpus'
 TYPES=['PAYMENT_MADE','PAYMENT_LATE','PAYMENT_MISSED','INVOICE_RECEIVED','SERVICE_OUTAGE','SLA_BREACH',
        'DELIVERY_LATE','DELIVERY_RECEIVED','REGULATORY_CHANGE','PRICE_CHANGE','TERMINATION_NOTICE_RECEIVED',
        'RENEWAL_NOTICE_RECEIVED','PARTY_CHANGE','FORCE_MAJEURE','DISPUTE_RAISED','CUSTOM']

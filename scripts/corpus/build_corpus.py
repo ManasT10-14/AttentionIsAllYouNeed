@@ -13,7 +13,7 @@ from reportlab.lib.styles import ParagraphStyle
 from reportlab.platypus import BaseDocTemplate, Frame, PageTemplate, Paragraph, Spacer, KeepTogether, Table, TableStyle, HRFlowable
 from contracts import CONTRACTS
 
-ROOT=Path(__file__).resolve().parents[1]
+ROOT=Path(__file__).resolve().parents[2]
 CORPUS=ROOT/'corpus'
 PDFS=CORPUS/'inputs/contracts'
 PARTIES=[('P01','Aurora Software Private Limited'),('P02','Forge Electronics Private Limited'),('P03','Willow Housing Private Limited')]

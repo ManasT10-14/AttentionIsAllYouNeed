@@ -1,11 +1,11 @@
 """Generate demo contracts (DOCX, authoring spec §3.1) with deliberately planted traps.
-Run:  python scripts/make_samples.py      → samples/contracts/*.docx
+Run:  python scripts/make_samples.py      → corpus/samples/contracts/*.docx
 Replace these with the teammate's real documents when ready (same format)."""
 from pathlib import Path
 
 from docx import Document
 
-OUT = Path(__file__).resolve().parents[1] / "samples" / "contracts"
+OUT = Path(__file__).resolve().parents[1] / "corpus" / "samples" / "contracts"
 
 CONTRACTS = {
     "01_office_lease.docx": ({

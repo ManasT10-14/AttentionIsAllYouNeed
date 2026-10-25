@@ -57,7 +57,7 @@ def initialize_workspace(workspace, *, dense=False):
     workspace = Path(workspace).resolve()
     workspace.mkdir(parents=True, exist_ok=True)
     repository = Path(__file__).resolve().parents[2]
-    config = yaml.safe_load((repository / "config/odin.yaml").read_text(encoding="utf-8"))
+    config = yaml.safe_load((repository / "backend/config/odin.yaml").read_text(encoding="utf-8"))
     config["retrieval"]["dense_enabled"] = dense
     config["retrieval"]["dense_backend"] = "memory"
     config["email"]["auto_reply_on_reject"] = False

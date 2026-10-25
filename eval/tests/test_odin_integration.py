@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 from pydantic import BaseModel
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "backend" / "backend"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "backend"))
 
 
 def test_capture_is_context_local_and_parallel_safe():
@@ -216,7 +216,7 @@ def odin_db(tmp_path, monkeypatch):
     from odin.db.tables import Base, ClauseRow, Company, Contract
     from odin.retrieval.hybrid import _BM25
 
-    cfg = yaml.safe_load((ROOT / "config/odin.yaml").read_text())
+    cfg = yaml.safe_load((ROOT / "backend/config/odin.yaml").read_text())
     cfg["retrieval"]["dense_enabled"] = False
     cfg_path = tmp_path / "odin.yaml"
     cfg_path.write_text(yaml.safe_dump(cfg))

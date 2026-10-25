@@ -8,7 +8,7 @@ import hashlib
 import json
 from pathlib import Path
 
-ROOT=Path(__file__).resolve().parents[1]/'corpus'
+ROOT=Path(__file__).resolve().parents[2]/'corpus'
 OUT=ROOT/'oracle/golden'
 AGENTS=['odin','thor','norns','loki','heimdall','tyr']
 ROLES={

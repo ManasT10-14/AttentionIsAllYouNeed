@@ -12,7 +12,7 @@ from odin.graphs import analysis as analysis_graph
 from odin.ingest.service import ingest_company_context, ingest_contract
 from odin.services import events
 
-SAMPLES = ROOT / "samples"
+SAMPLES = ROOT / "corpus" / "samples"
 DEMO_START = date(2026, 10, 20)
 
 

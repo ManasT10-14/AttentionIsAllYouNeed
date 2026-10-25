@@ -55,16 +55,17 @@ dev = ["pytest==8.4.2", "fastapi==0.135.3", "uvicorn>=0.34,<1", "ruff>=0.12,<1"]
 ragnarok = "ragnarok.__main__:main"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/ragnarok"]
+packages = ["eval/ragnarok"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests", "backend/tests"]
-pythonpath = ["src", ".", "backend"]
+testpaths = ["eval/tests", "backend/tests"]
+pythonpath = ["eval", "backend"]
 addopts = "-ra"
 markers = ["live: explicitly enabled network/paid integration checks"]
 
 [tool.ruff]
 target-version = "py311"
+src = ["eval"]
 line-length = 100
 
 [tool.ruff.lint]

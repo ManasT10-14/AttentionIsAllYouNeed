@@ -10,4 +10,4 @@ Each agreement appears in both signing companies' folders. These are byte-identi
 
 These folders contain the full portfolio, including C08 in Aurora and Willow. For the initial demo upload, use `odin-initial-upload-v2.zip` with 14 contracts. Release C08 only at its receipt using `odin-live-arrival-v2.zip`. Do not recursively ingest this browsing directory alongside canonical inputs.
 
-Rebuild and verify the copies with `python tools/group_contracts.py` from the repository root.
+Rebuild and verify the copies with `python scripts/corpus/group_contracts.py` from the repository root.

@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 from datetime import datetime
 
-ROOT=Path(__file__).resolve().parents[1]/'corpus'
+ROOT=Path(__file__).resolve().parents[2]/'corpus'
 G=ROOT/'oracle/golden'
 AGENTS=['odin','thor','norns','loki','heimdall','tyr']
 

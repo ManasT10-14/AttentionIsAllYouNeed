@@ -6,7 +6,7 @@ from pathlib import Path
 
 
 def invoke(*args):
-    env = {**os.environ, "PYTHONPATH": str(Path(__file__).parents[1] / "src")}
+    env = {**os.environ, "PYTHONPATH": str(Path(__file__).parents[1])}
     return subprocess.run(
         [sys.executable, "-m", "ragnarok", *args],
         capture_output=True,

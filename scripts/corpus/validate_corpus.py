@@ -15,7 +15,7 @@ from contracts import CONTRACTS
 from build_corpus import clause_records, render, LAYOUTS, SIGNATORIES
 from build_emails import strict_fields, TYPES
 
-ROOT=Path(__file__).resolve().parents[1]
+ROOT=Path(__file__).resolve().parents[2]
 C=ROOT/'corpus'
 
 

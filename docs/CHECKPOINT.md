@@ -38,7 +38,7 @@ Validation checks hashes, actual PDF pages/quotes, release visibility and source
 references. The original corpus validators also check fixture arithmetic and
 deterministic PDF regeneration. Validation is separate from actual model results.
 
-`ragnarok corpus-build` compiles five datasets under datasets/corpus/:
+`ragnarok corpus-build` compiles five datasets under eval/datasets/corpus/:
 
 - `retrieval.json`: all 276 citation queries. Gold table rows are mapped to the
   actual source SCHEDULE chunk containing their quote, independently of results.
@@ -70,11 +70,11 @@ to make tests pass. Backend domain improvements can now be measured iteratively.
 ## Live baseline and tracing
 
 ```powershell
-uv run --env-file .env --all-extras ragnarok run --config configs/corpus.retrieval.json
-uv run --env-file .env --all-extras ragnarok run --config configs/corpus.thor.json
-uv run --env-file .env --all-extras ragnarok run --config configs/corpus.rag.json
-uv run --env-file .env --all-extras ragnarok run --config configs/corpus.agent.json
-uv run --env-file .env --all-extras ragnarok run --config configs/corpus.security.json
+uv run --env-file .env --all-extras ragnarok run --config eval/configs/corpus.retrieval.json
+uv run --env-file .env --all-extras ragnarok run --config eval/configs/corpus.thor.json
+uv run --env-file .env --all-extras ragnarok run --config eval/configs/corpus.rag.json
+uv run --env-file .env --all-extras ragnarok run --config eval/configs/corpus.agent.json
+uv run --env-file .env --all-extras ragnarok run --config eval/configs/corpus.security.json
 ```
 
 `./scripts/checkpoint.ps1 -Live` runs the representative baseline above and
@@ -93,7 +93,7 @@ ignored; only a sanitized summary belongs in version control.
 For metric-only changes, re-score saved observations without product calls:
 
 ```powershell
-uv run --env-file .env --all-extras ragnarok run --config configs/corpus.thor.json --recorded-report reports/corpus-thor.json --output reports/corpus-thor-rescored.json
+uv run --env-file .env --all-extras ragnarok run --config eval/configs/corpus.thor.json --recorded-report reports/corpus-thor.json --output reports/corpus-thor-rescored.json
 ```
 
 The dataset hash must match. The source report cannot be overwritten. Product

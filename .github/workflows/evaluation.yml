@@ -29,11 +29,11 @@ jobs:
           enable-cache: true
       - run: uv sync --locked --all-extras
       - run: uv run --locked --all-extras ragnarok corpus-validate
-      - run: uv run --locked --all-extras python tools/validate_corpus.py
-      - run: uv run --locked --all-extras python tools/validate_golden.py
+      - run: uv run --locked --all-extras python scripts/corpus/validate_corpus.py
+      - run: uv run --locked --all-extras python scripts/corpus/validate_golden.py
       - run: uv run --locked --all-extras ragnarok corpus-build
       - run: uv run --locked --all-extras pytest -q
-      - run: uv run --locked --all-extras ruff check src tests examples
-      - run: uv run --locked --all-extras ruff format --check src tests examples
+      - run: uv run --locked --all-extras ruff check eval
+      - run: uv run --locked --all-extras ruff format --check eval
       - run: uv pip check
       - run: uv build

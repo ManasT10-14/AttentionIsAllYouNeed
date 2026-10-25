@@ -1,4 +1,4 @@
-"""Provider registry: bedrock (OpenAI-compatible) → openai → anthropic → groq, per config/odin.yaml."""
+"""Provider registry: bedrock (OpenAI-compatible) → openai → anthropic → groq, per backend/config/odin.yaml."""
 from __future__ import annotations
 
 from functools import lru_cache

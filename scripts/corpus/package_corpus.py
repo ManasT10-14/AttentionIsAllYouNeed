@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 from zipfile import ZipFile, ZipInfo, ZIP_DEFLATED
 
-ROOT=Path(__file__).resolve().parents[1]
+ROOT=Path(__file__).resolve().parents[2]
 C=ROOT/'corpus'
 OUT=ROOT.parent/'deliverables'
 

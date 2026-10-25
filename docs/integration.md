@@ -10,13 +10,13 @@ below remain useful for other targets.
 Start the fixture application to exercise HTTP locally:
 
 ```powershell
-uv run --all-extras uvicorn examples.mock_product:app --host 127.0.0.1 --port 8000
+uv run --all-extras uvicorn --app-dir eval examples.mock_product:app --host 127.0.0.1 --port 8000
 ```
 
 In another terminal:
 
 ```powershell
-uv run --all-extras ragnarok run --config configs/http.example.json
+uv run --all-extras ragnarok run --config eval/configs/http.example.json
 ```
 
 This is a real FastAPI application serving recorded synthetic results, not a model-powered Odin implementation. The automated HTTP integration test uses HTTPX's ASGI transport; it exercises routing/serialization without a TCP server.

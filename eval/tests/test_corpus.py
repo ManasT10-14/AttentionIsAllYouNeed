@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-ROOT = Path(__file__).resolve().parents[1] / "corpus"
+ROOT = Path(__file__).resolve().parents[2] / "corpus"
 
 
 def test_validate_supplied_corpus_counts_and_hashes():

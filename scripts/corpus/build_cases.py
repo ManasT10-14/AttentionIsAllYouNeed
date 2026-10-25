@@ -9,7 +9,7 @@ from extra_cases import author_extra_cases
 import csv
 import json
 
-ROOT = Path(__file__).resolve().parents[1] / 'corpus'
+ROOT = Path(__file__).resolve().parents[2] / 'corpus'
 CASES = []
 
 

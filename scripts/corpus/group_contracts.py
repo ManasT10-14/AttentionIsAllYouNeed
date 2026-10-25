@@ -3,7 +3,7 @@ import hashlib
 import json
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1] / 'corpus'
+ROOT = Path(__file__).resolve().parents[2] / 'corpus'
 OUT = ROOT / 'company_contracts'
 COMPANIES = {'P01': 'Aurora_Software', 'P02': 'Forge_Electronics', 'P03': 'Willow_Housing'}
 
@@ -46,7 +46,7 @@ def build():
         'For the initial demo upload, use `odin-initial-upload-v2.zip` with 14 contracts. '
         'Release C08 only at its receipt using `odin-live-arrival-v2.zip`. '
         'Do not recursively ingest this browsing directory alongside canonical inputs.\n\n'
-        'Rebuild and verify the copies with `python tools/group_contracts.py` from the repository root.\n',
+        'Rebuild and verify the copies with `python scripts/corpus/group_contracts.py` from the repository root.\n',
         encoding='utf-8')
     print('Company folders verified: Aurora 15, Forge 8, Willow 7; 15 unique agreements, 30 identical copies.')
 

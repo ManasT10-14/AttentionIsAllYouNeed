@@ -1,6 +1,6 @@
 """Upload only synthetic status metadata and verify both trace trees and feedback.
 
-Run: uv run --env-file .env --all-extras python examples/langsmith_smoke.py
+Run: uv run --env-file .env --all-extras python eval/examples/langsmith_smoke.py
 """
 
 import asyncio
@@ -11,7 +11,7 @@ import time
 from pathlib import Path
 from uuid import uuid4
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "backend"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "backend"))
 
 from ragnarok.config import TracingConfig
 from ragnarok.models import CaseReport, CheckResult, ExecutionResult

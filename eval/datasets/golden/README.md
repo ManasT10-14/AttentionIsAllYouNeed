@@ -1,7 +1,7 @@
 # Custom dataset templates
 
 Current corpus goldens are compiled with `ragnarok corpus-build` into
-`datasets/corpus/`. See `docs/CHECKPOINT.md` for the active workflow.
+`eval/datasets/corpus/`. See `docs/CHECKPOINT.md` for the active workflow.
 This folder retains the generic schema and earlier authoring notes for additional
 team datasets; the awaiting-upload notes below describe the earlier template stage.
 
@@ -42,5 +42,5 @@ was exercised rather than merely the evaluation sandbox. An attack corpus must
 include injection-bearing contracts/emails in the disposable target database;
 queries alone cannot test indirect document injection.
 
-Run `uv run --all-extras ragnarok validate datasets/golden/rag.json` before live
+Run `uv run --all-extras ragnarok validate eval/datasets/golden/rag.json` before live
 execution. Configs deliberately reference missing golden files until supplied.

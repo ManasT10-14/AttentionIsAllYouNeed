@@ -5,20 +5,28 @@ and LangSmith tracing pipeline.
 
 ## Repository layout
 
-Run commands from this folder, the Git repository root. There is one backend directory.
+Run every command from the repository root.
 
 ```text
-Ragnarok/
-  backend/odin/     Product API, agents, graphs, retrieval and services
-  backend/tests/    Product unit tests
-  frontend/         Team frontend integration directory
-  ui-dev/           Reference UI wired to the API
-  src/ragnarok/     Evaluation and security pipeline
+backend/            Odin product (owned by the backend team)
+  odin/             API, agents, graphs, retrieval, ingestion, services
+  config/odin.yaml  Agent models, loop limits, budgets and thresholds
+  tests/            Product unit tests
+  Dockerfile, requirements.txt
+eval/               Evaluation and security pipeline (owned by the eval team)
+  ragnarok/         Evaluator package and `ragnarok` CLI
   tests/            Evaluator and integration tests
-  corpus/           Contract inputs, scenarios and evaluator-only goldens
   configs/          Evaluation run configurations
-  config/           Product runtime configuration
-  docs/             Checkpoint handoff and measured results
+  datasets/         Compiled datasets (corpus/ is rebuilt by `ragnarok corpus-build`)
+  examples/         Mock product and LangSmith smoke example
+corpus/             Contract inputs, scenarios, evaluator-only oracle
+  samples/          Six demo contracts, company context and demo emails (used by Demo seed)
+frontend/           Team UI
+ui-dev/             Reference UI wired to every API endpoint
+scripts/            make_samples.py, checkpoint.ps1
+  corpus/           Corpus generators and validators
+docs/               Current specs and handoffs
+  archive/          Superseded plans and progress logs
 ```
 
 ## Setup and offline checks
@@ -40,7 +48,17 @@ LangSmith and database settings. Never commit `.env`, tokens or local reports.
 
 ## Product API
 
-With a working PostgreSQL/pgvector database:
+Start the database with `docker compose up -d db` (PostgreSQL 16 + pgvector, user, password and
+database all `odin`, port 5432). `DATABASE_URL` in `.env` must match it:
+`postgresql+psycopg://odin:odin@localhost:5432/odin`.
+
+If login fails with "password authentication failed for user odin":
+- A native PostgreSQL service on Windows may already own port 5432, so the app reaches it instead of
+  Docker. Stop that service, or map Docker to another port and change `DATABASE_URL` to match.
+- The Docker volume was first created with a different password. The password only applies on first
+  start. Run `docker compose down -v` (this deletes local data), then `docker compose up -d db`.
+
+Then run the API:
 
 ```powershell
 uv run --env-file .env --all-extras uvicorn --app-dir backend odin.api.main:app --port 8000
@@ -55,6 +73,6 @@ No external mail is sent by evaluation workers.
 See [setup and teammate handoff](docs/CHECKPOINT.md),
 [measured results and remaining work](docs/CHECKPOINT_RESULTS.md),
 [corpus documentation](corpus/README.md) and [input schemas](docs/SCHEMAS.md).
-Live model evaluation is explicit through `configs/corpus.*.json`; goldens never
+Live model evaluation is explicit through `eval/configs/corpus.*.json`; goldens never
 enter product prompts. The checkpoint is ready for frontend development and
 further evaluation improvements, with known quality gaps retained in reports.

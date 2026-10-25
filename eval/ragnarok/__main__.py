@@ -34,7 +34,7 @@ def main(argv=None) -> int:
     corpus_validation.add_argument("root", nargs="?", default="corpus")
     corpus_build = sub.add_parser("corpus-build", help="Compile evaluator-only golden datasets")
     corpus_build.add_argument("root", nargs="?", default="corpus")
-    corpus_build.add_argument("--output", default="datasets/corpus")
+    corpus_build.add_argument("--output", default="eval/datasets/corpus")
     evaluation = sub.add_parser("run", help="Run a configured evaluation")
     evaluation.add_argument("--config", required=True)
     evaluation.add_argument(

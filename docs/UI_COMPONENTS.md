@@ -199,7 +199,7 @@ calls are already audited with `blocked=true`. Expected endpoints: `GET /api/sec
 |---|---|---|---|
 | O1 | **Security overview** | summary counts | Blocked LLM calls, blocked tool calls, prompt injections detected (emails or contracts), PII redactions, policy violations, approvals pending. |
 | O2 | **Guard event log** | `security/events[] {ts, hook, agent, tool?, rule, verdict, excerpt, run_id}` | Filters; click opens the trace (M2). |
-| O3 | **Prompt-injection inspector** | the email or document flagged by `on_email` / `on_ingest` | Malicious span highlighted (demo: `samples/emails/06_prompt_injection.txt`). |
+| O3 | **Prompt-injection inspector** | the email or document flagged by `on_email` / `on_ingest` | Malicious span highlighted (demo: `corpus/samples/emails/06_prompt_injection.txt`). |
 | O4 | **Quarantine queue** | blocked emails and documents | Release (admin) or delete. |
 | O5 | **Tool permission matrix** | `GET /api/tools` → `allowed_agents` per tool | Agent × tool grid; side-effect and approval-gated tools marked. Editable by super_admin later. |
 | O6 | **Approval audit trail** | actions with `approved_by/at`, `sent_at`, `rejected_by` plus tool_calls of `send_gmail/apply_amendment` | Who approved what, when, and what was sent. |
@@ -211,7 +211,7 @@ calls are already audited with `blocked=true`. Expected endpoints: `GET /api/sec
 | # | Component | Behaviour |
 |---|---|---|
 | P1 | **User and role management** | Invite users, assign `viewer/admin/super_admin` (the backend already has `users.role` and `require_role()`). |
-| P2 | **Model / provider settings** | Per-agent provider and model (today in `config/odin.yaml`, for example Thor → Kimi K2.5). Show the fallback chain. |
+| P2 | **Model / provider settings** | Per-agent provider and model (today in `backend/config/odin.yaml`, for example Thor → Kimi K2.5). Show the fallback chain. |
 | P3 | **Budget settings** | `max_agent_calls`, `max_usd`, `max_tokens`, `max_debate_rounds`, `max_clarify_rounds`, `evidence_threshold`. |
 | P4 | **Integrations** | Gmail connection (connect or disconnect), webhook URL (Slack), LangSmith project. |
 

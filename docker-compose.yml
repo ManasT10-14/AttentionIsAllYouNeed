@@ -20,8 +20,8 @@ services:
       DATABASE_URL: postgresql+psycopg://odin:odin@db:5432/odin
       ODIN_DATA_DIR: /data
     volumes:
-      - ./config:/app/config:ro
-      - ./samples:/app/samples:ro
+      - ./backend/config:/app/backend/config:ro
+      - ./corpus/samples:/app/corpus/samples:ro
       - ./ui-dev/dist:/app/ui-dev/dist:ro
       - odindata:/data
     ports: ["8000:8000"]

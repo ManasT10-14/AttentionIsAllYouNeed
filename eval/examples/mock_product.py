@@ -1,7 +1,7 @@
 """A fixture-serving FastAPI app for testing the HTTP integration path.
 
 This does not call a model or implement Odin. All records are synthetic.
-Run: uv run uvicorn examples.mock_product:app --host 127.0.0.1 --port 8000
+Run: uv run uvicorn --app-dir eval examples.mock_product:app --host 127.0.0.1 --port 8000
 """
 
 import json

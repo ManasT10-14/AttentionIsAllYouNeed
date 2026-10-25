@@ -9,6 +9,7 @@ RUN pip install --no-cache-dir --trusted-host pypi.org --trusted-host files.pyth
 # warm the embedding model into the image
 RUN python -c "from fastembed import TextEmbedding; TextEmbedding('BAAI/bge-small-en-v1.5')" || true
 COPY odin ./odin
-ENV ODIN_CONFIG=/app/config/odin.yaml PYTHONUNBUFFERED=1
+COPY config ./config
+ENV ODIN_CONFIG=/app/backend/config/odin.yaml PYTHONUNBUFFERED=1
 EXPOSE 8000
 CMD ["uvicorn", "odin.api.main:app", "--host", "0.0.0.0", "--port", "8000"]

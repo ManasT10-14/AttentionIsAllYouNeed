@@ -73,4 +73,4 @@ The response is a parser aid, not a contract notice or agent risk finding. The c
 | Future OCCURRED_AT | Advance SimClock; recompute deadline state |
 | Late receipt or correction | Keep clock monotonic, recompute affected history and retain earlier as-known view |
 
-The strict fixture linter in tools/build_emails.py verifies authoring only. It is not proof that the application fallback, OAuth, polling, encryption, labels, dashboard or auto-replies work.
+The strict fixture linter in scripts/corpus/build_emails.py verifies authoring only. It is not proof that the application fallback, OAuth, polling, encryption, labels, dashboard or auto-replies work.
