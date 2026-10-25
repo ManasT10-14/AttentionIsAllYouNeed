@@ -1,0 +1,116 @@
+# ==============================
+# Environment variables and secrets
+# ==============================
+.env
+.env.*
+!.env.example
+!.env.sample
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.sample
+
+# ==============================
+# Python
+# ==============================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.python-version
+.venv/
+venv/
+env/
+ENV/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.coverage
+htmlcov/
+*.egg-info/
+dist/
+build/
+
+# ==============================
+# FastAPI / runtime data
+# ==============================
+*.log
+logs/
+tmp/
+temp/
+instance/
+uploads/
+data/uploads/
+
+# ==============================
+# Next.js / Node.js
+# ==============================
+node_modules/
+.next/
+out/
+dist/
+build/
+coverage/
+.npm/
+.turbo/
+.vercel/
+*.tsbuildinfo
+
+# ==============================
+# Frontend local configuration
+# ==============================
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
+# ==============================
+# IDEs and operating systems
+# ==============================
+.vs/
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ==============================
+# Jupyter / notebooks
+# ==============================
+.ipynb_checkpoints/
+
+# ==============================
+# ML models and large artifacts
+# ==============================
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.h5
+*.keras
+*.pkl
+*.joblib
+
+# ==============================
+# Generated evaluation outputs
+# ==============================
+eval/reports/
+reports/generated/
+
+# ==============================
+# Local databases
+# ==============================
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+
+# ==============================
+# Local caches
+# ==============================
+.cache/
+.cache-*/
+__cache__/
