@@ -21,6 +21,38 @@ def _relative(base: Path, name: str) -> Path:
     return path if path.is_absolute() else base / path
 
 
+def adapter_for(config: RunConfig, path: Path, dataset):
+    """Adapter named by a run configuration (paths resolve against the config file directory)."""
+    if config.adapter == "fixture":
+        if not config.fixtures:
+            raise ValueError("fixture adapter requires a fixtures JSON path")
+        raw = json.loads(_relative(path.parent, config.fixtures).read_text(encoding="utf-8"))
+        adapter = FixtureAdapter(
+            {key: ExecutionResult.model_validate(value) for key, value in raw.items()}
+        )
+    elif config.adapter == "http":
+        if config.http is None:
+            raise ValueError("http adapter requires an http configuration object")
+        adapter = HTTPAdapter(config.http)
+    elif config.adapter == "odin":
+        from .odin_adapter import OdinAdapter
+
+        if config.odin is None:
+            raise ValueError("odin adapter requires an odin configuration object")
+        adapter = OdinAdapter(config.odin, root=path.parent)
+    elif config.adapter == "corpus":
+        from .corpus_adapter import CorpusAdapter
+
+        if config.corpus is None:
+            raise ValueError("corpus adapter requires a corpus configuration object")
+        adapter = CorpusAdapter(config.corpus, root=path.parent, cases=dataset.cases)
+    else:
+        raise ValueError(
+            "CLI adapter must be fixture, http or odin; use GraphAdapter through Python"
+        )
+    return adapter
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description="Agent/RAG evaluation and security pipeline")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -89,33 +121,8 @@ def main(argv=None) -> int:
                 config = config.model_copy(update={"concurrency": 1})
         elif args.retry_judge_errors:
             raise ValueError("retry-judge-errors requires recorded-report")
-        elif config.adapter == "fixture":
-            if not config.fixtures:
-                raise ValueError("fixture adapter requires a fixtures JSON path")
-            raw = json.loads(_relative(path.parent, config.fixtures).read_text(encoding="utf-8"))
-            adapter = FixtureAdapter(
-                {key: ExecutionResult.model_validate(value) for key, value in raw.items()}
-            )
-        elif config.adapter == "http":
-            if config.http is None:
-                raise ValueError("http adapter requires an http configuration object")
-            adapter = HTTPAdapter(config.http)
-        elif config.adapter == "odin":
-            from .odin_adapter import OdinAdapter
-
-            if config.odin is None:
-                raise ValueError("odin adapter requires an odin configuration object")
-            adapter = OdinAdapter(config.odin, root=path.parent)
-        elif config.adapter == "corpus":
-            from .corpus_adapter import CorpusAdapter
-
-            if config.corpus is None:
-                raise ValueError("corpus adapter requires a corpus configuration object")
-            adapter = CorpusAdapter(config.corpus, root=path.parent, cases=dataset.cases)
         else:
-            raise ValueError(
-                "CLI adapter must be fixture, http or odin; use GraphAdapter through Python"
-            )
+            adapter = adapter_for(config, path, dataset)
         report = asyncio.run(run(config, dataset, adapter))
         write_report(
             report, Path(args.output) if args.output else _relative(path.parent, config.report)

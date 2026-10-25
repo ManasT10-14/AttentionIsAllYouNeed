@@ -77,3 +77,28 @@ email:
   subject_prefix: "[ODIN-EVENT]"
   processed_label: "ODIN/processed"
   auto_reply_on_reject: true
+
+# Runtime guard (odin/security): injection detection on uploads / emails / tool results, secret+PII redaction
+# of LLM inputs, tool scope + tenant checks. Detections are `security_event` records (Security page).
+security:
+  enabled: true
+  quarantine_min_severity: high              # emails with a detection at/above this wait for admin review
+  restricted_scopes: [external_send, file_write]
+  restricted_scope_agents: [system, heimdall]   # heimdall posts alert webhooks; everything else is admin-driven
+  redact_pii: true                           # card numbers / SSN / Aadhaar in LLM inputs (secrets always)
+  llm_classifier: false                      # cheap LLM second opinion when rules find nothing (costs tokens)
+
+# Live evaluation (odin/evals): every run is scored on finish → `eval_score` records (Evaluation page).
+evals:
+  enabled: true
+  thresholds: {citation_faithfulness: 0.9, extraction_completeness: 0.6, groundedness: 0.75,
+               latency_ms: 600000, max_tokens: 1500000, max_usd: 2.0, max_tool_calls: 400}
+  forbidden_tools: [send_gmail, apply_amendment]   # only ever run from an approved admin action, never in a run
+  judge:                                     # DeepEval faithfulness / answer relevancy via the ragnarok judge
+    enabled: false
+    provider: openai
+    threshold: 0.7
+    sample_findings: 2                       # findings judged per analysis/event run
+    max_calls_per_day: 40                    # cost cap (metric evaluations; each makes a few LLM calls)
+    timeout_s: 90
+  suite_configs: [offline, vulnerable, odin.security]   # golden suite configs runnable without allow_live

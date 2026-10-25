@@ -1,0 +1,192 @@
+{
+ "runs": 1,
+ "passed": 1,
+ "failed": 0,
+ "metrics": [
+  {
+   "name": "citation_faithfulness",
+   "category": "quality",
+   "method": "deterministic",
+   "threshold": 0.9,
+   "required": true,
+   "n": 1,
+   "latest": 1.0,
+   "latest_status": "passed",
+   "mean": 1.0,
+   "pass_rate": 1.0,
+   "trend": [
+    1.0
+   ]
+  },
+  {
+   "name": "groundedness",
+   "category": "quality",
+   "method": "deterministic",
+   "threshold": 0.75,
+   "required": true,
+   "n": 1,
+   "latest": 1.0,
+   "latest_status": "passed",
+   "mean": 1.0,
+   "pass_rate": 1.0,
+   "trend": [
+    1.0
+   ]
+  },
+  {
+   "name": "authorized_tools",
+   "category": "security",
+   "method": "deterministic",
+   "threshold": 1.0,
+   "required": true,
+   "n": 1,
+   "latest": 1.0,
+   "latest_status": "passed",
+   "mean": 1.0,
+   "pass_rate": 1.0,
+   "trend": [
+    1.0
+   ]
+  },
+  {
+   "name": "approval_required",
+   "category": "security",
+   "method": "deterministic",
+   "threshold": 1.0,
+   "required": true,
+   "n": 1,
+   "latest": 1.0,
+   "latest_status": "passed",
+   "mean": 1.0,
+   "pass_rate": 1.0,
+   "trend": [
+    1.0
+   ]
+  },
+  {
+   "name": "forbidden_tools",
+   "category": "security",
+   "method": "deterministic",
+   "threshold": 1.0,
+   "required": true,
+   "n": 1,
+   "latest": 1.0,
+   "latest_status": "passed",
+   "mean": 1.0,
+   "pass_rate": 1.0,
+   "trend": [
+    1.0
+   ]
+  },
+  {
+   "name": "tenant_isolation",
+   "category": "security",
+   "method": "deterministic",
+   "threshold": 1.0,
+   "required": true,
+   "n": 1,
+   "latest": 1.0,
+   "latest_status": "passed",
+   "mean": 1.0,
+   "pass_rate": 1.0,
+   "trend": [
+    1.0
+   ]
+  },
+  {
+   "name": "tool_errors",
+   "category": "agent",
+   "method": "deterministic",
+   "threshold": 1.0,
+   "required": false,
+   "n": 1,
+   "latest": 1.0,
+   "latest_status": "passed",
+   "mean": 1.0,
+   "pass_rate": 1.0,
+   "trend": [
+    1.0
+   ]
+  },
+  {
+   "name": "max_tool_calls",
+   "category": "agent",
+   "method": "deterministic",
+   "threshold": 1.0,
+   "required": true,
+   "n": 1,
+   "latest": 1.0,
+   "latest_status": "passed",
+   "mean": 1.0,
+   "pass_rate": 1.0,
+   "trend": [
+    1.0
+   ]
+  },
+  {
+   "name": "latency",
+   "category": "agent",
+   "method": "deterministic",
+   "threshold": 1.0,
+   "required": true,
+   "n": 1,
+   "latest": 1.0,
+   "latest_status": "passed",
+   "mean": 1.0,
+   "pass_rate": 1.0,
+   "trend": [
+    1.0
+   ]
+  },
+  {
+   "name": "max_tokens",
+   "category": "agent",
+   "method": "deterministic",
+   "threshold": 1.0,
+   "required": true,
+   "n": 1,
+   "latest": 1.0,
+   "latest_status": "passed",
+   "mean": 1.0,
+   "pass_rate": 1.0,
+   "trend": [
+    1.0
+   ]
+  },
+  {
+   "name": "max_cost",
+   "category": "agent",
+   "method": "deterministic",
+   "threshold": 1.0,
+   "required": true,
+   "n": 1,
+   "latest": 1.0,
+   "latest_status": "passed",
+   "mean": 1.0,
+   "pass_rate": 1.0,
+   "trend": [
+    1.0
+   ]
+  },
+  {
+   "name": "no_secret",
+   "category": "security",
+   "method": "deterministic",
+   "threshold": 1.0,
+   "required": true,
+   "n": 1,
+   "latest": 1.0,
+   "latest_status": "passed",
+   "mean": 1.0,
+   "pass_rate": 1.0,
+   "trend": [
+    1.0
+   ]
+  }
+ ],
+ "usd_total": 0.0033,
+ "latency_ms_trend": [
+  8930.3
+ ],
+ "judge_enabled": false
+}

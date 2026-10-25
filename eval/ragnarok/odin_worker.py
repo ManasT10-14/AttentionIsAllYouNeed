@@ -19,6 +19,11 @@ def execute(config: OdinConfig, question, request_id: str):
 
     settings()
     HOOKS.guards.append(EvaluationGuard(allow_internal_writes=config.disposable_database))
+    # Evaluate the product's real runtime guard too, not just the evaluation fence.
+    from odin.security import SecurityGuard, install
+
+    preinstalled = any(isinstance(guard, SecurityGuard) for guard in HOOKS.guards)
+    product_guard = None if preinstalled else install()
     run_id = str(uuid4())
     parameters = dict(config.parameters)
     trace_id = None
@@ -71,8 +76,11 @@ def execute(config: OdinConfig, question, request_id: str):
         budget.release(run_id)
         # execute() is also usable from Python tests; leave no global policy behind.
         HOOKS.guards[:] = [
-            guard for guard in HOOKS.guards if not isinstance(guard, EvaluationGuard)
+            guard
+            for guard in HOOKS.guards
+            if not isinstance(guard, EvaluationGuard) and guard is not product_guard
         ]
+        HOOKS.evals[:] = [hook for hook in HOOKS.evals if hook is not product_guard]
 
 
 def graph(config, run_id):
