@@ -620,6 +620,23 @@ def demo_seed(analyze: bool = True, u: User = Depends(admin)):
     return demo.seed(u.company_id, analyze=analyze)
 
 
+@router.post("/workspace/reset", tags=["demo"])
+def workspace_reset(u: User = Depends(admin)):
+    """Delete this company's contracts, events and analysis; keep users and the Gmail link."""
+    import shutil
+    from sqlalchemy import delete
+    from odin.core.config import DATA_DIR
+    from odin.db.tables import AgentMessageRow, Contract
+    cid = u.company_id
+    with db() as s:
+        for t in (ToolCall, AgentMessageRow, Run, Record, ClauseRow, ContractVersion, Contract):
+            s.execute(delete(t).where(t.company_id == cid))
+        co = s.get(Company, cid)
+        co.context, co.sim_now, co.name = {}, None, u.email.split("@")[-1]
+    shutil.rmtree(DATA_DIR / cid, ignore_errors=True)
+    return {"ok": True}
+
+
 @router.post("/demo/play", tags=["demo"])
 def demo_play(delay_seconds: float = 20, u: User = Depends(current_user)):
     from odin.services import demo
