@@ -12,7 +12,7 @@ from odin.core.config import odin_config
 from odin.core.models import (EXTRACTION_LIST_FIELDS, EXTRACTION_ONE_FIELDS, SEVERITY_RANK, Alert,
                                ContractExtraction, Event, Violation)
 from odin.db import repo
-from odin.services.timeline import ContractInputs, ContractTimeline, compute, counterfactual
+from odin.services.timeline import ContractInputs, ContractTimeline, compute, counterfactual, fmt_date
 
 
 # ───────────────────────────── loading ─────────────────────────────
@@ -106,7 +106,7 @@ def deadline_alerts(now: date) -> list[Alert]:
                 continue
             days = (e.date - now).days
             if e.status == "missed":
-                sev, why = "critical", f"{e.title} was missed on {e.date}."
+                sev, why = "critical", f"{e.title} was missed on {fmt_date(e.date)}."
             elif e.status in ("done", "past"):
                 continue
             elif days > horizon:
@@ -115,7 +115,7 @@ def deadline_alerts(now: date) -> list[Alert]:
                 sev = "critical" if days <= 7 else "high" if days <= 14 else "medium" if days <= 30 else "low"
                 if e.kind == "payment":
                     sev = "medium" if days <= 7 else "low"
-                why = f"{e.kind.replace('_', ' ')} in {days} days ({e.date})."
+                why = f"{e.kind.replace('_', ' ')} in {days} days ({fmt_date(e.date)})."
             key = f"{e.contract_id}:{e.kind}:{e.date}"
             out.append(Alert(id=_alert_id(key), dedupe_key=key, severity=sev, kind=e.kind, title=e.title,
                              why=why + (f" Amount {e.amount.currency} {e.amount.amount:,.0f}." if e.amount else ""),

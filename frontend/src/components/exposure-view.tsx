@@ -1,31 +1,19 @@
 'use client';
-import { useState } from 'react';
 import Link from 'next/link';
-import { ArrowUpRight,SlidersHorizontal,RotateCcw } from 'lucide-react';
 import { useResource } from '@/lib/use-resource';
 import { formatMoney,query,text,list,type Dashboard } from '@/lib/api';
-import { heatScaleMaximum,heatLevel } from '@/lib/heatmap';
 import { useWorkspace } from './providers';
-import { PageTitle,Panel,PanelTitle,Button } from './ui';
+import { PageTitle,Panel,PanelTitle } from './ui';
 import { ResourceState,SourceBadge,FieldValue } from './api-ui';
 import { ExposureGauge } from './exposure-chart';
+import { ExposureHeatmap } from './exposure-heatmap';
 import { ClockControl } from './clock-control';
-function monthLabel(month:string){const date=new Date(month+'-01T00:00:00Z');return Number.isNaN(date.getTime())?month:date.toLocaleDateString('en-GB',{month:'short',year:'numeric',timeZone:'UTC'});}
 export function ExposureView() {
- const {date}=useWorkspace();const [by,setBy]=useState<'contract'|'type'>('contract');
- const [contract,setContract]=useState('');const [type,setType]=useState('');const [month,setMonth]=useState('');
+ const {date}=useWorkspace();
  const r=useResource<Dashboard>(query('/api/dashboard',{as_of:date}),120);const contracts=useResource('/api/contracts');
  const names=new Map(list(contracts.data).map(c=>[text(c.id),text(c.title)]));
- const d=r.data;const cells=d?.heatmap?.cells??[];
- const visible=cells.filter(c=>(!contract||c.contract_id===contract)&&(!type||c.clause_type===type)&&(!month||c.month===month));
- const rows=[...new Set(visible.map(c=>by==='contract'?c.contract_id:c.clause_type))];const months=[...new Set(visible.map(c=>c.month))].sort();
- const maximum=heatScaleMaximum(cells,by);const currency=d?.exposure?.currency;
- const filters=Boolean(contract||type||month);
- return <><PageTitle eyebrow="FINANCIAL EXPOSURE" title="Find concentrated risk." description="See where financial exposure builds, and which agreements need a closer look."/><ClockControl/><ResourceState resource={r}>{d&&<>
+ const d=r.data;const cells=d?.heatmap?.cells??[];const currency=d?.exposure?.currency;
+ return <><PageTitle eyebrow="FINANCIAL EXPOSURE" title="Find concentrated risk." description="See how much money is at stake, when, and in which agreements. Click the heatmap to see why."/><ClockControl/><ResourceState resource={r}>{d&&<>
  <Panel className="exposure-financial-panel"><PanelTitle title="Portfolio exposure" description="Expected and worst-case estimates at your selected date"><SourceBadge value="analysis"/></PanelTitle><div className="exposure-two-column"><ExposureGauge data={d}/><div className="table-scroll"><table className="data-table exposure-contract-table"><thead><tr><th>Agreement</th><th>Exposure</th><th>Assumptions</th></tr></thead><tbody>{d.exposure?.contracts.map((c,i)=><tr key={text(c.contract_id,String(i))}><td><Link href={query('/dashboard/contracts',{contract:text(c.contract_id)})}>{text(c.title,names.get(text(c.contract_id))??text(c.contract_id))}</Link></td><td>{formatMoney(c.amount??c.worst_case,currency)}</td><td><details><summary>View assumptions</summary><FieldValue value={c.assumptions}/></details></td></tr>)}</tbody></table></div></div></Panel>
- <Panel className="risk-matrix-panel"><div className="risk-matrix-heading"><div><p className="eyebrow">EXPOSURE DISTRIBUTION</p><h2>Risk heatmap</h2><p>Find the months and clauses where costs concentrate.</p></div><div className="matrix-group-toggle" aria-label="Group heatmap rows"><button aria-pressed={by==='contract'} className={by==='contract'?'active':''} onClick={()=>setBy('contract')}>By agreement</button><button aria-pressed={by==='type'} className={by==='type'?'active':''} onClick={()=>setBy('type')}>By clause type</button></div></div>
- <div className="risk-matrix-filters"><span><SlidersHorizontal size={14}/>Filter</span><label className="sr-only" htmlFor="heat-contract">Agreement</label><select id="heat-contract" value={contract} onChange={e=>setContract(e.target.value)}><option value="">All agreements</option>{[...new Set(cells.map(c=>c.contract_id))].map(id=><option value={id} key={id}>{names.get(id)??id}</option>)}</select><label className="sr-only" htmlFor="heat-type">Clause type</label><select id="heat-type" value={type} onChange={e=>setType(e.target.value)}><option value="">All clause types</option>{[...new Set(cells.map(c=>c.clause_type))].map(t=><option key={t}>{t}</option>)}</select><label className="sr-only" htmlFor="heat-month">Month</label><select id="heat-month" value={month} onChange={e=>setMonth(e.target.value)}><option value="">All months</option>{[...new Set(cells.map(c=>c.month))].sort().map(m=><option key={m} value={m}>{monthLabel(m)}</option>)}</select>{filters&&<button onClick={()=>{setContract('');setType('');setMonth('');}}><RotateCcw size={12}/>Clear</button>}</div>
- {!visible.length?<div className="empty-state"><h3>No exposure in this view.</h3><p>Try another date or clear the filters.</p>{filters&&<Button variant="secondary" onClick={()=>{setContract('');setType('');setMonth('');}}>Clear filters</Button>}</div>:<div className="risk-matrix-scroll"><table className="risk-matrix"><thead><tr><th>{by==='contract'?'Agreement':'Clause type'}</th>{months.map(m=><th key={m}>{monthLabel(m)}</th>)}<th className="risk-total-heading">Total</th></tr></thead><tbody>{rows.map(row=>{const total=visible.filter(c=>(by==='contract'?c.contract_id:c.clause_type)===row).reduce((sum,c)=>sum+c.amount,0);return <tr key={row}><th><span className={'matrix-row-dot '+(by==='type'?'is-clause':'')}/>{by==='contract'?names.get(row)??row:row}</th>{months.map(m=>{const matches=visible.filter(c=>(by==='contract'?c.contract_id:c.clause_type)===row&&c.month===m);const amount=matches.reduce((sum,c)=>sum+c.amount,0);const label=(by==='contract'?names.get(row)??row:row)+' · '+monthLabel(m)+' · '+formatMoney(amount,currency);return <td key={m}>{matches.length?<Link className={'risk-tile risk-level-'+heatLevel(amount,maximum)} title={label} aria-label={label+'. View obligations.'} href={query('/dashboard/timeline',{contract_id:by==='contract'?row:contract||undefined,clause_type:by==='type'?row:type||undefined,month:m})}><span>{amount===0?'—':formatMoney(amount,currency)}</span><ArrowUpRight size={12}/><i style={{width:Math.min(100,amount/maximum*100)+'%'}}/></Link>:<div className="risk-tile risk-no-data">No data</div>}</td>;})}<td className="risk-row-total">{formatMoney(total,currency)}</td></tr>;})}</tbody></table></div>}
- <footer className="risk-matrix-footer"><span>Select a cell to inspect its obligations<ArrowUpRight size={12}/></span><div><small>No exposure</small><i className="risk-level-0"/><i className="risk-level-1"/><i className="risk-level-2"/><i className="risk-level-3"/><i className="risk-level-4"/><small>Higher exposure</small></div></footer><p className="risk-matrix-scale-note">Colour shows relative financial exposure across this portfolio, with the same scale while filtering. Totals use {currency??'the reported currency'}.</p>
- </Panel></>}</ResourceState></>;
+ <ExposureHeatmap cells={cells} names={names} currency={currency} date={date}/></>}</ResourceState></>;
 }

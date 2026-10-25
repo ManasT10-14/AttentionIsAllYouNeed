@@ -103,10 +103,16 @@ export function formatMoney(value: unknown, currency?: string) {
   try { return new Intl.NumberFormat(code === 'INR' ? 'en-IN' : 'en-US', { style: 'currency', currency: code, maximumFractionDigits: 0 }).format(amount); }
   catch { return code + ' ' + amount.toLocaleString(); }
 }
+/** One date format for the whole app ("12 Nov 2026"). Uses the calendar date as written (date-only, offset or UTC timestamp), so IST/UTC never shifts a day. */
 export function dateText(value: unknown) {
-  const s = text(value, '');
-  const date = new Date(s.length === 10 ? s + 'T00:00:00Z' : s);
-  return !s || Number.isNaN(date.getTime()) ? 'Not provided' : date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(text(value, ''));
+  const date = m ? new Date(Date.UTC(+m[1], +m[2] - 1, +m[3])) : new Date(NaN);
+  return Number.isNaN(date.getTime()) ? 'Not provided' : date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+}
+/** dateText plus wall-clock time as written ("2 Nov 2026, 03:00 +05:30"); naive backend timestamps are UTC. */
+export function dateTimeText(value: unknown) {
+  const s = text(value, ''); const m = /[T ](\d{2}:\d{2})(?::\d{2}(?:\.\d+)?)?(Z|[+-]\d{2}:?\d{2})?$/.exec(s);
+  return m ? dateText(s) + ', ' + m[1] + ' ' + (m[2] && m[2] !== 'Z' ? m[2] : 'UTC') : dateText(s);
 }
 export function today() { return new Date().toISOString().slice(0, 10); }
 export function offsetDate(date: string, days: number) { const d = new Date(date + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() + days); return d.toISOString().slice(0, 10); }
