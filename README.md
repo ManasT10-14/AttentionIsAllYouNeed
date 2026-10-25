@@ -182,7 +182,7 @@ uv run --locked --all-extras ruff check eval
 cd frontend; npm run typecheck; npm test; cd ..
 ```
 
-Corpus checks (the same steps CI runs):
+Corpus checks (run locally; GitHub Actions CI is deferred for now):
 
 ```powershell
 uv run --locked --all-extras ragnarok corpus-validate
