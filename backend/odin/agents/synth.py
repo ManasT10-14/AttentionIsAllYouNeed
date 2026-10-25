@@ -61,20 +61,43 @@ def _summary(rep: dict, cid: str) -> dict:
         return {"executive_summary": f"(summary unavailable: {e})", "key_risks": [], "recommended_next_steps": []}
 
 
-@agent_node("synth")
-def synthesize(state: dict) -> dict:
-    results = {r["contract_id"]: r for r in state.get("ws_results", [])}
-    cids = state.get("contract_ids") or [c.contract_id for c in repo.contracts()]
+def _write_contract(cid: str, ws: dict | None) -> dict:
+    rep = contract_report(cid, ws)
+    repo.put("report", _R(**rep), contract_id=cid, status=rep["completeness"])
+    return rep
 
-    def one(cid):
-        rep = contract_report(cid, results.get(cid))
-        repo.put("report", _R(**rep), contract_id=cid, status=rep["completeness"])
-        return rep
-    reports = pmap(one, cids)            # independent summaries → parallel (was ~23 s × N serial)
+
+@agent_node("synth")
+def synthesize_contract(state: dict) -> dict:
+    """One contract's report, written as soon as its workstream finishes (state['ws'] = its ws result)."""
+    _write_contract(state["contract_id"], state.get("ws"))
+    return {}
+
+
+def _company(state: dict, reports: list[dict], results: dict) -> None:
     company = company_report(reports, results.get("cross"))
     repo.put("report", _R(**company), status=company["completeness"])
     say("synth", "all", "report", f"Reports ready: {len(reports)} contract reports + company risk report "
         f"({company['completeness'].upper()}).", payload={"completeness": company["completeness"]})
+
+
+@agent_node("synth")
+def synthesize_company(state: dict) -> dict:
+    """Company report only; contract reports already exist (per-contract pipeline)."""
+    results = {r["contract_id"]: r for r in state.get("ws_results", [])}
+    cids = state.get("contract_ids") or [c.contract_id for c in repo.contracts()]
+    reports = [repo.get("report", f"report:{c}") or _write_contract(c, results.get(c)) for c in cids]
+    _company(state, reports, results)
+    return {}
+
+
+@agent_node("synth")
+def synthesize(state: dict) -> dict:
+    """All contract reports (parallel) + company report — used by update / refresh."""
+    results = {r["contract_id"]: r for r in state.get("ws_results", [])}
+    cids = state.get("contract_ids") or [c.contract_id for c in repo.contracts()]
+    reports = pmap(lambda cid: _write_contract(cid, results.get(cid)), cids)   # independent → parallel
+    _company(state, reports, results)
     return {}
 
 

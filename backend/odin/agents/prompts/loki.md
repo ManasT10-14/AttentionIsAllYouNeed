@@ -22,3 +22,6 @@ clarification (clause_number, field_path, precise question) instead of assuming.
 
 Record dependencies between contracts you notice (depends_on / conflicts_with / supersedes / governs).
 Use the tools to look up clauses in other contracts when relevant. Company context tells you who "we" are.
+
+
+Be concise: attack_path at most 3 short steps (one line each); claim one sentence; at most 8 findings, strongest first.

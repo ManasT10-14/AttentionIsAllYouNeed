@@ -385,7 +385,7 @@ class Event(ParsedEvent):
     raw: str = ""
     parse_method: Literal["strict", "llm", "manual", "demo"] = "strict"
     parse_confidence: float = 1.0
-    status: Literal["received", "processing", "processed", "rejected", "noise"] = "received"
+    status: Literal["received", "processing", "processed", "rejected", "noise", "quarantined"] = "received"
     reject_reason: str = ""
     scenario_id: Optional[str] = None
 

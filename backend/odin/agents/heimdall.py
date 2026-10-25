@@ -5,6 +5,7 @@ import hashlib
 
 from odin.agents.base import agent_node, j, prompt, say, tool
 from odin.core import citations
+from odin.core.config import limits
 from odin.core.models import (SEVERITY_RANK, Alert, Citation, EventMapping, HeimdallVerifications, Verification,
                               Violation, new_id)
 from odin.db import repo
@@ -47,8 +48,8 @@ def verify(state: dict) -> dict:
         hist = (f.get("debate") or []) + [{"by": "heimdall", "verdict": v.verdict, "rationale": v.rationale}]
         status = {"support": "verified", "challenge": "challenged", "insufficient": "open"}[v.verdict]
         repo.set_status(v.finding_id, status, debate=hist)
-        if v.verdict == "challenge":
-            disputed.append(v.finding_id)
+        if v.verdict == "challenge" and f.get("severity", 0) >= limits().get("debate_min_severity", 3):
+            disputed.append(v.finding_id)       # low-severity challenges stay "challenged" without a debate round
     say("heimdall", "tyr" if disputed else "loki", "verify",
         f"{cid or 'event'}: supported {counts['support']}, challenged {counts['challenge']}, "
         f"insufficient {counts['insufficient']}.", payload={**counts, "disputed": disputed}, contract_id=cid)

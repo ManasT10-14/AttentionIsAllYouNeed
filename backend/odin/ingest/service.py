@@ -13,7 +13,7 @@ from odin.core.hooks import HOOKS
 from odin.core.models import CompanyContext, new_id
 from odin.db.session import db
 from odin.db.tables import ClauseRow, Company, Contract, ContractVersion
-from odin.ingest.parse import docx_to_pdf, parse_money, parse_pdf, text_to_pdf
+from odin.ingest.parse import docx_to_pdf, image_to_pdf, parse_money, parse_pdf, text_to_pdf
 from odin.retrieval.hybrid import chunk_header, embed_passages
 
 
@@ -28,14 +28,17 @@ class IngestResult:
     duplicate: bool = False
 
 
+IMAGE_EXTS = (".png", ".jpg", ".jpeg", ".tif", ".tiff")
+
+
 def _safe(name: str) -> str:
     return re.sub(r"[^A-Za-z0-9_.-]+", "_", name)[:80]
 
 
 def ingest_contract(company_id: str, filename: str, content: bytes) -> IngestResult:
     ext = Path(filename).suffix.lower()
-    if ext not in (".pdf", ".docx", ".txt", ".md"):
-        raise ValueError(f"Unsupported file type {ext} — use PDF or DOCX.")
+    if ext not in (".pdf", ".docx", ".txt", ".md", *IMAGE_EXTS):
+        raise ValueError(f"Unsupported file type {ext} — use PDF, DOCX or a scanned image (PNG/JPG/TIFF).")
     sha = hashlib.sha256(content).hexdigest()
     stage = DATA_DIR / company_id / "_staging" / sha[:16]
     stage.mkdir(parents=True, exist_ok=True)
@@ -47,6 +50,8 @@ def ingest_contract(company_id: str, filename: str, content: bytes) -> IngestRes
         pdf.write_bytes(content)
     elif ext == ".docx":
         warnings += docx_to_pdf(src, pdf)
+    elif ext in IMAGE_EXTS:
+        image_to_pdf(content, ext, pdf)
     else:
         text_to_pdf(content.decode("utf-8", errors="replace"), pdf)
 

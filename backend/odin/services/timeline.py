@@ -45,6 +45,11 @@ def _eid(*parts) -> str:
     return "tl-" + hashlib.sha1("|".join(map(str, parts)).encode()).hexdigest()[:12]
 
 
+def fmt_date(d: date) -> str:
+    """Human date used in all generated prose ("12 Nov 2026") — same format as the UI."""
+    return f"{d.day} {d:%b %Y}"
+
+
 def _status(d: date, now: date) -> str:
     if d < now:
         return "past"
@@ -122,7 +127,7 @@ def compute(ci: ContractInputs, now: date, horizon_months: int = 12, apply_actio
             entries.append(TimelineEntry(
                 id=_eid(ci.contract_id, "notice", notice_deadline), contract_id=ci.contract_id, date=notice_deadline,
                 kind="notice_deadline", status=st, citation=_cite(rn),
-                title=f"Last day to send non-renewal notice ({rn.notice_days} days before {end.isoformat()}, "
+                title=f"Last day to send non-renewal notice ({rn.notice_days} days before {fmt_date(end)}, "
                       f"business-day adjusted, {country})"))
             if rn.auto_renew and not sent:
                 commit = rn.renewal_value or _annualised(ci, rn.renewal_period_months or 12, cur)
@@ -134,7 +139,7 @@ def compute(ci: ContractInputs, now: date, horizon_months: int = 12, apply_actio
                     lines.append(ExposureLine(contract_id=ci.contract_id, label="Locked-in renewal if no notice sent",
                                               amount=commit, month=end.strftime("%Y-%m"), clause_type="renewal",
                                               citation=_cite(rn)))
-                    assumptions.append(f"{ci.contract_id}: no non-renewal notice is sent before {notice_deadline}.")
+                    assumptions.append(f"{ci.contract_id}: no non-renewal notice is sent before {fmt_date(notice_deadline)}.")
 
     # ── payments ──
     missed_dates = sorted(e.occurred_at.date() for e in ci.events if e.event_type in ("PAYMENT_LATE", "PAYMENT_MISSED"))

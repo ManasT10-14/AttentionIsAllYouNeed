@@ -51,13 +51,17 @@ def agent_node(agent: str):
                     return {"errors": [f"{agent}: crash {type(e).__name__}: {str(e)[:300]}"]}
         @functools.wraps(fn)
         def observed(state, *a, **kw):
-            from odin.core.telemetry import span
-            with span(f"agent:{agent}:{fn.__name__}"):
+            from odin.core.telemetry import _plain, _set_outputs, span
+            ins = {k: _plain(v) for k, v in (state or {}).items() if k in ("contract_id", "mode", "debate_round",
+                                                                           "event_id", "run_id", "clarify_round")}
+            with span(f"agent:{agent}:{fn.__name__}", inputs=ins, metadata={"agent": agent},
+                      tags=[agent]) as run:
                 HOOKS.record("agent", agent, None, None, {"event": f"{agent}.{fn.__name__}.start"})
                 output = wrapper(state, *a, **kw)
                 HOOKS.record("agent", agent, None, output,
                              {"event": f"{agent}.{fn.__name__}.end",
                               "failed": bool(output.get("errors") or output.get("budget_hit"))})
+                _set_outputs(run, output)
                 return output
         return observed
     return deco

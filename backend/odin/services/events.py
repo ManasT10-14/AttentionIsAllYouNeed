@@ -36,11 +36,12 @@ def receive(company_id: str, *, subject: str, body: str, sender: str = "", gmail
         if not scenario_id and any(e.get("gmail_msg_id") == dedupe for e in repo.query("event")):
             return {"status": "duplicate", "dedupe": dedupe}
         ev_id = new_id("evt")
+        quarantine = ""
         try:
-            body = HOOKS.on_email(body, {"company_id": company_id, "sender": sender, "subject": subject})
-        except Blocked as e:
-            return _reject(company_id, ev_id, dedupe, subject, body, sender, [f"blocked by security guard: {e}"],
-                           thread_id, scenario_id, method)
+            body = HOOKS.on_email(body, {"company_id": company_id, "sender": sender, "subject": subject,
+                                         "event_id": ev_id})
+        except Blocked as e:   # held for admin review (POST /api/security/events/{id}), never auto-run
+            quarantine = f"quarantined by security guard: {e}"
         parse_method, conf = method, 1.0
         try:
             parsed = event_parser.parse(subject, body)
@@ -62,6 +63,10 @@ def receive(company_id: str, *, subject: str, body: str, sender: str = "", gmail
                    **parsed.model_dump())
         if unknown:
             ev.reject_reason = f"unknown contract ids ignored: {unknown}; Heimdall will infer"
+        if quarantine:
+            ev.status, ev.reject_reason = "quarantined", "; ".join(filter(None, [quarantine, ev.reject_reason]))
+            repo.put("event", ev)
+            return {"status": "quarantined", "event_id": ev_id, "reason": quarantine}
         repo.put("event", ev)
         if not scenario_id:
             _advance_clock(company_id, ev)

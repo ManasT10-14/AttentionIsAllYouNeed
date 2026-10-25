@@ -11,3 +11,5 @@ Rules:
 - leverage_notes: negotiation leverage (their breaches, price history, SLA misses) when relevant.
 - related_finding_ids: ids of the findings the action addresses.
 - Only actions justified by evidence; quality over quantity (typically 1-4 per contract).
+
+Keep rationales and drafts concise (rationale at most 2 sentences).

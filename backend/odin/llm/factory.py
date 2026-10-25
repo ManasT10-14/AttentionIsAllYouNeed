@@ -36,14 +36,21 @@ def model_for(agent: str, provider: str) -> str | None:
     return ((odin_config()["agents"].get(agent) or {}).get("models") or {}).get(provider)
 
 
+def max_tokens_for(agent: str) -> int | None:
+    """Per-agent output cap (agents.<name>.max_tokens) — keeps slow thinking/verbose models bounded."""
+    return (odin_config()["agents"].get(agent) or {}).get("max_tokens")
+
+
 @lru_cache(maxsize=64)
-def chat_model(name: str, temperature: float = 0.0, model: str | None = None):
+def chat_model(name: str, temperature: float = 0.0, model: str | None = None, max_tokens: int | None = None):
     cfg = {**provider_cfg(name), **({"model": model} if model else {})}
     kind = cfg["kind"]
     common = dict(temperature=temperature, max_retries=0, timeout=120)
     if kind == "openai":
         from langchain_openai import ChatOpenAI
         kw = dict(model=cfg["model"], api_key=cfg["api_key"], seed=7, **common)
+        if max_tokens:
+            kw["max_tokens"] = max_tokens
         if cfg.get("base_url"):
             kw["base_url"] = cfg["base_url"]
         if cfg.get("project"):                       # sends OpenAI-Project header (Bedrock Mantle)
@@ -51,10 +58,10 @@ def chat_model(name: str, temperature: float = 0.0, model: str | None = None):
         return ChatOpenAI(**kw)
     if kind == "anthropic":
         from langchain_anthropic import ChatAnthropic
-        return ChatAnthropic(model=cfg["model"], api_key=cfg["api_key"], max_tokens=8192, **common)
+        return ChatAnthropic(model=cfg["model"], api_key=cfg["api_key"], max_tokens=max_tokens or 8192, **common)
     if kind == "groq":
         from langchain_groq import ChatGroq
-        return ChatGroq(model=cfg["model"], api_key=cfg["api_key"], **common)
+        return ChatGroq(model=cfg["model"], api_key=cfg["api_key"], max_tokens=max_tokens, **common)
     raise ValueError(f"no chat model for provider kind {kind}")
 
 

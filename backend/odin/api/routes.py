@@ -195,10 +195,10 @@ def start_analysis(req: AnalysisReq, u: User = Depends(admin)):
 
 
 @router.get("/runs", tags=["runs"])
-def list_runs(limit: int = 30, u: User = Depends(current_user)):
-    with db() as s:
-        rows = s.scalars(select(Run).where(Run.company_id == u.company_id).order_by(Run.started_at.desc()).limit(limit)).all()
-        return [repo.run_dict(r) for r in rows]
+def list_runs(limit: int = 30, kind: Optional[str] = None, contract_id: Optional[str] = None,
+              event_id: Optional[str] = None, u: User = Depends(current_user)):
+    from odin.services import runs as runs_svc
+    return runs_svc.runs_for(u.company_id, kind=kind, contract_id=contract_id, event_id=event_id, limit=limit)
 
 
 @router.get("/runs/{run_id}", tags=["runs"])

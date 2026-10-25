@@ -1,12 +1,12 @@
 """Main analysis graph (plan §2.1):
-  odin.plan ─Send per contract→ extract (Thor+Norns, parallel) → gate
-            ─Send per contract→ review workstreams (Loki⇄Thor, Loki⇄Heimdall, Tyr)  ┐ all parallel
-            ─Send───────────→ cross-contract workstream                            ┘
-  → synth (parallel reports) → odin.final
-Cross-contract only needs extractions, so it no longer waits for every per-contract debate to finish.
+  odin.plan ─Send per contract→ pipeline: Thor+Norns → review workstream (Loki⇄Thor, Loki⇄Heimdall, Tyr)
+            │                    → that contract's report                                  ┐ all parallel,
+            ─Send───────────────→ cross-contract workstream (waits only for all extractions) ┘ no barriers
+  → company report → odin.final
 """
 from __future__ import annotations
 
+import threading
 from functools import lru_cache
 
 from langgraph.graph import END, START, StateGraph
@@ -31,8 +31,18 @@ def _payloads(state: AnalysisState, mode: str) -> list[dict]:
     return out
 
 
-def fan_extract(state: AnalysisState):
-    return [Send("extract", p) for p in _payloads(state, "analysis")] or ["gate"]
+# run_id -> {contract_id: Event set when that contract's Thor+Norns finished}; lets cross start once all
+# extractions exist without holding back any per-contract pipeline. Absent after a resume -> cross doesn't wait.
+_extracted: dict[str, dict[str, threading.Event]] = {}
+
+
+def fan_out(state: AnalysisState):
+    """One independent pipeline per contract (extract → Loki → Heimdall → Tyr → report) + cross."""
+    base = {k: state.get(k) for k in ("company_id", "run_id", "scenario_id")}
+    pays = _payloads(state, "review")
+    _extracted[state["run_id"]] = {p["contract_id"]: threading.Event() for p in pays}
+    return [Send("pipeline", p) for p in pays] + [Send("cross", {**base, "contract_id": "cross", "mode": "analysis",
+                                                                  "debate_round": 0})]
 
 
 def extract(payload: dict) -> dict:
@@ -44,25 +54,32 @@ def extract(payload: dict) -> dict:
     return {"errors": errs}
 
 
-def gate(state: AnalysisState) -> dict:
-    return {}
-
-
-def fan_review(state: AnalysisState):
-    base = {k: state.get(k) for k in ("company_id", "run_id", "scenario_id")}
-    sends = [Send("workstream", p) for p in _payloads(state, "review")]
-    sends.append(Send("cross", {**base, "contract_id": "cross", "mode": "analysis", "debate_round": 0}))
-    return sends
-
-
-def workstream(payload: dict) -> dict:
+def pipeline(payload: dict) -> dict:
+    """Everything for one contract, starting Loki the moment its own Thor finishes and writing its report
+    as soon as its workstream is done (no cross-contract barriers)."""
+    ev = _extracted.get(payload["run_id"], {}).get(payload["contract_id"])
+    try:
+        ext = extract(payload)
+    finally:
+        if ev:
+            ev.set()
     out = contract_ws.build().invoke(payload)
-    return {"ws_results": out.get("ws_results", []), "errors": out.get("errors", [])}
+    res = out.get("ws_results", [])
+    synth.synthesize_contract({**{k: payload.get(k) for k in ("company_id", "run_id", "scenario_id", "contract_id")},
+                               "ws": res[0] if res else None})
+    return {"ws_results": res, "errors": ext["errors"] + out.get("errors", [])}
 
 
 def cross(payload: dict) -> dict:
+    for ev in list(_extracted.get(payload["run_id"], {}).values()):
+        ev.wait(timeout=900)        # cross-contract review needs every extraction
     out = contract_ws.build().invoke(payload)
     return {"ws_results": out.get("ws_results", []), "errors": out.get("errors", [])}
+
+
+def company_report(state: AnalysisState) -> dict:
+    _extracted.pop(state["run_id"], None)
+    return synth.synthesize_company(state)
 
 
 def final(state: AnalysisState) -> dict:
@@ -77,17 +94,13 @@ def final(state: AnalysisState) -> dict:
 def build():
     g = StateGraph(AnalysisState)
     g.add_node("plan", odin.plan)
-    g.add_node("extract", extract)
-    g.add_node("gate", gate)
-    g.add_node("workstream", workstream)
+    g.add_node("pipeline", pipeline)
     g.add_node("cross", cross)
-    g.add_node("synth", synth.synthesize)
+    g.add_node("synth", company_report)
     g.add_node("final", final)
     g.add_edge(START, "plan")
-    g.add_conditional_edges("plan", fan_extract, ["extract", "gate"])
-    g.add_edge("extract", "gate")                       # barrier: all extractions done
-    g.add_conditional_edges("gate", fan_review, ["workstream", "cross"])
-    g.add_edge("workstream", "synth")                   # both run in the same superstep → synth once
+    g.add_conditional_edges("plan", fan_out, ["pipeline", "cross"])
+    g.add_edge("pipeline", "synth")                     # company report waits for every pipeline + cross
     g.add_edge("cross", "synth")
     g.add_edge("synth", "final")
     g.add_edge("final", END)

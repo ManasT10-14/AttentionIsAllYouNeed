@@ -29,7 +29,7 @@ export function WorkPlan() {
   const reduced = useReducedMotion();
 
   return <Panel className="workplan-panel">
-    <header className="workplan-heading"><span className="workplan-symbol"><Workflow size={20} strokeWidth={1.6} /></span><div><h2>Analysis workplan</h2><p>Evidence behind each agreement. Progress at a glance.</p></div><Link className="workplan-run-link" href="/dashboard/observability">Inspect run<ArrowUpRight size={14} /></Link></header>
+    <header className="workplan-heading"><span className="workplan-symbol"><Workflow size={20} strokeWidth={1.6} /></span><div><h2>Analysis workplan</h2><p>Evidence behind each agreement. Progress at a glance.</p></div><Link className="workplan-run-link" href={run ? query('/dashboard/workflow', { run: text(run.id) }) : '/dashboard/workflow'}>Inspect run<ArrowUpRight size={14} /></Link></header>
     <ResourceState resource={resource} empty={resource.data !== undefined && !run}>{run && <>
       <div className="workplan-overview">
         <div className="workplan-coverage-ring"><svg viewBox="0 0 90 90" aria-hidden="true"><circle cx="45" cy="45" r="36" /><motion.circle cx="45" cy="45" r="36" pathLength="100" initial={false} animate={{ strokeDasharray: `${average ?? 0} 100` }} transition={{ duration: reduced ? 0 : .65 }} /></svg><strong>{average === undefined ? '—' : average + '%'}<small>evidence</small></strong></div>
@@ -37,14 +37,14 @@ export function WorkPlan() {
       </div>
       <div className="workstream-list">{streams.map((stream, index) => {
         const contractId = text(stream.contract_id, '');
-        const title = names.get(contractId) || (contractId ? contractId.replaceAll('_', ' ').replaceAll('-', ' ').replace(/^./, character => character.toUpperCase()) : 'Cross-contract review');
+        const title = contractId === 'cross' ? 'Cross-contract review' : names.get(contractId) || (contractId ? contractId.replaceAll('_', ' ').replaceAll('-', ' ').replace(/^./, character => character.toUpperCase()) : 'Cross-contract review');
         const score = coverage(stream.evidence_score);
         return <article className="workstream-row" key={contractId || index}>
           <span className="workstream-document">{contractId ? <FileText size={18} strokeWidth={1.5} /> : <Layers3 size={18} strokeWidth={1.5} />}</span>
-          <div className="workstream-info"><span className="workstream-index">WORKSTREAM {String(index + 1).padStart(2, '0')}</span>{contractId ? <Link href={query('/dashboard/contracts', { contract: contractId })}>{title}<ArrowUpRight size={12} /></Link> : <strong>{title}</strong>}{stream.reason && !sharedReason ? <p>{text(stream.reason)}</p> : null}</div>
+          <div className="workstream-info"><span className="workstream-index">WORKSTREAM {String(index + 1).padStart(2, '0')}</span>{contractId && contractId !== 'cross' ? <Link href={query('/dashboard/contracts', { contract: contractId })}>{title}<ArrowUpRight size={12} /></Link> : <strong>{title}</strong>}{stream.reason && !sharedReason ? <p>{text(stream.reason)}</p> : null}</div>
           <div className="workstream-progress"><div><span>Evidence</span><strong>{score === undefined ? 'Not supplied' : score + '%'}</strong></div><div className="workstream-meter" role={score === undefined ? undefined : 'meter'} aria-label={'Evidence coverage for ' + title} aria-valuemin={score === undefined ? undefined : 0} aria-valuemax={score === undefined ? undefined : 100} aria-valuenow={score}><motion.i style={{ width: (score ?? 0) + '%' }} initial={{ scaleX: reduced ? 1 : 0 }} animate={{ scaleX: 1 }} transition={{ duration: reduced ? 0 : .7, delay: reduced ? 0 : index * .06 }} /></div></div>
           <div className="workstream-status"><Status value={stream.status} /></div>
-          {list(stream.tasks).length > 0 && <details className="workstream-tasks"><summary>Inspect tasks<ChevronDown size={12} /></summary><FieldValue value={stream.tasks} /></details>}
+          {Array.isArray(stream.tasks) && stream.tasks.length > 0 && <details className="workstream-tasks"><summary>Inspect tasks<ChevronDown size={12} /></summary><FieldValue value={stream.tasks} /></details>}
         </article>;
       })}</div>
       {!streams.length && <p className="muted-note workplan-empty">No workstreams supplied for this run.</p>}

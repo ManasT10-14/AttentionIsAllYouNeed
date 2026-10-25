@@ -1,0 +1,58 @@
+{
+ "total": 11,
+ "open": 6,
+ "by_severity": {
+  "high": 8,
+  "medium": 3
+ },
+ "by_source": {
+  "ingest": 3,
+  "email": 5,
+  "tool_call": 3
+ },
+ "by_kind": {
+  "injection": 8,
+  "tool_blocked": 3
+ },
+ "by_action": {
+  "flagged": 3,
+  "quarantined": 5,
+  "blocked": 3
+ },
+ "quarantined_events": [],
+ "blocked_tool_calls": [
+  {
+   "agent": "system",
+   "tool": "send_system_reply",
+   "scope": "external_send",
+   "run_id": "d8a447f2-bd53-4c43-894a-7f206672ab03",
+   "summary": "Blocked: External effects are disabled in the evaluation worker",
+   "ts": "2026-10-25T19:11:39.175925"
+  },
+  {
+   "agent": "system",
+   "tool": "apply_amendment",
+   "scope": "file_write",
+   "run_id": "73512a05-1d54-4b32-94b5-86d433ecccee",
+   "summary": "ApprovalRequired: this tool needs an approved action (approval_id)",
+   "ts": "2026-10-25T19:11:36.755318"
+  },
+  {
+   "agent": "system",
+   "tool": "send_gmail",
+   "scope": "external_send",
+   "run_id": "1da1d7d3-71ac-4fd9-9401-6e6997f8b49e",
+   "summary": "ApprovalRequired: this tool needs an approved action (approval_id)",
+   "ts": "2026-10-25T19:11:34.084245"
+  },
+  {
+   "agent": "loki",
+   "tool": "send_gmail",
+   "scope": "external_send",
+   "run_id": "92de696f-84a8-4fb2-ad54-f2811d2fc9a2",
+   "summary": "ToolDenied: agent 'loki' may not call 'send_gmail'",
+   "ts": "2026-10-25T19:11:31.652803"
+  }
+ ],
+ "guard_enabled": true
+}

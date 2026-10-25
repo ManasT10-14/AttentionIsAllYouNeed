@@ -1,2 +1,2 @@
-import { FutureView } from '@/components/future-view';
-export default function SecurityPage() { return <FutureView section="security" />; }
+import { SecurityView } from '@/components/security-view';
+export default function SecurityPage() { return <SecurityView />; }
