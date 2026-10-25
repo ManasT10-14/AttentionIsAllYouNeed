@@ -146,3 +146,22 @@ def test_registry_allowlist_and_approval():
         REGISTRY._check_approval(None)
     loki_tools = {t.name for t in REGISTRY.langchain_tools("loki", ["get_clause", "save_finding", "send_gmail"])}
     assert loki_tools == {"get_clause"}       # writes / side effects never exposed to the LLM
+
+
+def test_llm_scores_are_clamped_not_rejected():
+    from odin.core.models import Finding, LokiRebuttal
+
+    def rev(v):
+        return LokiRebuttal(finding_id="f", position="revise", argument="a", revised_severity=v).revised_severity
+
+    assert (rev(0), rev(7), rev(3)) == (None, 5, 3)   # 0 once failed a whole Loki debate step
+    f = Finding(id="x", contract_id="C", kind="ambiguity", claim="c", attack_path="p", citations=[],
+                severity=0, likelihood=85)
+    assert (f.severity, f.likelihood) == (1, 0.85)
+
+
+def test_clean_text_unfolds_ligatures_and_drops_broken_chars():
+    from odin.ingest.parse import clean_text
+
+    assert clean_text("Conﬁdential") == "Confidential"
+    assert clean_text("Con�\udc81dential") == "Condential"   # broken glyph never reaches clauses

@@ -9,9 +9,26 @@ from __future__ import annotations
 
 import uuid
 from datetime import date, datetime
-from typing import Literal, Optional
+from typing import Annotated, Literal, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, BeforeValidator, Field
+
+
+def _clamp_severity(v):
+    """Models sometimes answer 0 or 6; clamp into 1-5 instead of failing the whole step."""
+    return v if v is None else min(5, max(1, round(float(v))))
+
+
+def _clamp_unit(v):
+    """Scores in 0-1; a model answering 85 means 0.85."""
+    if v is None:
+        return v
+    v = float(v)
+    return min(1.0, max(0.0, v / 100 if 1 < v <= 100 else v))
+
+
+Score5 = Annotated[int, BeforeValidator(_clamp_severity), Field(ge=1, le=5)]
+Unit = Annotated[float, BeforeValidator(_clamp_unit), Field(ge=0, le=1)]
 
 
 def new_id(prefix: str) -> str:
@@ -89,7 +106,7 @@ class Clause(BaseModel):
 # ───────────────────────────── Thor (extraction) ─────────────────────────────
 class Sourced(BaseModel):
     """Envelope every extracted value travels in (FR2.2/FR2.3)."""
-    confidence: float = Field(ge=0, le=1)
+    confidence: Unit
     citation: Optional[Citation] = None
     status: FieldStatus = "found"
     note: str = ""
@@ -274,8 +291,8 @@ class LokiFindingDraft(BaseModel):
     claim: str = Field(description="What the counterparty's lawyer would argue")
     attack_path: str = Field(description="Step-by-step how the clause is exploited")
     citations: list[Citation]
-    severity: int = Field(ge=1, le=5)
-    likelihood: float = Field(ge=0, le=1)
+    severity: Score5
+    likelihood: Unit
     other_contract_ids: list[str] = Field(default=[], description="For cross-contract conflicts")
 
 
@@ -304,7 +321,9 @@ class LokiRebuttal(BaseModel):
     finding_id: str
     position: Literal["maintain", "revise", "withdraw"]
     argument: str
-    revised_severity: Optional[int] = Field(None, ge=1, le=5)
+    # 0 means "no new severity" (e.g. withdrawn); anything else is clamped into 1-5
+    revised_severity: Annotated[Optional[int], BeforeValidator(
+        lambda v: None if v in (None, 0, "0") else _clamp_severity(v))] = Field(None, ge=1, le=5)
 
 
 class LokiRebuttals(BaseModel):
@@ -418,8 +437,8 @@ class RulingDraft(BaseModel):
     finding_id: str
     winner: Literal["loki", "heimdall", "split"]
     rationale: str
-    final_severity: int = Field(ge=1, le=5)
-    confidence: float = Field(ge=0, le=1)
+    final_severity: Score5
+    confidence: Unit
 
 
 class TyrRulings(BaseModel):
@@ -448,7 +467,7 @@ class ActionDraftOut(BaseModel):
     subject: str
     body_md: str = Field(description="Ready-to-send text that cites exact clause numbers")
     citations: list[Citation]
-    confidence: float = Field(ge=0, le=1)
+    confidence: Unit
     est_exposure_avoided: Optional[Money] = None
     deadline: Optional[date] = None
     redlines: list[ClauseRedline] = []

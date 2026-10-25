@@ -10,6 +10,7 @@ import re
 import shutil
 import subprocess
 import tempfile
+import unicodedata
 from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
@@ -99,6 +100,13 @@ class Line:
     words: list[Word] = field(default_factory=list)
 
 
+def clean_text(s: str) -> str:
+    """Ligatures (ﬁ, ﬂ) → plain letters, and drop broken surrogate/replacement chars that a PDF font
+    without the ligature glyph yields. Otherwise quotes, search and re-ingested versions get garbled."""
+    s = unicodedata.normalize("NFKC", s)
+    return "".join(ch for ch in s if not (0xD800 <= ord(ch) <= 0xDFFF or ch == "�"))
+
+
 def layout(pdf_path: Path) -> tuple[str, list[Line]]:
     """Rebuild reading-order text with a char→bbox map. Lines are grouped by visual baseline."""
     doc = fitz.open(str(pdf_path))
@@ -128,9 +136,10 @@ def layout(pdf_path: Path) -> tuple[str, list[Line]]:
                 if i:
                     chunks.append(" ")
                     pos += 1
-                line.words.append(Word(pno, w[0], w[1], w[2], w[3], pos, pos + len(w[4])))
-                chunks.append(w[4])
-                pos += len(w[4])
+                t = clean_text(w[4])
+                line.words.append(Word(pno, w[0], w[1], w[2], w[3], pos, pos + len(t)))
+                chunks.append(t)
+                pos += len(t)
             line.text = "".join(chunks)
             parts.append(line.text + "\n")
             pos += 1
