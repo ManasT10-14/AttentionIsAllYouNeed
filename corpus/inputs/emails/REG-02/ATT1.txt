@@ -1,0 +1,20 @@
+Subject: [ODIN-EVENT] CUSTOM C07
+
+EVENT_ID: EVT-REG-02-ATT1
+EVENT_TYPE: CUSTOM
+OCCURRED_AT: 2027-03-31T12:00:00Z
+CONTRACT_ID: C07
+REFERENCE: record:ATT1
+DESCRIPTION:
+{
+  "observation_type": "safeguard_attested",
+  "source_ref": "record:ATT1",
+  "processor_id": "P08",
+  "rule_id": "FDB-27-A",
+  "dataset_id": "DS-CEDAR",
+  "region_id": "REGION-NORTH",
+  "safeguards": [
+    "access-review-attestation"
+  ],
+  "signature_ref": "record-attestation-01"
+}

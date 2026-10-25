@@ -1,0 +1,97 @@
+{
+  "traps": [
+    {
+      "trap_id": "reasonable_time",
+      "evidence": [
+        "C03:19.1"
+      ],
+      "case_ids": [
+        "TRAP-01"
+      ]
+    },
+    {
+      "trap_id": "blank_penalty_percentage",
+      "evidence": [
+        "C04:19.1"
+      ],
+      "case_ids": [
+        "TRAP-02"
+      ]
+    },
+    {
+      "trap_id": "contradictory_notice_periods",
+      "evidence": [
+        "C08:18.1",
+        "C08:19.1"
+      ],
+      "case_ids": [
+        "TRAP-03"
+      ]
+    },
+    {
+      "trap_id": "one_sided_indemnity",
+      "evidence": [
+        "C04:11.1",
+        "C04:12.1"
+      ],
+      "case_ids": [
+        "TRAP-06"
+      ]
+    },
+    {
+      "trap_id": "exclusive_procurement_conflict",
+      "evidence": [
+        "C03:17.1",
+        "C08:20.1"
+      ],
+      "case_ids": [
+        "TRAP-04",
+        "ARR-01"
+      ]
+    },
+    {
+      "trap_id": "jurisdiction_scope",
+      "evidence": [
+        "C02:7.1",
+        "C08:6.1"
+      ],
+      "case_ids": [
+        "JUR-01",
+        "JUR-02"
+      ]
+    },
+    {
+      "trap_id": "stricter_downstream_sla",
+      "evidence": [
+        "C01:3.1",
+        "C02:3.1"
+      ],
+      "case_ids": [
+        "OUT-02",
+        "OUT-03",
+        "OUT-04"
+      ]
+    },
+    {
+      "trap_id": "office_term_before_service_term",
+      "evidence": [
+        "C02:19.1",
+        "C05:2.1",
+        "C05:6.1"
+      ],
+      "case_ids": [
+        "TRAP-05"
+      ]
+    },
+    {
+      "trap_id": "missing_attachment",
+      "evidence": [
+        "C06:7.1"
+      ],
+      "case_ids": [
+        "AMB-01",
+        "AMB-02"
+      ]
+    }
+  ]
+}

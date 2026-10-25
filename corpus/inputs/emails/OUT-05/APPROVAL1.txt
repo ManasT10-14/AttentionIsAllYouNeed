@@ -1,0 +1,19 @@
+Subject: [ODIN-EVENT] CUSTOM C01,C02
+
+EVENT_ID: EVT-OUT-05-APPROVAL1
+EVENT_TYPE: CUSTOM
+OCCURRED_AT: 2027-01-14T10:00:00Z
+CONTRACT_ID: C01,C02
+REFERENCE: INC-OUT1
+DESCRIPTION:
+{
+  "observation_type": "maintenance_approval_recorded",
+  "source_ref": "record:APPROVAL1",
+  "approver_party_id": "P01",
+  "service_id": "SVC-ATLAS",
+  "incident_id": "INC-OUT1",
+  "window_start": "2027-01-16T10:00:00Z",
+  "window_end": "2027-01-16T12:00:00Z",
+  "approved_at": "2027-01-14T10:00:00Z",
+  "signature_ref": "record-approval-001"
+}

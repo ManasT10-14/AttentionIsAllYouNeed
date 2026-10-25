@@ -1,0 +1,9 @@
+From: operations@aurora.example
+To: odin-inbox@aurora.example
+Subject: [ODIN-EVENT] CUSTOM UNKNOWN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+
+DESCRIPTION:
+SVC-ATLAS outage began on 2027-01-16 at 10:00 UTC and ended at 11:30 UTC.

@@ -1,0 +1,17 @@
+[
+  {
+    "event_id": "BREACH1",
+    "event_type": "notice_received",
+    "occurred_at": "2027-02-11T09:00:00Z",
+    "received_at": "2027-02-11T09:00:00Z",
+    "source_ref": "record:BREACH1",
+    "payload": {
+      "sender_party_id": "P01",
+      "recipient_party_id": "P04",
+      "recipient_address": "notices@forge.example",
+      "order_id": "PO-AX7",
+      "subject": "Delivery breach LOT-AX7",
+      "delivery_receipt": "record-notice-receipt"
+    }
+  }
+]

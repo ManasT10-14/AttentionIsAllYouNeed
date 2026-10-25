@@ -1,0 +1,19 @@
+Subject: [ODIN-EVENT] SERVICE_OUTAGE C01,C02
+
+EVENT_ID: EVT-OUT-06-OUT1
+EVENT_TYPE: SERVICE_OUTAGE
+OCCURRED_AT: 2027-01-16T11:30:00Z
+CONTRACT_ID: C01,C02
+REFERENCE: INC-OUT1
+DESCRIPTION:
+{
+  "observation_type": "service_restored",
+  "source_ref": "record:OUT1",
+  "provider_id": "P02",
+  "service_id": "SVC-ATLAS",
+  "application_id": "APP-ATLAS",
+  "incident_id": "INC-OUT1",
+  "start": "2027-01-16T10:00:00Z",
+  "end": "2027-01-16T11:30:00Z",
+  "scheduled_maintenance": true
+}

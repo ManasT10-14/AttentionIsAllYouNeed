@@ -1,0 +1,14 @@
+[
+  {
+    "event_id": "EXIT1",
+    "event_type": "early_exit_requested",
+    "occurred_at": "2027-02-01T08:00:00Z",
+    "received_at": "2027-02-01T08:00:00Z",
+    "source_ref": "record:EXIT1",
+    "payload": {
+      "requestor_id": "P01",
+      "subscription_id": "TOOL-LUMEN",
+      "requested_exit_at": "2027-02-15T17:00:00Z"
+    }
+  }
+]

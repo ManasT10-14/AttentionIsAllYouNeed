@@ -1,0 +1,24 @@
+From: operations@aurora.example
+To: odin-inbox@aurora.example
+Subject: [ODIN-EVENT] SERVICE_OUTAGE C01,C02
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+
+EVENT_ID: EVT-OUT-08-OUT2
+EVENT_TYPE: SERVICE_OUTAGE
+OCCURRED_AT: 2027-01-17T11:30:00Z
+CONTRACT_ID: C01,C02
+REFERENCE: INC-OUT2
+DESCRIPTION:
+{
+  "observation_type": "service_restored",
+  "source_ref": "record:OUT2",
+  "provider_id": "P02",
+  "service_id": "SVC-ATLAS",
+  "application_id": "APP-ATLAS",
+  "incident_id": "INC-OUT2",
+  "start": "2027-01-17T10:00:00Z",
+  "end": "2027-01-17T11:30:00Z",
+  "scheduled_maintenance": false
+}

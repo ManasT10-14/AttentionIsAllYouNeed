@@ -1,0 +1,113 @@
+{
+  "schema_version": "2.0",
+  "corpus_id": "odin-eight-v2",
+  "stage": "full",
+  "root": "corpus",
+  "context": "inputs/company_context.md",
+  "structured_context": "inputs/company_context.json",
+  "contracts": [
+    {
+      "contract_id": "C01",
+      "file": "inputs/contracts/C01.pdf",
+      "sha256": "cd2cbbd3b0450f528980f0c19adf4f84eec8185ab379cd0b6afe2908e295a625",
+      "contract_type": "vendor",
+      "initial": true,
+      "party_ids": [
+        "P01",
+        "P02"
+      ]
+    },
+    {
+      "contract_id": "C02",
+      "file": "inputs/contracts/C02.pdf",
+      "sha256": "f9bea3b13e16cd2ba3cbe6063b574b2318edc54508e317c8db80d8e4e6aca7b7",
+      "contract_type": "saas",
+      "initial": true,
+      "party_ids": [
+        "P01",
+        "P03"
+      ]
+    },
+    {
+      "contract_id": "C03",
+      "file": "inputs/contracts/C03.pdf",
+      "sha256": "e55b91b1e883b7acf0abc26dce8d69a49d55a8b5a8c93d65e75ebdccdc5d4937",
+      "contract_type": "supply",
+      "initial": true,
+      "party_ids": [
+        "P01",
+        "P04"
+      ]
+    },
+    {
+      "contract_id": "C04",
+      "file": "inputs/contracts/C04.pdf",
+      "sha256": "f903abfba905d12148add18f0fe7993a758d8295210ce6cb59de6de9f0a7babd",
+      "contract_type": "supply",
+      "initial": true,
+      "party_ids": [
+        "P01",
+        "P05"
+      ]
+    },
+    {
+      "contract_id": "C05",
+      "file": "inputs/contracts/C05.pdf",
+      "sha256": "5f4caf8bc9d4fd738e92696bc5154de547aedf841e109a259addaa7f74aa9050",
+      "contract_type": "lease",
+      "initial": true,
+      "party_ids": [
+        "P01",
+        "P06"
+      ]
+    },
+    {
+      "contract_id": "C06",
+      "file": "inputs/contracts/C06.pdf",
+      "sha256": "7e455ffa50784207b36775c1903f3a73cd8fd4134d2bfe1e27077d101c3f87f4",
+      "contract_type": "saas",
+      "initial": true,
+      "party_ids": [
+        "P01",
+        "P07"
+      ]
+    },
+    {
+      "contract_id": "C07",
+      "file": "inputs/contracts/C07.pdf",
+      "sha256": "9774f6964d275a631e7c74d73cd061a0b70fc2048875b65c3ce710c44ee7db91",
+      "contract_type": "nda",
+      "initial": true,
+      "party_ids": [
+        "P01",
+        "P08"
+      ]
+    },
+    {
+      "contract_id": "C08",
+      "file": "inputs/contracts/C08.pdf",
+      "sha256": "d674196ae1054fb1efd5927537a8c68cda10133e6566ea8814a02ef10c2b9b05",
+      "contract_type": "supply",
+      "initial": false,
+      "party_ids": [
+        "P01",
+        "P03"
+      ]
+    }
+  ],
+  "initial_contract_ids": [
+    "C01",
+    "C02",
+    "C03",
+    "C04",
+    "C05",
+    "C06",
+    "C07"
+  ],
+  "held_back_contract_ids": [
+    "C08"
+  ],
+  "input_policy": "Only selected PDFs, company context and released observations; never ingest oracle/ or future schedules.",
+  "scenario_index": "inputs/scenarios/index.json",
+  "email_fixture_index": "inputs/emails/index.json"
+}

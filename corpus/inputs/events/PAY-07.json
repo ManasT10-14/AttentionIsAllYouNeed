@@ -1,0 +1,17 @@
+[
+  {
+    "event_id": "PAY1",
+    "event_type": "payment_cleared",
+    "occurred_at": "2027-01-24T12:00:00Z",
+    "received_at": "2027-01-29T09:00:00Z",
+    "source_ref": "record:PAY1",
+    "payload": {
+      "payer_id": "P01",
+      "payee_id": "P06",
+      "invoice_id": "RENT-2027-01",
+      "amount": "100000",
+      "currency": "INR",
+      "bank_transaction_id": "BANK-001"
+    }
+  }
+]

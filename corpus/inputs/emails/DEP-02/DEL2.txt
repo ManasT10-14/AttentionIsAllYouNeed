@@ -1,0 +1,18 @@
+Subject: [ODIN-EVENT] DELIVERY_RECEIVED C04
+
+EVENT_ID: EVT-DEP-02-DEL2
+EVENT_TYPE: DELIVERY_RECEIVED
+OCCURRED_AT: 2027-02-07T12:00:00Z
+CONTRACT_ID: C04
+REFERENCE: SO-AX7
+DESCRIPTION:
+{
+  "observation_type": "delivery_accepted",
+  "source_ref": "record:DEL2",
+  "order_id": "SO-AX7",
+  "lot_id": "LOT-AX7",
+  "quantity": 100,
+  "conforming": true,
+  "destination": "DEPOT-H",
+  "acceptance_ref": "record-receipt-DEL2"
+}

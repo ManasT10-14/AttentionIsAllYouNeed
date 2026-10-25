@@ -1,0 +1,4 @@
+Subject: [ODIN-EVENT] CUSTOM UNKNOWN
+
+DESCRIPTION:
+SVC-ATLAS outage began on 2027-01-16 at 10:00 UTC and ended at 11:30 UTC.

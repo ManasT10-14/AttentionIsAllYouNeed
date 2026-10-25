@@ -1,0 +1,15 @@
+From: operations@aurora.example
+To: odin-inbox@aurora.example
+Subject: [ODIN-EVENT] PAYMENT_MISSED C06
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+
+EVENT_ID: EVT-TEMPLATE-03
+EVENT_TYPE: PAYMENT_MISSED
+OCCURRED_AT: 2027-02-11T09:00:00Z
+CONTRACT_ID: C06
+AMOUNT: INR 1,20,000
+REFERENCE: LUMEN-2027
+DESCRIPTION:
+No cleared payment is recorded for the annual invoice.

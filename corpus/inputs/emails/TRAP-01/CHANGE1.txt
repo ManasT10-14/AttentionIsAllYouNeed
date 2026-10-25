@@ -1,0 +1,15 @@
+Subject: [ODIN-EVENT] CUSTOM C03
+
+EVENT_ID: EVT-TRAP-01-CHANGE1
+EVENT_TYPE: CUSTOM
+OCCURRED_AT: 2027-01-19T09:00:00Z
+CONTRACT_ID: C03
+REFERENCE: PO-AX7
+DESCRIPTION:
+{
+  "observation_type": "change_request_received",
+  "source_ref": "record:CHANGE1",
+  "requestor_id": "P01",
+  "order_id": "PO-AX7",
+  "request": "Please propose an earlier delivery date."
+}

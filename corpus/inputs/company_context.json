@@ -1,0 +1,65 @@
+{
+  "company_id": "P01",
+  "company_name": "Aurora Systems Private Limited",
+  "industry": "B2B SaaS and controller supply",
+  "jurisdictions": [
+    "IN",
+    "EU"
+  ],
+  "headquarters": "Bengaluru, India",
+  "fiscal_year_start": "04-01",
+  "base_currency": "INR",
+  "risk_appetite": "low",
+  "approval_threshold_inr": "1000000",
+  "key_contacts": [
+    "aurora-legal@aurora.example",
+    "cfo@aurora.example"
+  ],
+  "strategic_priorities": [
+    "Reduce vendor lock-in",
+    "Preserve APP-ATLAS continuity",
+    "Expand EU services"
+  ],
+  "critical_dependencies": [
+    "Nimbus SVC-ATLAS",
+    "Forge AX-7",
+    "UNIT-5 staffed support"
+  ],
+  "timezone": "UTC",
+  "baseline_clock": "2027-01-15T09:00:00Z",
+  "parties": [
+    {
+      "party_id": "P01",
+      "legal_name": "Aurora Systems Private Limited"
+    },
+    {
+      "party_id": "P02",
+      "legal_name": "Nimbus Harbor Private Limited"
+    },
+    {
+      "party_id": "P03",
+      "legal_name": "Cedar Market Private Limited"
+    },
+    {
+      "party_id": "P04",
+      "legal_name": "Forge Vale Private Limited"
+    },
+    {
+      "party_id": "P05",
+      "legal_name": "Harbor Works Private Limited"
+    },
+    {
+      "party_id": "P06",
+      "legal_name": "Willow Estates Private Limited"
+    },
+    {
+      "party_id": "P07",
+      "legal_name": "Lumen Stack Private Limited"
+    },
+    {
+      "party_id": "P08",
+      "legal_name": "Quill Data Private Limited"
+    }
+  ],
+  "initial_records": "Only records explicitly supplied in a scenario exist; earlier term balances are outside this dataset."
+}

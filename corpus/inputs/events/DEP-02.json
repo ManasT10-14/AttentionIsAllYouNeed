@@ -1,0 +1,32 @@
+[
+  {
+    "event_id": "DEL1",
+    "event_type": "delivery_accepted",
+    "occurred_at": "2027-02-07T08:00:00Z",
+    "received_at": "2027-02-07T08:00:00Z",
+    "source_ref": "record:DEL1",
+    "payload": {
+      "order_id": "PO-AX7",
+      "lot_id": "LOT-AX7",
+      "quantity": 100,
+      "conforming": true,
+      "destination": "DEPOT-A",
+      "acceptance_ref": "record-receipt-DEL1"
+    }
+  },
+  {
+    "event_id": "DEL2",
+    "event_type": "delivery_accepted",
+    "occurred_at": "2027-02-07T12:00:00Z",
+    "received_at": "2027-02-07T12:00:00Z",
+    "source_ref": "record:DEL2",
+    "payload": {
+      "order_id": "SO-AX7",
+      "lot_id": "LOT-AX7",
+      "quantity": 100,
+      "conforming": true,
+      "destination": "DEPOT-H",
+      "acceptance_ref": "record-receipt-DEL2"
+    }
+  }
+]

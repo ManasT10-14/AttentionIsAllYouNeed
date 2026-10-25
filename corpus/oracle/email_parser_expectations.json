@@ -1,0 +1,135 @@
+{
+  "scope": "Strict fixture validation only; actual LLM fallback, parse_confidence, Gmail dedupe and rejection auto-reply must be tested in the real application.",
+  "event_type_enum": [
+    "PAYMENT_MADE",
+    "PAYMENT_LATE",
+    "PAYMENT_MISSED",
+    "INVOICE_RECEIVED",
+    "SERVICE_OUTAGE",
+    "SLA_BREACH",
+    "DELIVERY_LATE",
+    "DELIVERY_RECEIVED",
+    "REGULATORY_CHANGE",
+    "PRICE_CHANGE",
+    "TERMINATION_NOTICE_RECEIVED",
+    "RENEWAL_NOTICE_RECEIVED",
+    "PARTY_CHANGE",
+    "FORCE_MAJEURE",
+    "DISPUTE_RAISED",
+    "CUSTOM"
+  ],
+  "cases": [
+    {
+      "file": "inputs/emails/templates/PAYMENT_MADE.eml",
+      "strict_result": "parsed",
+      "event_type": "PAYMENT_MADE",
+      "contract_id": "C05"
+    },
+    {
+      "file": "inputs/emails/templates/PAYMENT_LATE.eml",
+      "strict_result": "parsed",
+      "event_type": "PAYMENT_LATE",
+      "contract_id": "C05"
+    },
+    {
+      "file": "inputs/emails/templates/PAYMENT_MISSED.eml",
+      "strict_result": "parsed",
+      "event_type": "PAYMENT_MISSED",
+      "contract_id": "C06"
+    },
+    {
+      "file": "inputs/emails/templates/INVOICE_RECEIVED.eml",
+      "strict_result": "parsed",
+      "event_type": "INVOICE_RECEIVED",
+      "contract_id": "C03"
+    },
+    {
+      "file": "inputs/emails/templates/SERVICE_OUTAGE.eml",
+      "strict_result": "parsed",
+      "event_type": "SERVICE_OUTAGE",
+      "contract_id": "C01,C02"
+    },
+    {
+      "file": "inputs/emails/templates/SLA_BREACH.eml",
+      "strict_result": "parsed",
+      "event_type": "SLA_BREACH",
+      "contract_id": "C01,C02"
+    },
+    {
+      "file": "inputs/emails/templates/DELIVERY_LATE.eml",
+      "strict_result": "parsed",
+      "event_type": "DELIVERY_LATE",
+      "contract_id": "C03"
+    },
+    {
+      "file": "inputs/emails/templates/DELIVERY_RECEIVED.eml",
+      "strict_result": "parsed",
+      "event_type": "DELIVERY_RECEIVED",
+      "contract_id": "C04"
+    },
+    {
+      "file": "inputs/emails/templates/REGULATORY_CHANGE.eml",
+      "strict_result": "parsed",
+      "event_type": "REGULATORY_CHANGE",
+      "contract_id": "C07"
+    },
+    {
+      "file": "inputs/emails/templates/PRICE_CHANGE.eml",
+      "strict_result": "parsed",
+      "event_type": "PRICE_CHANGE",
+      "contract_id": "C06"
+    },
+    {
+      "file": "inputs/emails/templates/TERMINATION_NOTICE_RECEIVED.eml",
+      "strict_result": "parsed",
+      "event_type": "TERMINATION_NOTICE_RECEIVED",
+      "contract_id": "C03"
+    },
+    {
+      "file": "inputs/emails/templates/RENEWAL_NOTICE_RECEIVED.eml",
+      "strict_result": "parsed",
+      "event_type": "RENEWAL_NOTICE_RECEIVED",
+      "contract_id": "C05"
+    },
+    {
+      "file": "inputs/emails/templates/PARTY_CHANGE.eml",
+      "strict_result": "parsed",
+      "event_type": "PARTY_CHANGE",
+      "contract_id": "ALL"
+    },
+    {
+      "file": "inputs/emails/templates/FORCE_MAJEURE.eml",
+      "strict_result": "parsed",
+      "event_type": "FORCE_MAJEURE",
+      "contract_id": "ALL"
+    },
+    {
+      "file": "inputs/emails/templates/DISPUTE_RAISED.eml",
+      "strict_result": "parsed",
+      "event_type": "DISPUTE_RAISED",
+      "contract_id": "C02,C08"
+    },
+    {
+      "file": "inputs/emails/templates/CUSTOM.eml",
+      "strict_result": "parsed",
+      "event_type": "CUSTOM",
+      "contract_id": "UNKNOWN"
+    },
+    {
+      "file": "inputs/emails/parser/NO_EVENT_ID.eml",
+      "strict_result": "parsed"
+    },
+    {
+      "file": "inputs/emails/parser/MISSING_KEYS.eml",
+      "strict_result": "needs_llm_fallback"
+    },
+    {
+      "file": "inputs/emails/parser/INVALID_DATE.eml",
+      "strict_result": "needs_llm_fallback"
+    },
+    {
+      "file": "inputs/emails/parser/INVALID_TYPE.eml",
+      "strict_result": "needs_llm_fallback"
+    }
+  ]
+}

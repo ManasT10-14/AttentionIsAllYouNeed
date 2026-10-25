@@ -1,0 +1,21 @@
+Subject: [ODIN-EVENT] REGULATORY_CHANGE C07
+
+EVENT_ID: EVT-REG-02-RULE1
+EVENT_TYPE: REGULATORY_CHANGE
+OCCURRED_AT: 2027-03-19T09:00:00Z
+CONTRACT_ID: C07
+REFERENCE: record:RULE1
+DESCRIPTION:
+{
+  "observation_type": "rule_change_published",
+  "source_ref": "record:RULE1",
+  "issuer": "Data Standards Board",
+  "rule_id": "FDB-27-A",
+  "dataset_id": "DS-CEDAR",
+  "region_id": "REGION-NORTH",
+  "effective_at": "2027-04-01T00:00:00Z",
+  "processor_received_at": "2027-03-20T09:00:00Z",
+  "required_safeguards": [
+    "access-review-attestation"
+  ]
+}

@@ -1,0 +1,25 @@
+From: operations@aurora.example
+To: odin-inbox@aurora.example
+Subject: [ODIN-EVENT] DISPUTE_RAISED C02,C08
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+EVENT_ID: EVT-JUR-01-DISP1
+EVENT_TYPE: DISPUTE_RAISED
+OCCURRED_AT: 2027-02-02T08:00:00Z
+CONTRACT_ID: C02,C08
+REFERENCE: record:DISP1
+DESCRIPTION:
+{
+  "observation_type": "dispute_request_received",
+  "source_ref": "record:DISP1",
+  "requestor_id": "P03",
+  "requested_forum": "Mumbai",
+  "requested_scope": [
+    "APP-ATLAS",
+    "CAMP-SPRING"
+  ],
+  "request": "Combine service-credit and co-marketing claims in one proceedin=
+g."
+}

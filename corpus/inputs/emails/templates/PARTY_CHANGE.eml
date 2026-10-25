@@ -1,0 +1,15 @@
+From: operations@aurora.example
+To: odin-inbox@aurora.example
+Subject: [ODIN-EVENT] PARTY_CHANGE ALL
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+EVENT_ID: EVT-TEMPLATE-13
+EVENT_TYPE: PARTY_CHANGE
+OCCURRED_AT: 2027-02-11T09:00:00Z
+CONTRACT_ID: ALL
+COUNTERPARTY: Nimbus Harbor Private Limited
+DESCRIPTION:
+Nimbus reports a proposed acquisition and asks to assign its agreement. No si=
+gned consent is attached.

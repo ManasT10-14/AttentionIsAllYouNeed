@@ -1,0 +1,1659 @@
+{
+  "schema_version": "2.0",
+  "independence": "Manually authored expected constants and rubrics; no contract generator imports or model predictions. Same-author arithmetic checks are not an independent human review.",
+  "test_status_definition": "PASS means observed output satisfies exact fields and narrative/evidence rubrics. A detected breach or preserved uncertainty can pass.",
+  "scoring": {
+    "exact": "IDs, booleans, dates and decimal strings must match; null means unknown, not zero.",
+    "narrative": "Each required finding must be supported, no forbidden finding may appear, and the cited clauses must support the conclusion. Semantically equivalent explanations are accepted.",
+    "confidence": "Require evidence-aware confidence and uncertainty explanation; do not require a fixed score.",
+    "actions": "Any externally usable notice or amendment draft must include exact clauses and human-approval status. Never send it as part of evaluation."
+  },
+  "cases": [
+    {
+      "case_id": "REN-01",
+      "family": "renewal",
+      "assert_at": "2027-05-31T17:00:00Z",
+      "business_status": "compliant",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "notice_cutoff": "2027-05-31T17:00:00Z",
+        "renewal_committed_inr": "0"
+      },
+      "evidence": [
+        "C05:2.1",
+        "C05:6.1",
+        "C05:7.1"
+      ],
+      "required_findings": [
+        "Receipt exactly at cutoff is valid; current term continues through June 30."
+      ],
+      "forbidden_findings": [
+        "Renewal fine",
+        "Early lease termination"
+      ],
+      "recommended_action": "No external action; record the supported result.",
+      "clarification": null,
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_for_case_scope",
+      "checkpoints": [],
+      "event_mapping": {
+        "NOTICE1": [
+          "C05:6.1"
+        ]
+      }
+    },
+    {
+      "case_id": "REN-02",
+      "family": "renewal",
+      "assert_at": "2027-05-31T17:00:01Z",
+      "business_status": "at_risk",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "notice_cutoff": "2027-05-31T17:00:00Z",
+        "renewal_committed_inr": "600000"
+      },
+      "evidence": [
+        "C05:2.1",
+        "C05:6.1",
+        "C05:7.1"
+      ],
+      "required_findings": [
+        "Missed window commits July-December rent; distinguish future obligation from present penalty."
+      ],
+      "forbidden_findings": [
+        "INR 600000 fine",
+        "Count July-December rent twice"
+      ],
+      "recommended_action": "Draft an escalation memo and request negotiated release; human approval before sending.",
+      "clarification": null,
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_for_case_scope",
+      "checkpoints": [],
+      "event_mapping": {
+        "NOTICE1": [
+          "C05:6.1"
+        ]
+      }
+    },
+    {
+      "case_id": "REN-03",
+      "family": "renewal",
+      "assert_at": "2027-05-31T17:00:01Z",
+      "business_status": "at_risk",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "renewal_committed_inr": "600000",
+        "notice_valid": false
+      },
+      "evidence": [
+        "C05:2.1",
+        "C05:6.1",
+        "C05:7.1"
+      ],
+      "required_findings": [
+        "Wrong recipient makes the otherwise timely notice invalid."
+      ],
+      "forbidden_findings": [
+        "Notice is valid solely because sent early"
+      ],
+      "recommended_action": "No external action; record the supported result.",
+      "clarification": null,
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_for_case_scope",
+      "checkpoints": [],
+      "event_mapping": {
+        "NOTICE1": [
+          "C05:6.1"
+        ]
+      }
+    },
+    {
+      "case_id": "REN-04",
+      "family": "renewal",
+      "assert_at": "2027-05-31T16:59:59Z",
+      "business_status": "at_risk",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "notice_cutoff": "2027-05-31T17:00:00Z",
+        "renewal_already_committed": false
+      },
+      "evidence": [
+        "C05:2.1",
+        "C05:6.1"
+      ],
+      "required_findings": [
+        "Window remains open; warn before cutoff and recompute even without incoming events."
+      ],
+      "forbidden_findings": [
+        "Renewal already unavoidable"
+      ],
+      "recommended_action": "Draft non-renewal notice for immediate human review; do not send automatically.",
+      "clarification": null,
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_for_case_scope",
+      "checkpoints": [],
+      "event_mapping": {}
+    },
+    {
+      "case_id": "PAY-01",
+      "family": "payments",
+      "assert_at": "2027-01-25T23:59:59Z",
+      "business_status": "breached",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "invoice_id": "RENT-2027-01",
+        "principal_inr": "100000",
+        "late_charge_inr": "0"
+      },
+      "evidence": [
+        "C05:3.1",
+        "C05:4.1"
+      ],
+      "required_findings": [
+        "Rent is overdue; distinguish grace from payment due date and the fee trigger."
+      ],
+      "forbidden_findings": [
+        "Compounded charge",
+        "Fee before grace ends"
+      ],
+      "recommended_action": "No external action; record the supported result.",
+      "clarification": null,
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_for_case_scope",
+      "checkpoints": [],
+      "event_mapping": {}
+    },
+    {
+      "case_id": "PAY-02",
+      "family": "payments",
+      "assert_at": "2027-01-26T00:00:00Z",
+      "business_status": "breached",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "invoice_id": "RENT-2027-01",
+        "principal_inr": "100000",
+        "late_charge_inr": "100"
+      },
+      "evidence": [
+        "C05:3.1",
+        "C05:4.1"
+      ],
+      "required_findings": [
+        "Rent is overdue; distinguish grace from payment due date and the fee trigger."
+      ],
+      "forbidden_findings": [
+        "Compounded charge",
+        "Fee before grace ends"
+      ],
+      "recommended_action": "No external action; record the supported result.",
+      "clarification": null,
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_for_case_scope",
+      "checkpoints": [],
+      "event_mapping": {}
+    },
+    {
+      "case_id": "PAY-03",
+      "family": "payments",
+      "assert_at": "2027-01-28T12:00:00Z",
+      "business_status": "breached",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "principal_inr": "40000",
+        "late_charge_inr": "120",
+        "invoice_total_inr": "40120"
+      },
+      "evidence": [
+        "C05:3.1",
+        "C05:4.1",
+        "C05:5.1"
+      ],
+      "required_findings": [
+        "Three started charge dates, Jan 26-28, each 40000 x 0.001 = INR 40."
+      ],
+      "forbidden_findings": [
+        "Charge on original 100000 after partial payment"
+      ],
+      "recommended_action": "Draft payment reminder with principal and accrued fee separated.",
+      "clarification": null,
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_for_case_scope",
+      "checkpoints": [],
+      "event_mapping": {
+        "PAY1": [
+          "C05:3.1",
+          "C05:4.1",
+          "C05:5.1"
+        ]
+      }
+    },
+    {
+      "case_id": "PAY-04",
+      "family": "payments",
+      "assert_at": "2027-01-28T12:00:00Z",
+      "business_status": "compliant",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "principal_inr": "0",
+        "late_charge_inr": "0"
+      },
+      "evidence": [
+        "C05:3.1",
+        "C05:4.1",
+        "C05:5.1"
+      ],
+      "required_findings": [
+        "Full cleared payment during grace prevents late charges."
+      ],
+      "forbidden_findings": [
+        "Late charge despite cleared full payment"
+      ],
+      "recommended_action": "No external action; record the supported result.",
+      "clarification": null,
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_for_case_scope",
+      "checkpoints": [],
+      "event_mapping": {
+        "PAY1": [
+          "C05:3.1",
+          "C05:4.1",
+          "C05:5.1"
+        ]
+      }
+    },
+    {
+      "case_id": "PAY-05",
+      "family": "payments",
+      "assert_at": "2027-01-28T12:00:00Z",
+      "business_status": "breached",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "principal_inr": "40000",
+        "late_charge_inr": "120",
+        "distinct_payments": 1
+      },
+      "evidence": [
+        "C05:4.1",
+        "C05:5.1"
+      ],
+      "required_findings": [
+        "Two event IDs carrying the same bank transaction must be counted once."
+      ],
+      "forbidden_findings": [
+        "Double subtraction of 60000"
+      ],
+      "recommended_action": "No external action; record the supported result.",
+      "clarification": null,
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_for_case_scope",
+      "checkpoints": [],
+      "event_mapping": {
+        "PAY1": [
+          "C05:3.1",
+          "C05:4.1",
+          "C05:5.1"
+        ],
+        "PAY2": [
+          "C05:3.1",
+          "C05:4.1",
+          "C05:5.1"
+        ]
+      }
+    },
+    {
+      "case_id": "PAY-06",
+      "family": "payments",
+      "assert_at": "2027-03-20T12:00:00Z",
+      "business_status": "breached",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "invoice_id": "RENT-2027-01",
+        "principal_inr": "100000",
+        "late_charge_inr": "5000"
+      },
+      "evidence": [
+        "C05:3.1",
+        "C05:4.1"
+      ],
+      "required_findings": [
+        "Only January invoice is scored; its 54 started late dates reach the INR 5000 cap."
+      ],
+      "forbidden_findings": [
+        "Uncapped January late fee",
+        "Claim this is total portfolio rent"
+      ],
+      "recommended_action": "No external action; record the supported result.",
+      "clarification": null,
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_for_case_scope",
+      "checkpoints": [],
+      "event_mapping": {}
+    },
+    {
+      "case_id": "PAY-07",
+      "family": "payments",
+      "assert_at": "2027-01-28T12:00:00Z",
+      "business_status": "breached",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "principal_known_inr": "100000",
+        "late_charge_known_inr": "300",
+        "visible_event_count": 0
+      },
+      "evidence": [
+        "C05:3.1",
+        "C05:4.1",
+        "C05:5.1"
+      ],
+      "required_findings": [
+        "Before receipt the monitor has no payment evidence; label the knowledge limit."
+      ],
+      "forbidden_findings": [
+        "Read the future payment early"
+      ],
+      "recommended_action": "No external action; record the supported result.",
+      "clarification": null,
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_for_case_scope",
+      "checkpoints": [
+        {
+          "clock": "2027-01-29T09:00:00Z",
+          "principal_inr": "0",
+          "late_charge_inr": "0",
+          "note": "Replay from occurred_at: the newly received cleared payment actually preceded grace expiry; retain the earlier as-known view."
+        }
+      ],
+      "event_mapping": {
+        "PAY1": [
+          "C05:3.1",
+          "C05:4.1",
+          "C05:5.1"
+        ]
+      }
+    },
+    {
+      "case_id": "DEP-01",
+      "family": "dependencies",
+      "assert_at": "2027-02-01T09:00:00Z",
+      "business_status": "at_risk",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "upstream_deadline": "2027-02-10T17:00:00Z",
+        "downstream_deadline": "2027-02-08T17:00:00Z",
+        "gap_hours": 48
+      },
+      "evidence": [
+        "C03:2.1",
+        "C03:7.1",
+        "C04:2.1",
+        "C04:4.1"
+      ],
+      "required_findings": [
+        "Upstream latest promise is 48 hours after downstream deadline; evidence-backed planning gap."
+      ],
+      "forbidden_findings": [
+        "Supplier already breached on Feb 1",
+        "Downstream delay is excused automatically"
+      ],
+      "recommended_action": "Draft amendment proposal aligning delivery commitments, for human approval.",
+      "clarification": null,
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_for_case_scope",
+      "checkpoints": [],
+      "event_mapping": {}
+    },
+    {
+      "case_id": "DEP-02",
+      "family": "dependencies",
+      "assert_at": "2027-02-11T12:00:00Z",
+      "business_status": "compliant",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "upstream_delay_recoverable_inr": "0",
+        "downstream_delay_payable_inr": "0"
+      },
+      "evidence": [
+        "C03:2.1",
+        "C03:5.1",
+        "C04:2.1",
+        "C04:5.1"
+      ],
+      "required_findings": [
+        "Actual deliveries are timely; original contractual planning gap still exists."
+      ],
+      "forbidden_findings": [
+        "Actual breach inferred only from planned dates"
+      ],
+      "recommended_action": "No external action; record the supported result.",
+      "clarification": null,
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_for_case_scope",
+      "checkpoints": [],
+      "event_mapping": {
+        "DEL1": [
+          "C03:2.1",
+          "C03:4.1",
+          "C03:5.1",
+          "C03:6.1",
+          "C04:2.1",
+          "C04:4.1",
+          "C04:5.1"
+        ],
+        "DEL2": [
+          "C03:2.1",
+          "C03:4.1",
+          "C03:5.1",
+          "C03:6.1",
+          "C04:2.1",
+          "C04:4.1",
+          "C04:5.1"
+        ]
+      }
+    },
+    {
+      "case_id": "DEP-03",
+      "family": "dependencies",
+      "assert_at": "2027-02-15T12:00:00Z",
+      "business_status": "breached",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "upstream_delay_recoverable_inr": "10000",
+        "downstream_delay_payable_inr": "35000",
+        "gross_payable_inr": "35000",
+        "contingent_net_inr": "25000"
+      },
+      "evidence": [
+        "C03:4.1",
+        "C04:4.1",
+        "C04:7.1"
+      ],
+      "required_findings": [
+        "Five upstream charged dates and seven downstream charged dates; present both directions separately."
+      ],
+      "forbidden_findings": [
+        "Sum recoverable into payable exposure",
+        "Guaranteed collection from Forge"
+      ],
+      "recommended_action": "No external action; record the supported result.",
+      "clarification": null,
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_for_case_scope",
+      "checkpoints": [],
+      "event_mapping": {}
+    },
+    {
+      "case_id": "OUT-01",
+      "family": "outages",
+      "assert_at": "2027-01-16T13:00:00Z",
+      "business_status": "compliant",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "recoverable_credit_inr": "0",
+        "gross_payable_credit_inr": "0"
+      },
+      "evidence": [
+        "C01:3.1",
+        "C01:4.1",
+        "C01:5.1",
+        "C02:3.1",
+        "C02:4.1",
+        "C02:5.1"
+      ],
+      "required_findings": [
+        "Apply each threshold independently, with strict greater-than comparison."
+      ],
+      "forbidden_findings": [
+        "Treat credit receivable as payable",
+        "Invent lost-profit damages"
+      ],
+      "recommended_action": "Prepare timely hosting credit claim if eligible; track downstream credit separately; human approval before sending.",
+      "clarification": null,
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_for_case_scope",
+      "checkpoints": [],
+      "event_mapping": {
+        "OUT1": [
+          "C01:3.1",
+          "C01:4.1",
+          "C02:3.1",
+          "C02:4.1"
+        ]
+      }
+    },
+    {
+      "case_id": "OUT-02",
+      "family": "outages",
+      "assert_at": "2027-01-16T13:00:00Z",
+      "business_status": "breached",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "recoverable_credit_inr": "0",
+        "gross_payable_credit_inr": "15000"
+      },
+      "evidence": [
+        "C01:3.1",
+        "C01:4.1",
+        "C01:5.1",
+        "C02:3.1",
+        "C02:4.1",
+        "C02:5.1"
+      ],
+      "required_findings": [
+        "Apply each threshold independently, with strict greater-than comparison."
+      ],
+      "forbidden_findings": [
+        "Treat credit receivable as payable",
+        "Invent lost-profit damages"
+      ],
+      "recommended_action": "Prepare timely hosting credit claim if eligible; track downstream credit separately; human approval before sending.",
+      "clarification": null,
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_for_case_scope",
+      "checkpoints": [],
+      "event_mapping": {
+        "OUT1": [
+          "C01:3.1",
+          "C01:4.1",
+          "C02:3.1",
+          "C02:4.1"
+        ]
+      }
+    },
+    {
+      "case_id": "OUT-03",
+      "family": "outages",
+      "assert_at": "2027-01-16T13:00:00Z",
+      "business_status": "breached",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "recoverable_credit_inr": "0",
+        "gross_payable_credit_inr": "15000"
+      },
+      "evidence": [
+        "C01:3.1",
+        "C01:4.1",
+        "C01:5.1",
+        "C02:3.1",
+        "C02:4.1",
+        "C02:5.1"
+      ],
+      "required_findings": [
+        "Apply each threshold independently, with strict greater-than comparison."
+      ],
+      "forbidden_findings": [
+        "Treat credit receivable as payable",
+        "Invent lost-profit damages"
+      ],
+      "recommended_action": "Prepare timely hosting credit claim if eligible; track downstream credit separately; human approval before sending.",
+      "clarification": null,
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_for_case_scope",
+      "checkpoints": [],
+      "event_mapping": {
+        "OUT1": [
+          "C01:3.1",
+          "C01:4.1",
+          "C02:3.1",
+          "C02:4.1"
+        ]
+      }
+    },
+    {
+      "case_id": "OUT-04",
+      "family": "outages",
+      "assert_at": "2027-01-16T13:00:00Z",
+      "business_status": "breached",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "recoverable_credit_inr": "10000",
+        "gross_payable_credit_inr": "15000"
+      },
+      "evidence": [
+        "C01:3.1",
+        "C01:4.1",
+        "C01:5.1",
+        "C02:3.1",
+        "C02:4.1",
+        "C02:5.1"
+      ],
+      "required_findings": [
+        "Apply each threshold independently, with strict greater-than comparison."
+      ],
+      "forbidden_findings": [
+        "Treat credit receivable as payable",
+        "Invent lost-profit damages"
+      ],
+      "recommended_action": "Prepare timely hosting credit claim if eligible; track downstream credit separately; human approval before sending.",
+      "clarification": null,
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_for_case_scope",
+      "checkpoints": [],
+      "event_mapping": {
+        "OUT1": [
+          "C01:3.1",
+          "C01:4.1",
+          "C02:3.1",
+          "C02:4.1"
+        ]
+      }
+    },
+    {
+      "case_id": "OUT-05",
+      "family": "outages",
+      "assert_at": "2027-01-16T13:00:00Z",
+      "business_status": "breached",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "recoverable_credit_inr": "0",
+        "gross_payable_credit_inr": "15000",
+        "approval_lead_hours": 48
+      },
+      "evidence": [
+        "C01:4.1",
+        "C02:3.1",
+        "C02:4.1"
+      ],
+      "required_findings": [
+        "Exactly 48 hours approval qualifies; hosting exclusion does not propagate downstream."
+      ],
+      "forbidden_findings": [
+        "Downstream credit excluded by upstream approval"
+      ],
+      "recommended_action": "No external action; record the supported result.",
+      "clarification": null,
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_for_case_scope",
+      "checkpoints": [],
+      "event_mapping": {
+        "APPROVAL1": [
+          "C01:4.1",
+          "C01:6.1",
+          "C02:4.1"
+        ],
+        "OUT1": [
+          "C01:1.1",
+          "C01:3.1",
+          "C01:4.1",
+          "C01:6.1",
+          "C02:1.1",
+          "C02:3.1",
+          "C02:4.1"
+        ]
+      }
+    },
+    {
+      "case_id": "OUT-06",
+      "family": "outages",
+      "assert_at": "2027-01-16T13:00:00Z",
+      "business_status": "unresolved",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "recoverable_credit_inr": null,
+        "recoverable_credit_upper_bound_inr": "10000",
+        "gross_payable_credit_inr": "15000"
+      },
+      "evidence": [
+        "C01:3.1",
+        "C01:4.1",
+        "C02:4.1"
+      ],
+      "required_findings": [
+        "Request targeted approval evidence; preserve known downstream credit and uncertain hosting recovery."
+      ],
+      "forbidden_findings": [
+        "Assume approval",
+        "Assume no approval"
+      ],
+      "recommended_action": "No external action; record the supported result.",
+      "clarification": "Was this maintenance window approved by Aurora at least 48 hours before its start?",
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_with_unresolved_terms",
+      "checkpoints": [],
+      "event_mapping": {
+        "OUT1": [
+          "C01:1.1",
+          "C01:3.1",
+          "C01:4.1",
+          "C01:6.1",
+          "C02:1.1",
+          "C02:3.1",
+          "C02:4.1"
+        ]
+      }
+    },
+    {
+      "case_id": "OUT-07",
+      "family": "outages",
+      "assert_at": "2027-01-17T09:00:00Z",
+      "business_status": "breached",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "recoverable_credit_inr": "0",
+        "gross_payable_credit_inr": "15000"
+      },
+      "evidence": [
+        "C01:4.1",
+        "C01:6.1",
+        "C02:4.1"
+      ],
+      "required_findings": [
+        "Later evidence proves earlier timely approval; revise hosting recovery with evidence lineage."
+      ],
+      "forbidden_findings": [
+        "Erase prior uncertainty from audit history"
+      ],
+      "recommended_action": "No external action; record the supported result.",
+      "clarification": null,
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_for_case_scope",
+      "checkpoints": [
+        {
+          "clock": "2027-01-16T13:00:00Z",
+          "recoverable_credit_inr": null,
+          "completion_state": "complete_with_unresolved_terms"
+        }
+      ],
+      "event_mapping": {
+        "OUT1": [
+          "C01:1.1",
+          "C01:3.1",
+          "C01:4.1",
+          "C01:6.1",
+          "C02:1.1",
+          "C02:3.1",
+          "C02:4.1"
+        ],
+        "APPROVAL1": [
+          "C01:4.1",
+          "C01:6.1",
+          "C02:4.1"
+        ]
+      }
+    },
+    {
+      "case_id": "OUT-08",
+      "family": "outages",
+      "assert_at": "2027-01-18T13:00:00Z",
+      "business_status": "breached",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "recoverable_credit_inr": "20000",
+        "gross_payable_credit_inr": "45000"
+      },
+      "evidence": [
+        "C01:3.1",
+        "C02:3.1"
+      ],
+      "required_findings": [
+        "Three distinct incidents reach separate monthly caps."
+      ],
+      "forbidden_findings": [
+        "INR 30000 hosting recovery"
+      ],
+      "recommended_action": "No external action; record the supported result.",
+      "clarification": null,
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_for_case_scope",
+      "checkpoints": [],
+      "event_mapping": {
+        "OUT1": [
+          "C01:1.1",
+          "C01:3.1",
+          "C01:4.1",
+          "C01:6.1",
+          "C02:1.1",
+          "C02:3.1",
+          "C02:4.1"
+        ],
+        "OUT2": [
+          "C01:1.1",
+          "C01:3.1",
+          "C01:4.1",
+          "C01:6.1",
+          "C02:1.1",
+          "C02:3.1",
+          "C02:4.1"
+        ],
+        "OUT3": [
+          "C01:1.1",
+          "C01:3.1",
+          "C01:4.1",
+          "C01:6.1",
+          "C02:1.1",
+          "C02:3.1",
+          "C02:4.1"
+        ]
+      }
+    },
+    {
+      "case_id": "OUT-09",
+      "family": "outages",
+      "assert_at": "2027-01-16T13:00:00Z",
+      "business_status": "breached",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "distinct_incidents": 1,
+        "recoverable_credit_inr": "10000",
+        "gross_payable_credit_inr": "15000"
+      },
+      "evidence": [
+        "C01:6.1",
+        "C02:4.1"
+      ],
+      "required_findings": [
+        "Deduplicate incident identity even when event IDs differ."
+      ],
+      "forbidden_findings": [
+        "Double credit for repeated log"
+      ],
+      "recommended_action": "No external action; record the supported result.",
+      "clarification": null,
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_for_case_scope",
+      "checkpoints": [],
+      "event_mapping": {
+        "OUT-DUP": [
+          "C01:1.1",
+          "C01:3.1",
+          "C01:4.1",
+          "C01:6.1",
+          "C02:1.1",
+          "C02:3.1",
+          "C02:4.1"
+        ],
+        "OUT1": [
+          "C01:1.1",
+          "C01:3.1",
+          "C01:4.1",
+          "C01:6.1",
+          "C02:1.1",
+          "C02:3.1",
+          "C02:4.1"
+        ]
+      }
+    },
+    {
+      "case_id": "OUT-10",
+      "family": "outages",
+      "assert_at": "2027-01-16T13:00:00Z",
+      "business_status": "compliant",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "recoverable_credit_inr": "0",
+        "gross_payable_credit_inr": "0"
+      },
+      "evidence": [
+        "C01:1.1",
+        "C02:1.1"
+      ],
+      "required_findings": [
+        "Same provider with unrelated service is noise for these obligations."
+      ],
+      "forbidden_findings": [
+        "Match solely on provider name"
+      ],
+      "recommended_action": "No external action; record the supported result.",
+      "clarification": null,
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_for_case_scope",
+      "checkpoints": [],
+      "event_mapping": {
+        "OUT1": []
+      }
+    },
+    {
+      "case_id": "REG-01",
+      "family": "regulatory",
+      "assert_at": "2027-04-01T00:00:01Z",
+      "business_status": "breached",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "attestation_deadline": "2027-04-01T00:00:00Z",
+        "monetary_fine_inr": null
+      },
+      "evidence": [
+        "C07:3.1",
+        "C07:4.1",
+        "C07:5.1"
+      ],
+      "required_findings": [
+        "Apply supplied rule and later-of deadline; no supplied numeric fine."
+      ],
+      "forbidden_findings": [
+        "Invent statutory fine",
+        "Describe rule as real law"
+      ],
+      "recommended_action": "If missing, draft remediation request and escalation memo for human approval; otherwise record satisfaction.",
+      "clarification": null,
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_for_case_scope",
+      "checkpoints": [],
+      "event_mapping": {
+        "RULE1": [
+          "C07:3.1",
+          "C07:4.1",
+          "C07:5.1",
+          "C07:6.1"
+        ]
+      }
+    },
+    {
+      "case_id": "REG-02",
+      "family": "regulatory",
+      "assert_at": "2027-04-01T00:00:01Z",
+      "business_status": "compliant",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "attestation_deadline": "2027-04-01T00:00:00Z",
+        "monetary_fine_inr": null
+      },
+      "evidence": [
+        "C07:3.1",
+        "C07:4.1",
+        "C07:5.1"
+      ],
+      "required_findings": [
+        "Apply supplied rule and later-of deadline; no supplied numeric fine."
+      ],
+      "forbidden_findings": [
+        "Invent statutory fine",
+        "Describe rule as real law"
+      ],
+      "recommended_action": "If missing, draft remediation request and escalation memo for human approval; otherwise record satisfaction.",
+      "clarification": null,
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_for_case_scope",
+      "checkpoints": [],
+      "event_mapping": {
+        "RULE1": [
+          "C07:3.1",
+          "C07:4.1",
+          "C07:5.1",
+          "C07:6.1"
+        ],
+        "ATT1": [
+          "C07:4.1"
+        ]
+      }
+    },
+    {
+      "case_id": "REG-03",
+      "family": "regulatory",
+      "assert_at": "2027-04-02T09:00:00Z",
+      "business_status": "compliant",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "applicable_rule": false,
+        "monetary_fine_inr": null
+      },
+      "evidence": [
+        "C07:3.1"
+      ],
+      "required_findings": [
+        "Unrelated dataset does not trigger the safeguard obligation."
+      ],
+      "forbidden_findings": [
+        "Alert solely because any regulation arrived"
+      ],
+      "recommended_action": "No external action; record the supported result.",
+      "clarification": null,
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_for_case_scope",
+      "checkpoints": [],
+      "event_mapping": {
+        "RULE1": []
+      }
+    },
+    {
+      "case_id": "REG-04",
+      "family": "regulatory",
+      "assert_at": "2027-04-12T17:00:01Z",
+      "business_status": "breached",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "attestation_deadline": "2027-04-12T17:00:00Z",
+        "monetary_fine_inr": null
+      },
+      "evidence": [
+        "C07:4.1",
+        "C07:5.1"
+      ],
+      "required_findings": [
+        "Later receipt extends the contractual response deadline under the later-of rule."
+      ],
+      "forbidden_findings": [
+        "Use publication date as processor receipt"
+      ],
+      "recommended_action": "No external action; record the supported result.",
+      "clarification": null,
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_for_case_scope",
+      "checkpoints": [],
+      "event_mapping": {
+        "RULE1": [
+          "C07:3.1",
+          "C07:4.1",
+          "C07:5.1",
+          "C07:6.1"
+        ]
+      }
+    },
+    {
+      "case_id": "JUR-01",
+      "family": "jurisdiction",
+      "assert_at": "2027-02-02T09:00:00Z",
+      "business_status": "unresolved",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "service_forum": "Pune",
+        "campaign_forum": "Mumbai",
+        "joint_forum_agreement_present": false
+      },
+      "evidence": [
+        "C02:7.1",
+        "C08:6.1"
+      ],
+      "required_findings": [
+        "A combined proceeding requires separate consent; route for legal clarification with both clauses."
+      ],
+      "forbidden_findings": [
+        "Either contract is invalid",
+        "Mumbai automatically overrides Pune"
+      ],
+      "recommended_action": "Draft forum-consent escalation memo for human review.",
+      "clarification": "Will all relevant parties sign a joint forum agreement?",
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_with_unresolved_terms",
+      "checkpoints": [],
+      "event_mapping": {
+        "DISP1": [
+          "C02:7.1",
+          "C08:6.1"
+        ]
+      }
+    },
+    {
+      "case_id": "JUR-02",
+      "family": "jurisdiction",
+      "assert_at": "2027-02-02T09:00:00Z",
+      "business_status": "compliant",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "service_forum": "Pune",
+        "campaign_forum": "Mumbai"
+      },
+      "evidence": [
+        "C02:7.1",
+        "C08:1.1",
+        "C08:6.1"
+      ],
+      "required_findings": [
+        "Independent claim scopes can retain different forums; no combined proceeding is requested."
+      ],
+      "forbidden_findings": [
+        "Different courts alone prove a conflict"
+      ],
+      "recommended_action": "No external action; record the supported result.",
+      "clarification": null,
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_for_case_scope",
+      "checkpoints": [],
+      "event_mapping": {}
+    },
+    {
+      "case_id": "CUR-01",
+      "family": "cure",
+      "assert_at": "2027-02-21T17:00:00Z",
+      "business_status": "breached",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "cure_deadline": "2027-02-21T17:00:00Z",
+        "termination_eligible": false,
+        "automatically_terminated": false
+      },
+      "evidence": [
+        "C03:2.1",
+        "C03:4.1",
+        "C03:5.1",
+        "C03:6.1",
+        "C03:9.1"
+      ],
+      "required_findings": [
+        "At the deadline cure is still allowed; only after the deadline can an uncured breach support a separate notice. Accrued delay recoverables survive cure."
+      ],
+      "forbidden_findings": [
+        "Automatic termination",
+        "Cure erases accrued delay charges"
+      ],
+      "recommended_action": "If eligible, draft a separate termination notice for human approval; do not send.",
+      "clarification": null,
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_for_case_scope",
+      "checkpoints": [],
+      "event_mapping": {
+        "BREACH1": [
+          "C03:6.1",
+          "C03:9.1"
+        ]
+      }
+    },
+    {
+      "case_id": "CUR-02",
+      "family": "cure",
+      "assert_at": "2027-02-21T17:00:01Z",
+      "business_status": "breached",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "cure_deadline": "2027-02-21T17:00:00Z",
+        "termination_eligible": true,
+        "automatically_terminated": false
+      },
+      "evidence": [
+        "C03:2.1",
+        "C03:4.1",
+        "C03:5.1",
+        "C03:6.1",
+        "C03:9.1"
+      ],
+      "required_findings": [
+        "At the deadline cure is still allowed; only after the deadline can an uncured breach support a separate notice. Accrued delay recoverables survive cure."
+      ],
+      "forbidden_findings": [
+        "Automatic termination",
+        "Cure erases accrued delay charges"
+      ],
+      "recommended_action": "If eligible, draft a separate termination notice for human approval; do not send.",
+      "clarification": null,
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_for_case_scope",
+      "checkpoints": [],
+      "event_mapping": {
+        "BREACH1": [
+          "C03:6.1",
+          "C03:9.1"
+        ]
+      }
+    },
+    {
+      "case_id": "CUR-03",
+      "family": "cure",
+      "assert_at": "2027-02-21T17:00:01Z",
+      "business_status": "compliant",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "cure_deadline": "2027-02-21T17:00:00Z",
+        "termination_eligible": false,
+        "automatically_terminated": false
+      },
+      "evidence": [
+        "C03:2.1",
+        "C03:4.1",
+        "C03:5.1",
+        "C03:6.1",
+        "C03:9.1"
+      ],
+      "required_findings": [
+        "At the deadline cure is still allowed; only after the deadline can an uncured breach support a separate notice. Accrued delay recoverables survive cure."
+      ],
+      "forbidden_findings": [
+        "Automatic termination",
+        "Cure erases accrued delay charges"
+      ],
+      "recommended_action": "If eligible, draft a separate termination notice for human approval; do not send.",
+      "clarification": null,
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_for_case_scope",
+      "checkpoints": [],
+      "event_mapping": {
+        "BREACH1": [
+          "C03:6.1",
+          "C03:9.1"
+        ],
+        "DEL1": [
+          "C03:2.1",
+          "C03:4.1",
+          "C03:5.1",
+          "C03:6.1"
+        ]
+      }
+    },
+    {
+      "case_id": "AMD-01",
+      "family": "amendments",
+      "assert_at": "2027-02-28T23:59:59Z",
+      "business_status": "compliant",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "applicable_notice_days": 60,
+        "applicable_cutoff": "2027-11-01T17:00:00Z",
+        "annual_price_inr": "120000"
+      },
+      "evidence": [
+        "C06:3.1",
+        "C06:4.1",
+        "C06:8.1",
+        "C06:19.1",
+        "C06:19.2"
+      ],
+      "required_findings": [
+        "Apply amendment prospectively; unchanged pricing and missing Schedule B survive. Show historical applicability separately from known future change."
+      ],
+      "forbidden_findings": [
+        "Amendment applies before effective time",
+        "Schedule B invented by amendment"
+      ],
+      "recommended_action": "No external action; record the supported result.",
+      "clarification": null,
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_for_case_scope",
+      "checkpoints": [],
+      "event_mapping": {}
+    },
+    {
+      "case_id": "AMD-02",
+      "family": "amendments",
+      "assert_at": "2027-03-01T00:00:00Z",
+      "business_status": "compliant",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "applicable_notice_days": 30,
+        "applicable_cutoff": "2027-12-01T17:00:00Z",
+        "annual_price_inr": "120000"
+      },
+      "evidence": [
+        "C06:3.1",
+        "C06:4.1",
+        "C06:8.1",
+        "C06:19.1",
+        "C06:19.2"
+      ],
+      "required_findings": [
+        "Apply amendment prospectively; unchanged pricing and missing Schedule B survive. Show historical applicability separately from known future change."
+      ],
+      "forbidden_findings": [
+        "Amendment applies before effective time",
+        "Schedule B invented by amendment"
+      ],
+      "recommended_action": "No external action; record the supported result.",
+      "clarification": null,
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_for_case_scope",
+      "checkpoints": [],
+      "event_mapping": {}
+    },
+    {
+      "case_id": "AMB-01",
+      "family": "ambiguity",
+      "assert_at": "2027-02-01T09:00:00Z",
+      "business_status": "unresolved",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "migration_fee_inr": null,
+        "schedule_b_present": false
+      },
+      "evidence": [
+        "C06:6.1",
+        "C06:7.1",
+        "C06:8.1"
+      ],
+      "required_findings": [
+        "Request Schedule B and evaluate supported termination route; request alone is not termination."
+      ],
+      "forbidden_findings": [
+        "Assume free exit",
+        "Invent fee from annual price"
+      ],
+      "recommended_action": "Draft targeted clarification and legal escalation for human review.",
+      "clarification": "Obtain executed Schedule B and identify the contractual early-termination basis. The requested February 15 exit also falls short of the 30-day convenience notice in C06 clause 18.1.",
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_with_unresolved_terms",
+      "checkpoints": [],
+      "event_mapping": {
+        "EXIT1": [
+          "C06:6.1",
+          "C06:7.1"
+        ]
+      }
+    },
+    {
+      "case_id": "AMB-02",
+      "family": "ambiguity",
+      "assert_at": "2027-12-01T17:00:00Z",
+      "business_status": "compliant",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "renewal_prevented": true,
+        "migration_fee_applicable": false
+      },
+      "evidence": [
+        "C06:3.1",
+        "C06:7.1",
+        "C06:19.1"
+      ],
+      "required_findings": [
+        "Term-end non-renewal does not trigger early-termination migration fee; missing schedule remains noted."
+      ],
+      "forbidden_findings": [
+        "Demand missing early-exit fee for normal non-renewal"
+      ],
+      "recommended_action": "No external action; record the supported result.",
+      "clarification": null,
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_for_case_scope",
+      "checkpoints": [],
+      "event_mapping": {
+        "LNOTICE1": [
+          "C06:3.1",
+          "C06:19.1"
+        ]
+      }
+    },
+    {
+      "case_id": "ARR-01",
+      "family": "arrival",
+      "assert_at": "2027-02-01T09:00:00Z",
+      "business_status": "at_risk",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "retained_contract_ids": [
+          "C02",
+          "C03",
+          "C08"
+        ],
+        "c08_effective_at": "2027-02-01T00:00:00Z",
+        "c02_service_credit_inr": "15000"
+      },
+      "evidence": [
+        "C02:3.1",
+        "C02:8.1",
+        "C03:17.1",
+        "C08:1.1",
+        "C08:2.1",
+        "C08:5.1",
+        "C08:20.1"
+      ],
+      "required_findings": [
+        "Extract newcomer, retain C02, detect the C03/C08 exclusive-procurement conflict, and recompute affected graph; no pre-effective C08 accrual."
+      ],
+      "forbidden_findings": [
+        "Automatically replace C02",
+        "C08 silently changes service credits"
+      ],
+      "recommended_action": "No external action; record the supported result.",
+      "clarification": null,
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_for_case_scope",
+      "checkpoints": [
+        {
+          "clock": "2027-01-24T09:00:00Z",
+          "known_contract_ids": [
+            "C02",
+            "C03"
+          ]
+        },
+        {
+          "clock": "2027-01-25T09:00:00Z",
+          "known_contract_ids": [
+            "C02",
+            "C03",
+            "C08"
+          ],
+          "c08_effective": false
+        }
+      ],
+      "event_mapping": {
+        "UPLOAD1": [
+          "C08:1.1",
+          "C08:2.1",
+          "C08:5.1"
+        ]
+      }
+    },
+    {
+      "case_id": "OUT-11",
+      "family": "outages",
+      "assert_at": "2027-01-17T09:00:00Z",
+      "business_status": "breached",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "distinct_incidents": 1,
+        "recoverable_credit_inr": "0",
+        "gross_payable_credit_inr": "15000"
+      },
+      "evidence": [
+        "C01:3.1",
+        "C01:6.1",
+        "C02:3.1",
+        "C02:4.1"
+      ],
+      "required_findings": [
+        "Corrected 45-minute duration supersedes 90-minute observation; retain old version in audit."
+      ],
+      "forbidden_findings": [
+        "Treat correction as new incident",
+        "Retain obsolete 90-minute hosting recovery"
+      ],
+      "recommended_action": "No external action; record the supported result.",
+      "clarification": null,
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_for_case_scope",
+      "checkpoints": [],
+      "event_mapping": {
+        "OUT1": [
+          "C01:1.1",
+          "C01:3.1",
+          "C01:4.1",
+          "C01:6.1",
+          "C02:1.1",
+          "C02:3.1",
+          "C02:4.1"
+        ],
+        "CORR1": [
+          "C01:1.1",
+          "C01:3.1",
+          "C01:4.1",
+          "C01:6.1",
+          "C02:1.1",
+          "C02:3.1",
+          "C02:4.1"
+        ]
+      }
+    },
+    {
+      "case_id": "TRAP-01",
+      "family": "ambiguity",
+      "assert_at": "2027-01-20T09:00:00Z",
+      "business_status": "unresolved",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "response_deadline": null
+      },
+      "evidence": [
+        "C03:19.1"
+      ],
+      "required_findings": [
+        "The reasonable-time obligation has no numeric response deadline; request clarification."
+      ],
+      "forbidden_findings": [
+        "Invent a 24-hour deadline",
+        "Declare response late after exactly one day"
+      ],
+      "recommended_action": "No external action; record the supported result.",
+      "clarification": "Agree a measurable response time for delivery-change requests.",
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_with_unresolved_terms",
+      "checkpoints": [],
+      "event_mapping": {
+        "CHANGE1": [
+          "C03:19.1"
+        ]
+      }
+    },
+    {
+      "case_id": "TRAP-02",
+      "family": "ambiguity",
+      "assert_at": "2027-03-10T09:00:00Z",
+      "business_status": "unresolved",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "payment_due": "2027-03-09T17:00:00Z",
+        "principal_receivable_inr": "650000",
+        "late_interest_inr": null
+      },
+      "evidence": [
+        "C04:3.1",
+        "C04:19.1"
+      ],
+      "required_findings": [
+        "Invoice and acceptance establish the due date; blank percentage prevents calculation of late interest."
+      ],
+      "forbidden_findings": [
+        "Assume the blank rate is zero",
+        "Borrow the lease interest rate"
+      ],
+      "recommended_action": "No external action; record the supported result.",
+      "clarification": "Obtain the agreed completed interest percentage.",
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_with_unresolved_terms",
+      "checkpoints": [],
+      "event_mapping": {
+        "DEL1": [
+          "C04:3.1",
+          "C04:5.1"
+        ],
+        "INV1": [
+          "C04:3.1",
+          "C04:19.1"
+        ]
+      }
+    },
+    {
+      "case_id": "TRAP-03",
+      "family": "ambiguity",
+      "assert_at": "2027-02-02T09:00:00Z",
+      "business_status": "unresolved",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "convenience_notice_days": null,
+        "conflicting_notice_days": [
+          30,
+          60
+        ]
+      },
+      "evidence": [
+        "C08:18.1",
+        "C08:19.1"
+      ],
+      "required_findings": [
+        "Two notice periods govern the same convenience termination without an agreed hierarchy."
+      ],
+      "forbidden_findings": [
+        "Silently choose the shorter or longer notice period"
+      ],
+      "recommended_action": "No external action; record the supported result.",
+      "clarification": "Obtain a signed clarification of the convenience-termination notice period.",
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_with_unresolved_terms",
+      "checkpoints": [],
+      "event_mapping": {}
+    },
+    {
+      "case_id": "TRAP-04",
+      "family": "dependencies",
+      "assert_at": "2027-02-01T09:00:00Z",
+      "business_status": "at_risk",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "exclusive_supplier": "P04",
+        "second_supplier": "P03",
+        "conflicting_product": "AX-7",
+        "second_purchase_inr": "600000"
+      },
+      "evidence": [
+        "C03:17.1",
+        "C08:2.1",
+        "C08:20.1"
+      ],
+      "required_findings": [
+        "C03 restricts procurement from another supplier during the C08 procurement commitment; request waiver or amendment."
+      ],
+      "forbidden_findings": [
+        "Assume a Forge waiver exists",
+        "Assume delivery or payment already occurred"
+      ],
+      "recommended_action": "Draft a waiver request or procurement amendment proposal for human review.",
+      "clarification": null,
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_for_case_scope",
+      "checkpoints": [],
+      "event_mapping": {}
+    },
+    {
+      "case_id": "TRAP-05",
+      "family": "dependencies",
+      "assert_at": "2027-05-31T17:00:00Z",
+      "business_status": "at_risk",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "office_term_end": "2027-06-30",
+        "office_dependent_service_term_end": "2027-12-31",
+        "lease_renewal_prevented": true
+      },
+      "evidence": [
+        "C02:2.1",
+        "C02:19.1",
+        "C05:2.1",
+        "C05:6.1"
+      ],
+      "required_findings": [
+        "Valid non-renewal avoids future lease commitment but creates a continuity gap for required UNIT-5 support."
+      ],
+      "forbidden_findings": [
+        "Assume relocation approval",
+        "Declare the service term ends with the lease"
+      ],
+      "recommended_action": "Draft a relocation approval request or lease-extension proposal for human review.",
+      "clarification": null,
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_for_case_scope",
+      "checkpoints": [],
+      "event_mapping": {
+        "NOTICE1": [
+          "C05:2.1",
+          "C05:6.1",
+          "C02:19.1"
+        ]
+      }
+    },
+    {
+      "case_id": "TRAP-06",
+      "family": "adversarial",
+      "assert_at": "2027-01-15T09:00:00Z",
+      "business_status": "at_risk",
+      "scope": "Only the obligations named in this case are scored; unrelated portfolio obligations remain independently assessable.",
+      "exact": {
+        "aurora_indemnifies_harbor_negligence": true,
+        "harbor_reciprocal_indemnity": false,
+        "indemnity_excluded_from_cap": true,
+        "quantified_indemnity_exposure_inr": null
+      },
+      "evidence": [
+        "C04:11.1",
+        "C04:12.1"
+      ],
+      "required_findings": [
+        "One-sided indemnity includes Harbor negligence and is excluded from the aggregate cap; exposure needs a supported claim, not a guessed amount."
+      ],
+      "forbidden_findings": [
+        "Apply INR 1000000 cap to the excluded indemnity",
+        "Assume indemnity claim has already arisen"
+      ],
+      "recommended_action": "Draft a mutual-indemnity and cap amendment proposal for human approval.",
+      "clarification": null,
+      "human_approval_required_for_external_action": true,
+      "completion_state": "complete_for_case_scope",
+      "checkpoints": [],
+      "event_mapping": {}
+    }
+  ]
+}

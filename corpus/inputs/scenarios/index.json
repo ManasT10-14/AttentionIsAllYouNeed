@@ -1,0 +1,182 @@
+[
+  {
+    "scenario_id": "REN-01",
+    "file": "inputs/scenarios/REN-01.json"
+  },
+  {
+    "scenario_id": "REN-02",
+    "file": "inputs/scenarios/REN-02.json"
+  },
+  {
+    "scenario_id": "REN-03",
+    "file": "inputs/scenarios/REN-03.json"
+  },
+  {
+    "scenario_id": "REN-04",
+    "file": "inputs/scenarios/REN-04.json"
+  },
+  {
+    "scenario_id": "PAY-01",
+    "file": "inputs/scenarios/PAY-01.json"
+  },
+  {
+    "scenario_id": "PAY-02",
+    "file": "inputs/scenarios/PAY-02.json"
+  },
+  {
+    "scenario_id": "PAY-03",
+    "file": "inputs/scenarios/PAY-03.json"
+  },
+  {
+    "scenario_id": "PAY-04",
+    "file": "inputs/scenarios/PAY-04.json"
+  },
+  {
+    "scenario_id": "PAY-05",
+    "file": "inputs/scenarios/PAY-05.json"
+  },
+  {
+    "scenario_id": "PAY-06",
+    "file": "inputs/scenarios/PAY-06.json"
+  },
+  {
+    "scenario_id": "PAY-07",
+    "file": "inputs/scenarios/PAY-07.json"
+  },
+  {
+    "scenario_id": "DEP-01",
+    "file": "inputs/scenarios/DEP-01.json"
+  },
+  {
+    "scenario_id": "DEP-02",
+    "file": "inputs/scenarios/DEP-02.json"
+  },
+  {
+    "scenario_id": "DEP-03",
+    "file": "inputs/scenarios/DEP-03.json"
+  },
+  {
+    "scenario_id": "OUT-01",
+    "file": "inputs/scenarios/OUT-01.json"
+  },
+  {
+    "scenario_id": "OUT-02",
+    "file": "inputs/scenarios/OUT-02.json"
+  },
+  {
+    "scenario_id": "OUT-03",
+    "file": "inputs/scenarios/OUT-03.json"
+  },
+  {
+    "scenario_id": "OUT-04",
+    "file": "inputs/scenarios/OUT-04.json"
+  },
+  {
+    "scenario_id": "OUT-05",
+    "file": "inputs/scenarios/OUT-05.json"
+  },
+  {
+    "scenario_id": "OUT-06",
+    "file": "inputs/scenarios/OUT-06.json"
+  },
+  {
+    "scenario_id": "OUT-07",
+    "file": "inputs/scenarios/OUT-07.json"
+  },
+  {
+    "scenario_id": "OUT-08",
+    "file": "inputs/scenarios/OUT-08.json"
+  },
+  {
+    "scenario_id": "OUT-09",
+    "file": "inputs/scenarios/OUT-09.json"
+  },
+  {
+    "scenario_id": "OUT-10",
+    "file": "inputs/scenarios/OUT-10.json"
+  },
+  {
+    "scenario_id": "REG-01",
+    "file": "inputs/scenarios/REG-01.json"
+  },
+  {
+    "scenario_id": "REG-02",
+    "file": "inputs/scenarios/REG-02.json"
+  },
+  {
+    "scenario_id": "REG-03",
+    "file": "inputs/scenarios/REG-03.json"
+  },
+  {
+    "scenario_id": "REG-04",
+    "file": "inputs/scenarios/REG-04.json"
+  },
+  {
+    "scenario_id": "JUR-01",
+    "file": "inputs/scenarios/JUR-01.json"
+  },
+  {
+    "scenario_id": "JUR-02",
+    "file": "inputs/scenarios/JUR-02.json"
+  },
+  {
+    "scenario_id": "CUR-01",
+    "file": "inputs/scenarios/CUR-01.json"
+  },
+  {
+    "scenario_id": "CUR-02",
+    "file": "inputs/scenarios/CUR-02.json"
+  },
+  {
+    "scenario_id": "CUR-03",
+    "file": "inputs/scenarios/CUR-03.json"
+  },
+  {
+    "scenario_id": "AMD-01",
+    "file": "inputs/scenarios/AMD-01.json"
+  },
+  {
+    "scenario_id": "AMD-02",
+    "file": "inputs/scenarios/AMD-02.json"
+  },
+  {
+    "scenario_id": "AMB-01",
+    "file": "inputs/scenarios/AMB-01.json"
+  },
+  {
+    "scenario_id": "AMB-02",
+    "file": "inputs/scenarios/AMB-02.json"
+  },
+  {
+    "scenario_id": "ARR-01",
+    "file": "inputs/scenarios/ARR-01.json"
+  },
+  {
+    "scenario_id": "OUT-11",
+    "file": "inputs/scenarios/OUT-11.json"
+  },
+  {
+    "scenario_id": "TRAP-01",
+    "file": "inputs/scenarios/TRAP-01.json"
+  },
+  {
+    "scenario_id": "TRAP-02",
+    "file": "inputs/scenarios/TRAP-02.json"
+  },
+  {
+    "scenario_id": "TRAP-03",
+    "file": "inputs/scenarios/TRAP-03.json"
+  },
+  {
+    "scenario_id": "TRAP-04",
+    "file": "inputs/scenarios/TRAP-04.json"
+  },
+  {
+    "scenario_id": "TRAP-05",
+    "file": "inputs/scenarios/TRAP-05.json"
+  },
+  {
+    "scenario_id": "TRAP-06",
+    "file": "inputs/scenarios/TRAP-06.json"
+  }
+]

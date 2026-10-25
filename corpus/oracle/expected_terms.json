@@ -1,0 +1,586 @@
+{
+  "status": "Manually authored baseline extraction assertions; evaluator-only. Not independently human-reviewed.",
+  "evaluation_rule": "Every extracted field must cite supporting PDF text and include model confidence. These constants do not prescribe model confidence. Full clause quotations and verified pages are in evidence_index.json. Evaluate C08 only after receipt.",
+  "contracts": [
+    {
+      "contract_id": "C01",
+      "party_ids": [
+        "P01",
+        "P02"
+      ],
+      "fields": [
+        {
+          "field": "initial_term",
+          "value": [
+            "2027-01-01",
+            "2027-12-31"
+          ],
+          "evidence": [
+            "C01:2.1"
+          ]
+        },
+        {
+          "field": "auto_renew",
+          "value": false,
+          "evidence": [
+            "C01:2.1"
+          ]
+        },
+        {
+          "field": "monthly_fee_inr",
+          "value": "200000",
+          "evidence": [
+            "C01:2.1"
+          ]
+        },
+        {
+          "field": "monthly_payment_due_day_utc",
+          "value": 5,
+          "evidence": [
+            "C01:2.1"
+          ]
+        },
+        {
+          "field": "credit_threshold_minutes_strictly_greater_than",
+          "value": 60,
+          "evidence": [
+            "C01:3.1"
+          ]
+        },
+        {
+          "field": "credit_per_incident_inr",
+          "value": "10000",
+          "evidence": [
+            "C01:3.1"
+          ]
+        },
+        {
+          "field": "monthly_recoverable_cap_inr",
+          "value": "20000",
+          "evidence": [
+            "C01:3.1"
+          ]
+        },
+        {
+          "field": "maintenance_approval_lead_hours_minimum",
+          "value": 48,
+          "evidence": [
+            "C01:4.1"
+          ]
+        },
+        {
+          "field": "claim_days_after_restoration",
+          "value": 10,
+          "evidence": [
+            "C01:5.1"
+          ]
+        },
+        {
+          "field": "forum",
+          "value": "Bengaluru",
+          "evidence": [
+            "C01:8.1"
+          ]
+        },
+        {
+          "field": "schedule_hosting_fee_inr",
+          "value": "200000",
+          "evidence": [
+            "C01:Sch A, row 1"
+          ]
+        }
+      ]
+    },
+    {
+      "contract_id": "C02",
+      "party_ids": [
+        "P01",
+        "P03"
+      ],
+      "fields": [
+        {
+          "field": "initial_term",
+          "value": [
+            "2027-01-01",
+            "2027-12-31"
+          ],
+          "evidence": [
+            "C02:2.1"
+          ]
+        },
+        {
+          "field": "monthly_receivable_fee_inr",
+          "value": "300000",
+          "evidence": [
+            "C02:2.1"
+          ]
+        },
+        {
+          "field": "depends_on_contract",
+          "value": "C01",
+          "evidence": [
+            "C02:1.1"
+          ]
+        },
+        {
+          "field": "credit_threshold_minutes_strictly_greater_than",
+          "value": 30,
+          "evidence": [
+            "C02:3.1"
+          ]
+        },
+        {
+          "field": "credit_per_incident_payable_inr",
+          "value": "15000",
+          "evidence": [
+            "C02:3.1"
+          ]
+        },
+        {
+          "field": "monthly_payable_cap_inr",
+          "value": "45000",
+          "evidence": [
+            "C02:3.1"
+          ]
+        },
+        {
+          "field": "maintenance_exclusion",
+          "value": false,
+          "evidence": [
+            "C02:4.1"
+          ]
+        },
+        {
+          "field": "forum_for_service_only",
+          "value": "Pune",
+          "evidence": [
+            "C02:7.1"
+          ]
+        }
+      ]
+    },
+    {
+      "contract_id": "C03",
+      "party_ids": [
+        "P01",
+        "P04"
+      ],
+      "fields": [
+        {
+          "field": "initial_term",
+          "value": [
+            "2027-01-01",
+            "2027-03-31"
+          ],
+          "evidence": [
+            "C03:2.1"
+          ]
+        },
+        {
+          "field": "delivery_due",
+          "value": "2027-02-10T17:00:00Z",
+          "evidence": [
+            "C03:2.1"
+          ]
+        },
+        {
+          "field": "lot_units",
+          "value": 100,
+          "evidence": [
+            "C03:1.1",
+            "C03:5.1"
+          ]
+        },
+        {
+          "field": "purchase_price_payable_inr",
+          "value": "500000",
+          "evidence": [
+            "C03:3.1"
+          ]
+        },
+        {
+          "field": "payment_days_after_acceptance_and_invoice",
+          "value": 30,
+          "evidence": [
+            "C03:3.1"
+          ]
+        },
+        {
+          "field": "daily_delay_recoverable_inr",
+          "value": "2000",
+          "evidence": [
+            "C03:4.1"
+          ]
+        },
+        {
+          "field": "lot_recoverable_cap_inr",
+          "value": "20000",
+          "evidence": [
+            "C03:4.1"
+          ]
+        },
+        {
+          "field": "cure_days_after_receipt",
+          "value": 10,
+          "evidence": [
+            "C03:6.1"
+          ]
+        }
+      ]
+    },
+    {
+      "contract_id": "C04",
+      "party_ids": [
+        "P01",
+        "P05"
+      ],
+      "fields": [
+        {
+          "field": "initial_term",
+          "value": [
+            "2027-01-01",
+            "2027-03-31"
+          ],
+          "evidence": [
+            "C04:2.1"
+          ]
+        },
+        {
+          "field": "delivery_due",
+          "value": "2027-02-08T17:00:00Z",
+          "evidence": [
+            "C04:2.1"
+          ]
+        },
+        {
+          "field": "depends_on_contract",
+          "value": "C03",
+          "evidence": [
+            "C04:2.1"
+          ]
+        },
+        {
+          "field": "sale_price_receivable_inr",
+          "value": "650000",
+          "evidence": [
+            "C04:3.1"
+          ]
+        },
+        {
+          "field": "daily_delay_payable_inr",
+          "value": "5000",
+          "evidence": [
+            "C04:4.1"
+          ]
+        },
+        {
+          "field": "lot_payable_cap_inr",
+          "value": "50000",
+          "evidence": [
+            "C04:4.1"
+          ]
+        },
+        {
+          "field": "upstream_failure_excuses_delay",
+          "value": false,
+          "evidence": [
+            "C04:2.1"
+          ]
+        }
+      ]
+    },
+    {
+      "contract_id": "C05",
+      "party_ids": [
+        "P01",
+        "P06"
+      ],
+      "fields": [
+        {
+          "field": "initial_term",
+          "value": [
+            "2027-01-01",
+            "2027-06-30"
+          ],
+          "evidence": [
+            "C05:2.1"
+          ]
+        },
+        {
+          "field": "renewal_months",
+          "value": 6,
+          "evidence": [
+            "C05:2.1"
+          ]
+        },
+        {
+          "field": "nonrenewal_notice_days",
+          "value": 30,
+          "evidence": [
+            "C05:2.1"
+          ]
+        },
+        {
+          "field": "monthly_rent_payable_inr",
+          "value": "100000",
+          "evidence": [
+            "C05:3.1"
+          ]
+        },
+        {
+          "field": "rent_due_day",
+          "value": 20,
+          "evidence": [
+            "C05:3.1"
+          ]
+        },
+        {
+          "field": "grace_ends_day_at_235959_utc",
+          "value": 25,
+          "evidence": [
+            "C05:4.1"
+          ]
+        },
+        {
+          "field": "daily_simple_rate",
+          "value": "0.001",
+          "evidence": [
+            "C05:4.1"
+          ]
+        },
+        {
+          "field": "per_invoice_charge_cap_inr",
+          "value": "5000",
+          "evidence": [
+            "C05:4.1"
+          ]
+        },
+        {
+          "field": "notice_address",
+          "value": "notices@willow.example",
+          "evidence": [
+            "C05:6.1"
+          ]
+        },
+        {
+          "field": "notice_authorized_sender",
+          "value": "Mira Sen",
+          "evidence": [
+            "C05:6.1"
+          ]
+        }
+      ]
+    },
+    {
+      "contract_id": "C06",
+      "party_ids": [
+        "P01",
+        "P07"
+      ],
+      "fields": [
+        {
+          "field": "initial_term",
+          "value": [
+            "2027-01-01",
+            "2027-12-31"
+          ],
+          "evidence": [
+            "C06:2.1"
+          ]
+        },
+        {
+          "field": "annual_fee_payable_inr",
+          "value": "120000",
+          "evidence": [
+            "C06:4.1"
+          ]
+        },
+        {
+          "field": "initial_fee_due",
+          "value": "2027-01-31T17:00:00Z",
+          "evidence": [
+            "C06:4.1"
+          ]
+        },
+        {
+          "field": "original_notice_days",
+          "value": 60,
+          "evidence": [
+            "C06:3.1"
+          ]
+        },
+        {
+          "field": "amended_notice_days",
+          "value": 30,
+          "evidence": [
+            "C06:19.1"
+          ]
+        },
+        {
+          "field": "amendment_effective_at",
+          "value": "2027-03-01T00:00:00Z",
+          "evidence": [
+            "C06:19.1",
+            "C06:19.2"
+          ]
+        },
+        {
+          "field": "migration_fee_inr",
+          "value": null,
+          "evidence": [
+            "C06:7.1"
+          ]
+        },
+        {
+          "field": "missing_attachment",
+          "value": "Schedule B",
+          "evidence": [
+            "C06:7.1",
+            "C06:19.2"
+          ]
+        }
+      ]
+    },
+    {
+      "contract_id": "C07",
+      "party_ids": [
+        "P01",
+        "P08"
+      ],
+      "fields": [
+        {
+          "field": "initial_term",
+          "value": [
+            "2027-01-01",
+            "2027-12-31"
+          ],
+          "evidence": [
+            "C07:2.1"
+          ]
+        },
+        {
+          "field": "monthly_fee_payable_inr",
+          "value": "50000",
+          "evidence": [
+            "C07:2.1"
+          ]
+        },
+        {
+          "field": "dataset_id",
+          "value": "DS-CEDAR",
+          "evidence": [
+            "C07:1.1"
+          ]
+        },
+        {
+          "field": "region_id",
+          "value": "REGION-NORTH",
+          "evidence": [
+            "C07:1.1"
+          ]
+        },
+        {
+          "field": "applicable_simulated_issuer",
+          "value": "Data Standards Board",
+          "evidence": [
+            "C07:3.1"
+          ]
+        },
+        {
+          "field": "response_deadline_rule",
+          "value": "later of effective instant and 17:00 UTC on tenth calendar date after processor receipt",
+          "evidence": [
+            "C07:4.1"
+          ]
+        },
+        {
+          "field": "unspecified_regulatory_fine_inr",
+          "value": null,
+          "evidence": [
+            "C07:5.1"
+          ]
+        },
+        {
+          "field": "disclosure_reporting_hours_after_discovery",
+          "value": 24,
+          "evidence": [
+            "C07:7.1"
+          ]
+        }
+      ]
+    },
+    {
+      "contract_id": "C08",
+      "party_ids": [
+        "P01",
+        "P03"
+      ],
+      "fields": [
+        {
+          "field": "effective_at",
+          "value": "2027-02-01T00:00:00Z",
+          "evidence": [
+            "C08:2.1"
+          ]
+        },
+        {
+          "field": "term_end",
+          "value": "2027-05-31",
+          "evidence": [
+            "C08:2.1"
+          ]
+        },
+        {
+          "field": "campaign_id",
+          "value": "CAMP-SPRING",
+          "evidence": [
+            "C08:1.1"
+          ]
+        },
+        {
+          "field": "funding_payable_inr",
+          "value": "80000",
+          "evidence": [
+            "C08:3.1"
+          ]
+        },
+        {
+          "field": "funding_due",
+          "value": "2027-02-05T17:00:00Z",
+          "evidence": [
+            "C08:3.1"
+          ]
+        },
+        {
+          "field": "approved_plan_due",
+          "value": "2027-02-03T17:00:00Z",
+          "evidence": [
+            "C08:4.1"
+          ]
+        },
+        {
+          "field": "replaces_c02",
+          "value": false,
+          "evidence": [
+            "C08:1.1",
+            "C08:5.1"
+          ]
+        },
+        {
+          "field": "forum_for_campaign_only",
+          "value": "Mumbai",
+          "evidence": [
+            "C08:6.1"
+          ]
+        },
+        {
+          "field": "controller_procurement_payable_inr",
+          "value": "600000",
+          "evidence": [
+            "C08:20.1"
+          ]
+        }
+      ]
+    }
+  ]
+}

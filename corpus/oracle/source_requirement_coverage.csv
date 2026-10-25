@@ -1,0 +1,38 @@
+requirement,source_page,corpus_support,runtime_evidence_needed
+FR1.1,1,company context and eight PDFs,actual input acceptance
+FR1.2,1,C01-C02 and C03-C04 dependencies,per-contract and cross-contract plan
+FR1.3,1,independent scenarios,delegation and workstream status trace
+FR1.4,1,OUT-06 and AMB-01 uncertainty,coordination and honest synthesis status
+FR2.1,2,expected_terms.json across eight contracts,actual extracted fields
+FR2.2,2,152 body clauses and two schedule rows with verified pages,field confidence and correct citations
+FR2.3,2,AMB-01 and OUT-06,explicit uncertainty instead of guessing
+FR2.4,2,C06:7.1 missing attachment,targeted re-extraction and shared-state update
+FR3.1,2,PAY and REN and CUR scenarios,obligation history and future projection
+FR3.2,2,clock checkpoints and boundary cases,actual forward clock recomputation
+FR3.3,2,DEP-03 and PAY-06 and REN-02,contract-supported inaction projection
+FR4.1,2,missing Schedule B and unequal service commitments,reasoned adversarial findings
+FR4.2,2,DEP and JUR scenarios,evidence on both sides of an alleged conflict
+FR4.3,2,required and forbidden narrative findings,supported attack path plus severity and likelihood
+FR4.4,2,OUT-06 and AMB-01,targeted Thor clarification requests
+FR5.1,2,event envelopes and event_mapping fields,actual mapping and reassessment
+FR5.2,2,OUT-06 then OUT-07 approval evidence,actual verification or challenge
+FR5.3,2,REN cutoff and OUT-10 and REG-03,priority alerts and noise filtering
+FR6.1,2,OUT-07 and JUR-01,Tyr rationale if genuine disagreement occurs
+FR6.2,2,REN-04 and CUR-02 and DEP-01,usable evidence-grounded draft actions
+FR6.3,2,human approval assertions,visible approval flag and agent confidence
+FR7.1,2,uncertainty and later evidence scenarios,real clarification and arbitration messages
+FR7.2,3,RT-04 and RT-05 specifications,configured iteration and evidence and budget stopping
+FR8.1,3,per-contract evidence and obligations,actual independent contract reports
+FR8.2,3,DEP-03 and OUT-08 directional amounts,actual company synthesis and references
+FR9.1,3,party IDs and linked contracts and ARR-01,interactive graph from shared state
+FR9.2,3,scenario clock checkpoints,live slider recomputation
+FR9.3,3,currency amounts and contract dates,actual gauge and heatmap
+FR9.4,3,RT-09 specification,live debate transitions and rationale
+FR9.5,3,notice and payment scenarios,actual alert feed and approval-marked drafts
+NFR1,3,RT-13 specification,separate agents with defined messages and shared state
+NFR2,3,exact evidence and forbidden invented findings,citations and explicit fact-analysis distinction
+NFR3,3,RT-01 through RT-05 specifications,graceful failures bounded retries and honest completion
+NFR4,3,RT-08 and RT-13 specifications,observable plan findings transitions and synthesis
+NFR5,4,RT-02 and RT-04 through RT-06 specifications,no redundant extraction and bounded calls or tokens
+NFR6,4,frozen fixture dates and deterministic PDFs,structured persistent state and reproducible runs
+NFR7,4,RT-13 specification,meaningful LLM participation in a multi-agent trace
