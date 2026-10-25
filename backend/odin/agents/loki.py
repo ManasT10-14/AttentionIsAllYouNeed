@@ -3,7 +3,8 @@ from __future__ import annotations
 
 from odin.agents.base import agent_node, company_ctx, doc_block, j, prompt, say, tool
 from odin.core.config import limits
-from odin.core.models import Finding, LokiOutput, LokiRebuttals, new_id
+from odin.core.models import (EXTRACTION_LIST_FIELDS, EXTRACTION_ONE_FIELDS, Finding, LokiOutput, LokiRebuttals,
+                               new_id)
 from odin.db import repo
 from odin.llm.call import structured
 from odin.services import insights
@@ -20,8 +21,7 @@ def _extraction_digest(cid: str) -> list[dict]:
     if not x:
         return []
     out = []
-    for name in ("term", "renewal", "liability_cap", "governing_law", "payments", "penalties", "termination",
-                 "obligations", "compliance"):
+    for name in EXTRACTION_ONE_FIELDS + EXTRACTION_LIST_FIELDS:
         v = getattr(x, name)
         for f in (v if isinstance(v, list) else [v] if v else []):
             d = f.model_dump(mode="json", exclude={"source"})

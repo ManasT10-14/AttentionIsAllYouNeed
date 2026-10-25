@@ -153,6 +153,65 @@ def test_thor_mapping_uses_actual_fields_and_decimal_strings():
     assert score == 0.5 and "per_invoice_charge_cap_inr" in reason
 
 
+def test_thor_mapping_resolves_generic_fields_to_golden_names():
+    from ragnarok.corpus_checks import thor_score
+
+    def inr(n):
+        return {"amount": n, "currency": "INR"}
+
+    actual = {
+        "parties": [
+            {"name": "Willow Housing Ltd", "capacity": "Controller"},
+            {"name": "Aurora Software Pvt Ltd", "capacity": "Processor"},
+        ],
+        "penalties": [
+            {
+                "trigger": "late delivery",
+                "basis": "per_day",
+                "direction": "receivable",
+                "amount": inr(2000),
+                "cap": inr(20000),
+                "cap_period": "per_lot",
+            },
+            {
+                "trigger": "outage",
+                "kind": "service_credit",
+                "basis": "per_incident",
+                "pct": 20,
+                "direction": "receivable",
+                "cap": inr(15000),
+                "cap_period": "per_month",
+            },
+        ],
+        "obligations": [{"description": "Deliver lot", "due_at": "2027-02-10T22:30:00+05:30"}],
+        "periods": [{"purpose": "cure", "value": 10, "unit": "days"}],
+        "related_contracts": [
+            {"contract_ref": "C01", "relation": "depends_on"},
+            {"contract_ref": "C02", "relation": "does_not_replace"},
+        ],
+        "forum": {"value": "Bengaluru, Karnataka"},
+        "notice": {"address": "notices@willow.example"},
+    }
+    golden = {
+        "daily_delay_recoverable_inr": "2000",
+        "lot_recoverable_cap_inr": "20000",
+        "monthly_credit_cap_inr": "15000",
+        "recovery_credit_rate": "0.20",
+        "delivery_due": "2027-02-10T17:00:00Z",
+        "cure_days_after_receipt": 10,
+        "depends_on_contract": "C01",
+        "replaces_c02": False,
+        "forum": "Bengaluru",
+        "notice_address": "notices@willow.example",
+        "controller_party_id": "P03",
+        "processor_party_id": "P01",
+    }
+    score, reason = thor_score(
+        {"field_assertions": [{"name": k, "value": v} for k, v in golden.items()]}, actual
+    )
+    assert score == 1.0, reason
+
+
 def test_workspace_ingestion_uses_actual_pdf_without_embedding_download(tmp_path, monkeypatch):
     from ragnarok.corpus_runtime import initialize_workspace, seed_documents
 

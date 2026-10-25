@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import hashlib
 from dataclasses import dataclass, field
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from functools import lru_cache
 from typing import Optional
 
@@ -143,7 +143,7 @@ def compute(ci: ContractInputs, now: date, horizon_months: int = 12, apply_actio
         if not p.amount:
             continue
         step = FREQ_MONTHS.get(p.frequency)
-        first = p.first_due or eff
+        first = p.first_due or (p.first_due_at.date() if p.first_due_at else None) or eff
         if not first:
             assumptions.append(f"{ci.contract_id}: payment '{p.description}' has no first due date — not scheduled.")
             continue
@@ -171,7 +171,8 @@ def compute(ci: ContractInputs, now: date, horizon_months: int = 12, apply_actio
             label = p.description or (f"Receivable from {p.payer}" if incoming else f"Payment to {p.payee}")
             entries.append(TimelineEntry(id=eid, contract_id=ci.contract_id, date=d, kind="payment", status=st,
                                          amount=p.amount, title=("Receivable: " if incoming else "") + label,
-                                         citation=p.citation, owner=ci.owners.get(eid, "")))
+                                         citation=p.citation, owner=ci.owners.get(eid, ""),
+                                         due_at=datetime.combine(d, p.first_due_at.timetz()) if p.first_due_at else None))
             if incoming:
                 continue
             if d >= now and d <= horizon:
@@ -197,11 +198,12 @@ def compute(ci: ContractInputs, now: date, horizon_months: int = 12, apply_actio
 
     # ── obligations with dates ──
     for i, o in enumerate(x.obligations):
-        if o.due_date:
-            entries.append(TimelineEntry(id=_eid(ci.contract_id, "obl", i, o.due_date), contract_id=ci.contract_id,
-                                         date=o.due_date, kind="obligation", status=_status(o.due_date, now),
+        due = o.due_date or (o.due_at.date() if o.due_at else None)
+        if due:
+            entries.append(TimelineEntry(id=_eid(ci.contract_id, "obl", i, due), contract_id=ci.contract_id,
+                                         date=due, kind="obligation", status=_status(due, now), due_at=o.due_at,
                                          title=f"{o.owner}: {o.description}"[:160], citation=o.citation,
-                                         owner=ci.owners.get(_eid(ci.contract_id, "obl", i, o.due_date), "")))
+                                         owner=ci.owners.get(_eid(ci.contract_id, "obl", i, due), "")))
 
     # ── violations from events (Heimdall) ──
     worst_extra: list[ExposureLine] = []

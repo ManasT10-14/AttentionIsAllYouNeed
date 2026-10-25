@@ -20,7 +20,26 @@ corpus-thor-rescored.json, corpus-agent-final.json and corpus-security.json.
 The entire 384-agent/276-RAG live set was not run; the user chose the representative
 baseline. All vectors are compiled and available for later expanded testing.
 
-## Known limitations
+## Thor schema update (backend, later on 2026-10-25)
+
+Thor now extracts generic fields for penalty basis, cap period and direction, exact UTC
+deadlines, time periods, links to other contracts, forum, notice details and party
+capacity. `corpus_checks` maps these onto the golden concept names; no golden values
+enter prompts. Live run on all 15 contracts (Mantle, Kimi K2.5, tracing off):
+
+| Measure | Before | After |
+| --- | --- | --- |
+| Thor typed assertions matched | 29 / 114 | 85 / 114 |
+| Contracts with every assertion matched | 0 / 15 | 0 / 15 |
+| Thor judge rubric | not comparable | 12 / 15 passed |
+
+Before = the old mapping applied to the same run. The remaining 29 misses are mostly
+one-off facts (project, dataset and asset IDs, signers, lot units, free-text rules),
+derived totals, and a few cases where Thor chose a different relation or skipped a
+minute-level threshold. The clock and slider stay date-based; timeline entries carry
+`due_at` when the contract gives an exact time.
+
+
 
 - The supplied local PostgreSQL login failed authentication. Evaluation used
   isolated SQLite workspaces and explicitly BM25-only retrieval. PostgreSQL,

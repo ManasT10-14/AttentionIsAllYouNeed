@@ -9,7 +9,8 @@ from collections import defaultdict
 from datetime import date, datetime, timedelta
 
 from odin.core.config import odin_config
-from odin.core.models import SEVERITY_RANK, Alert, ContractExtraction, Event, Violation
+from odin.core.models import (EXTRACTION_LIST_FIELDS, EXTRACTION_ONE_FIELDS, SEVERITY_RANK, Alert,
+                               ContractExtraction, Event, Violation)
 from odin.db import repo
 from odin.services.timeline import ContractInputs, ContractTimeline, compute, counterfactual
 
@@ -152,8 +153,8 @@ def alerts(now: date | None = None, include_closed: bool = False) -> list[dict]:
 
 # ───────────────────────────── health / calibration / counterparty ─────────────────────────────
 def _fields(x: ContractExtraction) -> list:
-    out = [f for f in (x.term, x.renewal, x.liability_cap, x.governing_law) if f]
-    return out + x.payments + x.obligations + x.penalties + x.compliance + x.termination
+    out = [getattr(x, n) for n in EXTRACTION_ONE_FIELDS if getattr(x, n)]
+    return out + [f for n in EXTRACTION_LIST_FIELDS for f in getattr(x, n)]
 
 
 def health(contract_id: str, now: date | None = None) -> dict:

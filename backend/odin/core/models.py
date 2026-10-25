@@ -43,6 +43,8 @@ class Party(BaseModel):
     name: str
     role: Literal["company", "counterparty", "unknown"] = "unknown"
     alias: Optional[str] = None
+    capacity: Optional[str] = Field(None, description='Role this party plays as written in the contract, '
+                                    'e.g. "Controller", "Processor", "Supplier", "Customer", "Landlord"')
 
 
 class CompanyContext(BaseModel):
@@ -117,6 +119,7 @@ class PaymentField(Sourced):
     due_rule: str = Field("", description='e.g. "within 30 days of invoice", "5th of each month"')
     late_fee_pct_per_month: Optional[float] = None
     late_fee_flat: Optional[Money] = None
+    first_due_at: Optional[datetime] = Field(None, description="Exact deadline in UTC (ISO 8601 with Z) when the contract states a time of day; else null")
 
 
 class ObligationField(Sourced):
@@ -124,6 +127,7 @@ class ObligationField(Sourced):
     description: str = ""
     due_rule: str = ""
     due_date: Optional[date] = None
+    due_at: Optional[datetime] = Field(None, description="Exact deadline in UTC (ISO 8601 with Z) when the contract states a time of day; else null")
     recurring: bool = False
 
 
@@ -133,6 +137,14 @@ class PenaltyField(Sourced):
     pct: Optional[float] = Field(None, description="Percent of a base (fees, contract value, ...)")
     pct_base: str = ""
     cap: Optional[Money] = None
+    kind: Literal["service_credit", "delay_charge", "late_interest", "liquidated_damages", "indemnity",
+                  "other"] = "other"
+    basis: Literal["per_incident", "per_day", "per_month", "one_time", "other"] = Field(
+        "other", description="What `amount` (or `pct`) is charged per")
+    cap_period: Literal["per_incident", "per_month", "per_lot", "per_invoice", "per_year", "total", ""] = Field(
+        "", description="Period or unit the `cap` applies to")
+    direction: Literal["payable", "receivable", "unknown"] = Field(
+        "unknown", description="payable = the company pays it; receivable = the company receives or recovers it")
 
 
 class ComplianceField(Sourced):
@@ -149,6 +161,28 @@ class TerminationField(Sourced):
 
 class SimpleField(Sourced):
     value: str = ""
+
+
+class PeriodField(Sourced):
+    """A stated time limit that is not a payment or renewal, e.g. a cure, claim, warranty or reporting period."""
+    purpose: str = Field(description='Short snake_case purpose, e.g. "cure", "claim", "warranty", "survival", '
+                         '"reporting", "acknowledgement", "approval_lead", "restore", "return", "replacement", '
+                         '"payment", "notice", "credit_threshold"')
+    value: float
+    unit: Literal["minutes", "hours", "days", "business_days", "months", "years"]
+    starts_from: str = Field("", description='Trigger the period runs from, e.g. "receipt of notice"')
+    comparison: Literal["within", "at_least", "more_than", "exactly", ""] = ""
+
+
+class RelatedContractField(Sourced):
+    contract_ref: str = Field(description="Contract ID exactly as written, e.g. C01")
+    relation: Literal["depends_on", "supplies", "replaces", "does_not_replace", "separate_agreement", "amends",
+                      "related"]
+
+
+class NoticeField(Sourced):
+    address: str = Field("", description="Address or email for formal notices to the counterparty")
+    authorized_sender: str = Field("", description="Person named as authorised to send notices, if any")
 
 
 class AmbiguityFlag(BaseModel):
@@ -170,7 +204,17 @@ class ContractExtraction(BaseModel):
     termination: list[TerminationField] = []
     liability_cap: Optional[SimpleField] = None
     governing_law: Optional[SimpleField] = None
+    forum: Optional[SimpleField] = Field(None, description="City or seat of the courts or arbitration")
+    notice: Optional[NoticeField] = None
+    periods: list[PeriodField] = []
+    related_contracts: list[RelatedContractField] = []
     flags: list[AmbiguityFlag] = []
+
+
+# Every Sourced field of ContractExtraction, in one place (merge, digest, citation guard).
+EXTRACTION_ONE_FIELDS = ("term", "renewal", "liability_cap", "governing_law", "forum", "notice")
+EXTRACTION_LIST_FIELDS = ("payments", "obligations", "penalties", "compliance", "termination", "periods",
+                          "related_contracts")
 
 
 class ClauseReextraction(BaseModel):
@@ -196,6 +240,7 @@ class TimelineEntry(BaseModel):
     status: Literal["past", "due", "upcoming", "missed", "done"] = "upcoming"
     amount: Optional[Money] = None
     citation: Optional[Citation] = None
+    due_at: Optional[datetime] = None        # exact UTC deadline when the contract gives a time of day
     owner: str = ""
     source: Literal["analysis"] = "analysis"
 

@@ -75,7 +75,7 @@ Run `npm run gen:api` with the backend up to get TypeScript types for every endp
 
 | # | Component | Data | Behaviour |
 |---|---|---|---|
-| E1 | **Obligation timeline / Gantt** | `GET /api/timeline?as_of=&contract_id=` → `entries[] {id, date, kind, title, status, amount, citation, owner}` | Kinds: payment, renewal, notice_deadline, penalty_trigger, expiry, obligation. Status colours: past, due, upcoming, missed, done. |
+| E1 | **Obligation timeline / Gantt** | `GET /api/timeline?as_of=&contract_id=` → `entries[] {id, date, due_at?, kind, title, status, amount, citation, owner}` (`due_at` is an exact UTC time when the contract states one) | Kinds: payment, renewal, notice_deadline, penalty_trigger, expiry, obligation. Status colours: past, due, upcoming, missed, done. |
 | E2 | **Worst-case projection table** | `report.worst_case_projection` or timeline entries with amounts | "If no action is taken". Labelled ANALYSIS. |
 | E3 | **Owner assignment** | `POST /api/owners {timeline_id, owner}` | Inline owner picker per entry. |
 | E4 | **Calendar export button** | `GET /api/export/calendar.ics` | Download. |

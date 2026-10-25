@@ -4,13 +4,13 @@ from __future__ import annotations
 import re
 
 from odin.agents.base import agent_node, company_ctx, doc_block, j, pmap, prompt, say, tool
-from odin.core.models import ClauseReextraction, ContractExtraction
+from odin.core.models import (EXTRACTION_LIST_FIELDS, EXTRACTION_ONE_FIELDS, ClauseReextraction,
+                               ContractExtraction)
 from odin.db import repo
 from odin.llm.call import structured
 from odin.services import insights
 
-LIST_FIELDS = ("payments", "obligations", "penalties", "compliance", "termination")
-ONE_FIELDS = ("term", "renewal", "liability_cap", "governing_law")
+LIST_FIELDS, ONE_FIELDS = EXTRACTION_LIST_FIELDS, EXTRACTION_ONE_FIELDS
 
 
 def summarize(x: ContractExtraction) -> dict:
