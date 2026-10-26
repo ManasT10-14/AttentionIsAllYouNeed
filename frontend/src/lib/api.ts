@@ -41,7 +41,8 @@ export function query(path: string, values: Record<string, string | number | boo
 export async function api<T = unknown>(path: string, options: RequestInit = {}): Promise<T> {
   const headers = new Headers(options.headers);
   if (options.body && !(options.body instanceof FormData)) headers.set('Content-Type', 'application/json');
-  const signal = options.signal ? AbortSignal.any([options.signal, AbortSignal.timeout(30000)]) : AbortSignal.timeout(30000);
+  const timeoutMs = ['/api/ask', '/api/bundle/import', '/api/demo/seed'].includes(path.split('?')[0]) ? 240000 : 30000;
+  const signal = options.signal ? AbortSignal.any([options.signal, AbortSignal.timeout(timeoutMs)]) : AbortSignal.timeout(timeoutMs);
   const response = await fetch(apiUrl(path), { ...options, headers, signal, credentials: 'include', cache: 'no-store' });
   const plainText = path.split('?')[0] === '/api/email/template' && response.ok;
   const body: unknown = response.status === 204 ? null : plainText ? await response.text() : await response.json().catch(() => null);
@@ -84,7 +85,7 @@ export function adaptPayload(path: string, body: unknown) {
   if (route === '/api/contracts') list(body).forEach(contract);
   else if (/^\/api\/contracts\/[^/]+$/.test(route)) contract(o);
   else if (route === '/api/timeline' && !Array.isArray(o.entries)) o.entries = list(o.contracts).flatMap(c => list(c.entries)).sort((a, b) => text(a.date, '').localeCompare(text(b.date, '')));
-  else if (route === '/api/events') list(body).forEach(e => { e.date ??= e.occurred_at; e.type ??= e.event_type; e.title ??= e.subject; });
+  else if (route === '/api/events') list(body).forEach(e => { e.date ??= e.occurred_at; e.type ??= e.event_type; e.title ??= e.subject; e.sender ??= e.from; e.recipient ??= e.to; });
   else if (route === '/api/actions') list(body).forEach(a => { a.needs_approval ??= a.needs_human_approval; });
   else if (/^\/api\/actions\/[^/]+$/.test(route)) o.needs_approval ??= o.needs_human_approval;
   else if (route === '/api/alerts') list(body).forEach(analysis);

@@ -1,47 +1,49 @@
 'use client';
 import Link from 'next/link';
+import { CounterpartyProfiles, ReportBody } from './report-body';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { dateText, dateTimeText, formatMoney, list, query, record, text } from '@/lib/api';
+import { dateText, formatMoney, list, query, record, text } from '@/lib/api';
+import { activityTimeText } from '@/lib/activity-time';
 import { useResource } from '@/lib/use-resource';
 import { missingReportExplanation } from '@/lib/review-data';
 import { reportRuns, runReportTarget, runTitle } from '@/lib/run-presentation';
 import { useWorkspace } from './providers';
 import { Button,Badge,PageTitle,Panel,PanelTitle } from './ui';
 import { CitationChip,DownloadLink,FieldValue,MutationFeedback,ResourceState,SourceBadge,Status,useMutation } from './api-ui';
-
 const TABS = [['runs', 'Workflow reports'], ['contracts', 'By contract'], ['events', 'By event']] as const;
 type Tab = typeof TABS[number][0];
 type Row = Record<string, unknown>;
-
 function Refs({ value }: { value: unknown }) {
  const refs = list(value);
  return <section><h3>References</h3>{refs.map((ref, i) => <div key={i}><CitationChip value={ref} /><blockquote className="source-quote">{text(ref.quote, '')}</blockquote></div>)}{!refs.length && <p className="muted-note">No references returned.</p>}</section>;
 }
-function Body({ report }: { report: Row }) {
- return <>{Object.entries(report).filter(([k]) => !['references', 'state'].includes(k)).map(([k, v]) => <section key={k}><h3>{k.replaceAll('_', ' ')}</h3><FieldValue value={v} /></section>)}<Refs value={report.references} /></>;
-}
-const Items = ({ title, rows, label }: { title: string; rows: unknown; label: (r: Row) => string }) => <section><h3>{title} ({list(rows).length})</h3>{list(rows).length ? <ul>{list(rows).map((r, i) => <li key={i}>{label(r)}</li>)}</ul> : <p className="muted-note">None</p>}</section>;
+function Body({ report }: { report: Row }) { return <ReportBody report={report} />; }
 
+const Items = ({ title, rows, label }: { title: string; rows: unknown; label: (r: Row) => string }) => <section><h3>{title} ({list(rows).length})</h3>{list(rows).length ? <ul>{list(rows).map((r, i) => <li key={i}>{label(r)}</li>)}</ul> : <p className="muted-note">None</p>}</section>;
 function RunReport({ id, title }: { id: string; title: string }) {
+ const { timeZone } = useWorkspace();
  const r = useResource('/api/reports/runs/' + encodeURIComponent(id)); const d = record(record(r.data).diff); const rep = record(record(r.data).report); const ex = record(d.exposure_delta);
  const claim = (x: Row) => text(x.contract_id, '') + ': ' + text(x.claim ?? x.subject, '');
  const prev = text(record(r.data).previous_run_id, '');
  return <ResourceState resource={r}>{r.data !== undefined && <div className="report-content">
-  <PanelTitle title={title} description={dateText(record(r.data).generated_at)}><SourceBadge value="analysis" /><DownloadLink path={'/api/reports/runs/' + id + '?format=pdf'}>Download PDF</DownloadLink></PanelTitle>
+  <PanelTitle title={title} description={activityTimeText(record(r.data).generated_at, timeZone)}><SourceBadge value="analysis" /><DownloadLink path={'/api/reports/runs/' + id + '?format=pdf'}>Download PDF</DownloadLink></PanelTitle>
   <p><Link className="text-link" href={query('/dashboard/workflow', { run: id })}>View workflow execution</Link></p>
-  <section className="report-completeness"><h3>What changed since {prev ? 'run ' + prev.slice(0, 8) : 'start (first run)'}</h3>
+  {record(r.data).recovery_note ? <p className="muted-note">{text(record(r.data).recovery_note)}</p> : null}
+  {Object.keys(d).length > 0 && <section className="report-completeness"><h3>What changed since {prev ? 'run ' + prev.slice(0, 8) : 'start (first run)'}</h3>
    {d.exposure_delta ? <p>Exposure change: expected {formatMoney(ex.expected, text(ex.currency, 'INR'))}, worst case {formatMoney(ex.worst_case, text(ex.currency, 'INR'))}</p> : null}
    <Items title="New findings" rows={d.new_findings} label={claim} /><Items title="Resolved findings" rows={d.resolved_findings} label={claim} />
-   <Items title="New actions" rows={d.new_actions} label={claim} /><Items title="Resolved actions" rows={d.resolved_actions} label={claim} /></section>
-  <h2>Final company report</h2><Body report={rep} /></div>}</ResourceState>;
+   <Items title="New actions" rows={d.new_actions} label={claim} /><Items title="Resolved actions" rows={d.resolved_actions} label={claim} /></section>}
+  <h2>{rep.title === 'Saved contract reports' ? 'Available Synth outputs' : 'Final company report'}</h2><Body report={rep} />
+  {list(record(r.data).contract_reports).filter(c => c.kind === 'contract').map(c => <details key={text(c.id)} className="report-output"><summary>{text(c.title ?? c.contract_id)} — saved contract report</summary><Body report={c} /></details>)}</div>}</ResourceState>;
 }
 function SelectedRunReport({ id, snapshot, title }: { id: string; snapshot: boolean; title: string }) {
+ const { timeZone } = useWorkspace(); const dateTimeText = (value: unknown) => activityTimeText(value, timeZone);
  const workflow = useResource(snapshot ? null : '/api/workflow/' + encodeURIComponent(id));
  if (snapshot) return <RunReport id={id} title={title} />;
  const w = record(workflow.data); const target = runReportTarget(w); const run = record(w.run); const remarks = record(w.remarks);
  return <ResourceState resource={workflow}>{workflow.data !== undefined && (target?.kind === 'run' ? <RunReport id={target.id} title={title} /> : target?.kind === 'event' ? <EventReport id={target.id} /> : <div className="report-content execution-report">
   <PanelTitle title={title} description={dateTimeText(run.started_at)}><Status value={run.status} /></PanelTitle>
-  <div className="report-availability"><h3>{run.status === 'running' ? 'Analysis is still in progress' : 'Recorded execution summary'}</h3><p>{missingReportExplanation(run)}</p></div>
+  <div className="report-availability"><h3>{run.status === 'running' ? 'Analysis is still in progress' : 'Recorded execution summary'}</h3><p>{missingReportExplanation(run)}</p><p><Link className="text-link" href="/dashboard/reports?tab=contracts&contract=company">View latest final company report</Link> — includes current contract and event changes; it is separate from this historical run.</p></div>
   <p><Link className="text-link" href={query('/dashboard/workflow', { run: id })}>Inspect the full agent workflow</Link> <Link className="text-link" href={query('/dashboard/agent-review', { run: id })}>Review agent message history</Link></p>
   {remarks.error ? <p className="form-error">{text(remarks.error)}</p> : null}
   {['finding', 'violation', 'alert', 'action'].map(kind => <section key={kind}><h3>{({ finding: 'Findings', violation: 'Violations', alert: 'Alerts', action: 'Actions' })[kind]}</h3>{list(record(w.outputs)[kind]).map(o => <article className="report-output" key={text(o.id)}><Status value={o.status} /><p>{text(o.claim ?? o.explanation ?? o.title ?? o.subject)}</p><small>{text(o.contract_id, '')}</small>{list(o.citations).map((c, i) => <CitationChip key={i} value={c} />)}</article>)}{!list(record(w.outputs)[kind]).length && <p className="muted-note">None recorded.</p>}</section>)}
@@ -62,12 +64,11 @@ function EventReport({ id }: { id: string }) {
   <section><h3>Tyr rulings</h3>{list(rep.findings).map(f => { const ru = record(ruling.get(text(f.id))); return <p key={text(f.id)}>{text(f.claim)} <Badge tone="green">{ruling.has(text(f.id)) ? 'Tyr: ' + text(ru.winner) + ', sev ' + text(ru.final_severity) : 'no ruling'}</Badge></p>; })}{!list(rep.findings).length && <p className="muted-note">None</p>}</section>
   <Refs value={rep.affected_clauses} /></div>}</ResourceState>;
 }
-
 export function ReportsView() {
- const router = useRouter(); const p = useSearchParams(); const {canAdmin,demo}=useWorkspace(); const m=useMutation();
+ const router = useRouter(); const p = useSearchParams(); const {canAdmin,demo,timeZone}=useWorkspace(); const dateTimeText = (value: unknown) => activityTimeText(value, timeZone); const m=useMutation();
  const index = useResource('/api/report-index'); const idx = record(index.data);
  const recentRuns = useResource('/api/runs'); const agreements = useResource('/api/contracts'); const eventList = useResource('/api/events');
- const counterparties = useResource('/api/insights/counterparties');
+ const counterparties = useResource(p.get('tab') === 'contracts' || p.get('contract') ? '/api/insights/counterparties' : null);
  const requestedTab = p.get('tab');
  const tab = (TABS.some(([key]) => key === requestedTab) ? requestedTab as Tab : null) || (p.get('event') ? 'events' : p.get('contract') ? 'contracts' : 'runs');
  const go = (t: Tab, key: string, value: string) => router.push(query('/dashboard/reports', { tab: t, [key]: value }));
@@ -76,8 +77,12 @@ export function ReportsView() {
  const run = p.get('run') || text(runs[0]?.run_id, ''); const event = p.get('event') || text(events[0]?.event_id, ''); const contract = p.get('contract') || 'company';
  const cpath = contract === 'company' ? '/api/reports/company' : query('/api/reports/contract', { contract_id: contract });
  const cr = useResource(tab === 'contracts' ? cpath : null);
+ const generate = async (target?: string) => {
+  const result = record(await m.run(query('/api/reports/refresh', {contract_id: target})));
+  if (result.run_id) router.push(query('/dashboard/workflow', {run: text(result.run_id)}));
+ };
  const row = (key: string, id: string, sel: string, t: Tab, title: string, sub: string, badge?: unknown) => <button key={id} className="inbox-event-row" aria-current={id === sel} onClick={() => go(t, key, id)}><span className="inbox-event-summary"><strong>{title}{id === sel ? ' (open)' : ''}</strong><small>{sub}</small></span>{badge ? <Status value={badge} /> : null}</button>;
- return <><PageTitle eyebrow="REPORTS" title="The complete picture." description="Workflow, contract and event reports, newest first. Each is readable here with citations and downloadable as PDF.">{canAdmin && <Button disabled={m.pending || demo} onClick={()=>void m.run('/api/reports/refresh')}>Regenerate reports</Button>}</PageTitle><MutationFeedback mutation={m} />
+ return <><PageTitle eyebrow="REPORTS" title="The complete picture." description="Workflow, contract and event reports, newest first. Each is readable here with citations and downloadable as PDF.">{canAdmin && <Button disabled={m.pending || demo} onClick={()=>void generate(tab === 'contracts' && contract !== 'company' ? contract : undefined)}>{tab === 'contracts' && contract !== 'company' ? 'Generate report for this agreement' : 'Generate current reports'}</Button>}</PageTitle><MutationFeedback mutation={m} />
  <div className="segmented-control detail-tabs">{TABS.map(([k, label]) => <button key={k} className={tab === k ? 'active' : ''} onClick={() => router.push(query('/dashboard/reports', { tab: k }))}>{label}</button>)}</div>
  <div className="master-detail-layout reports-layout"><aside className="master-list"><Panel><ResourceState resource={index}><div className="inbox-event-list">
   {tab === 'runs' && <ResourceState resource={recentRuns}>{runs.map(r => row('run', text(r.run_id), run, 'runs', titleFor(r), dateTimeText(r.started_at ?? r.generated_at) + ' · ' + text(r.run_id).slice(0, 8) + (r.has_snapshot ? ' · Saved report' : ' · Execution & available reports'), r.status ?? r.completeness))}</ResourceState>}
@@ -89,5 +94,5 @@ export function ReportsView() {
   {tab === 'events' && (event ? <EventReport id={event} /> : null)}
   {tab === 'contracts' && <ResourceState resource={cr}>{cr.data !== undefined && <div className="report-content"><PanelTitle title={contract === 'company' ? 'Company report' : 'Contract report'}><SourceBadge value="analysis" /><DownloadLink path={cpath + (cpath.includes('?') ? '&' : '?') + 'format=pdf'}>Download PDF</DownloadLink></PanelTitle>{contract !== 'company' && <p><Link className="text-link" href={query('/dashboard/workflow', { contract })}>View workflow execution</Link></p>}<Body report={record(cr.data)} /></div>}</ResourceState>}
  </Panel></div></div>
- <Panel><PanelTitle title="Counterparty risk profiles" description="Exposure, violations and late-payment events by party" /><SourceBadge value="analysis" /><ResourceState resource={counterparties}><FieldValue value={counterparties.data} /></ResourceState></Panel></>;
+ {tab === 'contracts' && <Panel><PanelTitle title="Current counterparty risk profiles" description="Exposure, violations and late-payment events by party" /><SourceBadge value="analysis" /><ResourceState resource={counterparties}><CounterpartyProfiles value={counterparties.data} /></ResourceState></Panel>}</>;
 }

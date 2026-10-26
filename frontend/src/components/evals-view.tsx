@@ -3,9 +3,10 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { FlaskConical, LoaderCircle } from 'lucide-react';
 import { useResource } from '@/lib/use-resource';
+import { activityTimeText } from '@/lib/activity-time';
 import { metricHistory, qualityCoverage } from '@/lib/review-data';
 import { runTitle } from '@/lib/run-presentation';
-import { dateText, dateTimeText, list, number, query, record, text, type ApiRecord } from '@/lib/api';
+import { dateText, list, number, query, record, text, type ApiRecord } from '@/lib/api';
 import { useWorkspace } from './providers';
 import { Badge, Button, PageTitle, Panel, PanelTitle, Sheet } from './ui';
 import { ResourceState, Status } from './api-ui';
@@ -95,6 +96,7 @@ function SuitePanel() {
 }
 
 export function EvalsView() {
+  const { timeZone } = useWorkspace(); const dateTimeText = (value: unknown) => activityTimeText(value, timeZone);
   const summary = useResource('/api/evals/summary?limit=100');
   const runs = useResource('/api/evals/runs?limit=100');
   const executions = useResource('/api/runs?limit=100'); const agreements = useResource('/api/contracts');

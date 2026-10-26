@@ -269,3 +269,25 @@ def archive_legacy_report(company_id: str) -> None:
     for report in run_reports(company_id):
         if report.get("recovery_note") and not repo.get("report_run", f"reportrun:{report['run_id']}"):
             repo.put("report_run", _R(id=f"reportrun:{report['run_id']}", **report), publish=False)
+
+
+def recover_interrupted_runs() -> int:
+    """Single-worker API startup: old running rows have no surviving worker.
+
+    Retain outputs and mark events for review rather than freezing controls or
+    claiming an interrupted run completed. This app uses an in-process bus.
+    """
+    from sqlalchemy import select
+    from odin.db.tables import Record
+    recovered = 0
+    with db() as session:
+        for run in session.scalars(select(Run).where(Run.status == "running")).all():
+            run.status = "failed"
+            run.error = "Interrupted by a backend restart. Saved outputs are retained; retry the analysis or event."
+            run.finished_at = datetime.utcnow()
+            recovered += 1
+        for event in session.scalars(select(Record).where(Record.kind == "event", Record.status == "processing")).all():
+            event.status = "needs_review"
+            event.data = {**event.data, "status": "needs_review", "impact_review_required": True,
+                          "reject_reason": "Assessment interrupted by a backend restart"}
+    return recovered

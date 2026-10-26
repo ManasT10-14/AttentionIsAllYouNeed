@@ -1,0 +1,168 @@
+{
+  "_note": "Source-derived example of the implemented response schema. Import execution also returns per-document results, source file hashes and optional analysis run_id.",
+  "counts": {
+    "documents": 8,
+    "clauses": 221,
+    "relations": 7,
+    "ledger": 25,
+    "holidays": 10
+  },
+  "relations": [
+    {
+      "from_doc": "A1",
+      "to_doc": "STD",
+      "relation": "incorporates",
+      "detail": "A1 incorporates STD by reference",
+      "citation": {
+        "contract_id": "A1",
+        "clause_number": "PREAMBLE",
+        "ref": "PREAMBLE",
+        "quote": "This Cover Page incorporates by reference the Common Paper Cloud Service\nAgreement Standard Terms Version 2.0, a copy of which is maintained at\nSTD.txt in this bundle (the \"Standard Terms\"). If this Cover Page and the\nStandard Terms conflict on any point, this Cover Page controls.",
+        "verified": true
+      }
+    },
+    {
+      "from_doc": "A1",
+      "to_doc": "A2",
+      "relation": "incorporates",
+      "detail": "A1 incorporates A2 (QH-STRATO-2026-SLA) by reference",
+      "citation": {
+        "contract_id": "A1",
+        "clause_number": "E",
+        "ref": "Section E",
+        "quote": "Agreement\" (document QH-STRATO-2026-SLA), which is incorporated into this",
+        "verified": true
+      }
+    },
+    {
+      "from_doc": "A3",
+      "to_doc": "A2",
+      "relation": "amends",
+      "detail": "A3 amends A2 (QH-STRATO-2026-SLA)",
+      "citation": {
+        "contract_id": "A3",
+        "clause_number": "PREAMBLE",
+        "ref": "PREAMBLE",
+        "quote": "This Amendment No. 1 (\"Amendment\") amends the Service Level Agreement dated\nAugust 1, 2026, Document ID QH-STRATO-2026-SLA (the \"SLA\"), which is\nincorporated by reference into the Cloud Service Agreement between StratoNode\nInc. (\"Provider\") and Quillhub Inc. (\"Customer\") dated August 1, 2026\n(Contract ID: QH-STRATO-2026-001, the \"Agreement\").",
+        "verified": true
+      }
+    },
+    {
+      "from_doc": "A3",
+      "to_doc": "A1",
+      "relation": "amends",
+      "detail": "A3 amends A1 (QH-STRATO-2026-001)",
+      "citation": {
+        "contract_id": "A3",
+        "clause_number": "PREAMBLE",
+        "ref": "PREAMBLE",
+        "quote": "This Amendment No. 1 (\"Amendment\") amends the Service Level Agreement dated\nAugust 1, 2026, Document ID QH-STRATO-2026-SLA (the \"SLA\"), which is\nincorporated by reference into the Cloud Service Agreement between StratoNode\nInc. (\"Provider\") and Quillhub Inc. (\"Customer\") dated August 1, 2026\n(Contract ID: QH-STRATO-2026-001, the \"Agreement\").",
+        "verified": true
+      }
+    },
+    {
+      "from_doc": "B1",
+      "to_doc": "STD",
+      "relation": "incorporates",
+      "detail": "B1 incorporates STD by reference",
+      "citation": {
+        "contract_id": "B1",
+        "clause_number": "PREAMBLE",
+        "ref": "PREAMBLE",
+        "quote": "This Cover Page incorporates by reference the Common Paper Cloud Service\nAgreement Standard Terms Version 2.0, a copy of which is maintained at\nSTD.txt in this bundle (the \"Standard Terms\"). If this Cover Page and the\nStandard Terms conflict on any point, this Cover Page controls.",
+        "verified": true
+      }
+    },
+    {
+      "from_doc": "B2",
+      "to_doc": "B1",
+      "relation": "addendum_to",
+      "detail": "B2 is an addendum to B1 (QH-HARBOR-2026-001)",
+      "citation": {
+        "contract_id": "B2",
+        "clause_number": "PREAMBLE",
+        "ref": "PREAMBLE",
+        "quote": "================================================================================\n           DATA PROCESSING AND SECURITY ADDENDUM TO THE\n         CLOUD SERVICE AGREEMENT (QH-HARBOR-2026-001)\n================================================================================",
+        "verified": true
+      }
+    },
+    {
+      "from_doc": "C1",
+      "to_doc": "STD",
+      "relation": "incorporates",
+      "detail": "C1 incorporates STD by reference",
+      "citation": {
+        "contract_id": "C1",
+        "clause_number": "PREAMBLE",
+        "ref": "PREAMBLE",
+        "quote": "This Cover Page incorporates by reference the Common Paper Cloud Service\nAgreement Standard Terms Version 2.0, a copy of which is maintained at\nSTD.txt in this bundle (the \"Standard Terms\"). If this Cover Page and the\nStandard Terms conflict on any point, this Cover Page controls.",
+        "verified": true
+      }
+    }
+  ],
+  "overrides": [
+    {
+      "doc": "A2",
+      "number": "3.2",
+      "target_ref": "§3.2",
+      "by_doc": "A3",
+      "by_ref": "Section 1",
+      "by_number": "1",
+      "mode": "replaced",
+      "effective": "2027-01-01",
+      "new_text": "3.2  Credit Request Procedure. To receive a Service Credit, Customer must\n        submit a written request to Provider's Notice Address within fifteen\n        (15) days after the end of the calendar month in which the Downtime\n        occurred. The request must include: (a) the specific dates and times\n        of each Downtime incident; (b) a description of how the Cloud Service\n        was affected; (c) evidence from Customer's own monitoring systems or\n        Provider's status page; and (d) the calculated Monthly Uptime\n        Percentage. Provider will review the request and respond within ten\n        (10) business days. If Provider confirms that the Uptime Target was\n        not met, Provider will apply the Service Credit to Customer's next\n        invoice.",
+      "citation": {
+        "contract_id": "A3",
+        "clause_number": "1",
+        "ref": "Section 1",
+        "quote": "Section 3.2 of the SLA is deleted in its entirety and replaced with the",
+        "verified": true
+      }
+    },
+    {
+      "doc": "A2",
+      "number": "3.1",
+      "target_ref": "§3.1",
+      "by_doc": "A3",
+      "by_ref": "Section 2",
+      "by_number": "2",
+      "mode": "replaced",
+      "effective": "2027-01-01",
+      "new_text": "3.1  If the Monthly Uptime Percentage falls below the Uptime Target in any\n        calendar month, Customer will be eligible for a Service Credit as\n        specified in the table below:\n\n          Monthly Uptime Percentage          Service Credit\n          ----------------------------       -------------------------\n          99.0% to < 99.5%                   10% of Monthly Fee\n          95.0% to < 99.0%                   25% of Monthly Fee\n          Below 95.0%                        50% of Monthly Fee\n\n        'Monthly Fee' for the purpose of this SLA means the monthly Fee\n        payable under the Agreement, currently Eight Thousand U.S. Dollars\n        ($8,000.00).\n\n        Additionally, if Downtime in a single incident exceeds sixty (60)\n        consecutive minutes, Customer will receive an additional Service\n        Credit equal to five percent (5%) of the Monthly Fee for that month,\n        in addition to the credit specified in the table above. This\n        additional credit is subject to the maximum credit in Section 3.3.",
+      "citation": {
+        "contract_id": "A3",
+        "clause_number": "2",
+        "ref": "Section 2",
+        "quote": "Section 3.1 of the SLA is deleted in its entirety and replaced with the",
+        "verified": true
+      }
+    },
+    {
+      "doc": "A1",
+      "number": "B",
+      "target_ref": "Section B",
+      "by_doc": "A3",
+      "by_ref": "Section 3",
+      "by_number": "3",
+      "mode": "amended",
+      "effective": "2027-01-01",
+      "new_text": "The Non-Renewal Notice Period is changed from ninety (90) days to sixty\n  (60) days before the end of the then-current Subscription Period.\n\n  For clarity, the amended non-renewal provision reads: \"The Agreement will\n  automatically renew for successive Renewal Periods of 12 months each,\n  unless either party delivers written notice of non-renewal to the other\n  party's Notice Address at least 60 days before the end of the then-current\n  Subscription Period, in accordance with Section 5.1 of the Standard Terms.\"",
+      "citation": {
+        "contract_id": "A3",
+        "clause_number": "3",
+        "ref": "Section 3",
+        "quote": "Section B of the Cover Page (Contract ID: QH-STRATO-2026-001) is amended as",
+        "verified": true
+      }
+    }
+  ],
+  "warnings": [],
+  "clock": {
+    "start_date": "2027-01-15",
+    "checkpoints": [
+      "2027-03-15",
+      "2027-06-01",
+      "2027-09-15"
+    ]
+  }
+}

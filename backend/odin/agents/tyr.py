@@ -5,10 +5,11 @@ from typing import Literal
 
 from pydantic import BaseModel
 
-from odin.agents.base import agent_node, company_ctx, j, prompt, say, tool
-from odin.core.models import ActionDraft, ActionDraftOut, Ruling, TyrActions, TyrRulings, new_id
+from odin.agents.base import agent_node, company_ctx, j, override_note, prompt, say, tool
+from odin.core.models import clause_ref, ActionDraft, ActionDraftOut, Ruling, TyrActions, TyrRulings, new_id
 from odin.db import repo
 from odin.llm.call import structured
+from odin.services import insights
 
 APPROVAL_ALWAYS = {"termination_notice", "breach_notice", "amendment", "non_renewal_notice", "renewal_notice",
                    "payment_instruction"}
@@ -68,14 +69,27 @@ def _cited_clauses(*groups) -> str:
     keys = sorted({(c["contract_id"], c["clause_number"]) for items in groups for it in items if it
                    for c in (it.get("citations") or ([it["citation"]] if it.get("citation") else []))})
     rows = [tool("get_clause", {"contract_id": a, "clause_number": b}) for a, b in keys[:40]]
+    over = {(o.get("doc"), str(o.get("number"))): o for o in insights.clause_overrides()}
     return "<document contract_id=\"cited\">\n" + "\n".join(
-        f"[{r['contract_id']} §{r['clause_number']}] {r['text']}" for r in rows if "text" in r) + "\n</document>"
+        f"[{r['contract_id']} {clause_ref(r['clause_number'])}] {r['text']}"
+        + (f"\n{override_note(over[(r['contract_id'], r['clause_number'])])}" if (r['contract_id'], r['clause_number']) in over else "")
+        for r in rows if "text" in r) + "\n</document>"
 
 
 def _slim_findings(fs: list[dict]) -> list[dict]:
     return [{k: f.get(k) for k in ("id", "contract_id", "kind", "claim", "severity", "likelihood", "status",
-                                   "other_contract_ids")} | {"clauses": [c["clause_number"] for c in f.get("citations", [])]}
+                                   "other_contract_ids", "who", "why", "consequence", "exposure") if f.get(k)}
+            | {"clauses": [f"{c['contract_id']} {c.get('ref') or c['clause_number']}" for c in f.get("citations", [])]}
             for f in fs]
+
+
+def _notice_addresses(ids: list[str] | None) -> dict:
+    out = {}
+    for c in repo.contracts():
+        x = insights.extraction(c.contract_id) if ids is None or c.contract_id in ids else None
+        if x and x.notice and (x.notice.address or x.notice.authorized_sender):
+            out[c.contract_id] = {"address": x.notice.address, "sender": x.notice.authorized_sender}
+    return out
 
 
 def _slim_timeline(tl: dict) -> list[dict]:
@@ -93,10 +107,17 @@ def actions(state: dict) -> dict:
         for a in repo.query("action", contract_id=cid, status="draft"):
             if not a.get("event_id"):
                 repo.set_status(a["id"], "superseded")
+    head, members = insights.family_of(cid) if cid != "cross" else (cid, [cid])
+    if head != cid and state.get("mode") != "update":
+        return {}            # family members are handled by the family head's workstream
     findings = [f for f in repo.query("finding", contract_id=cid, status=["verified", "ruled", "open"])]
-    tl = tool("compute_timeline", {"contract_id": cid if cid != "cross" else None})
-    viols = repo.query("violation", contract_id=cid) if cid != "cross" else []
+    tl = tool("compute_timeline", {"contract_id": None})
+    if cid != "cross":
+        tl["contracts"] = [t for t in tl["contracts"] if t["contract_id"] in members]
+    viols = [v for m in members for v in repo.query("violation", contract_id=m)] if cid != "cross" else []
     user = (f"Today (simulated): {repo.sim_now()}\nCompany context:\n{j(company_ctx())}\n\n"
+            + (f"Document family reviewed together: {'+'.join(members)}\n" if len(members) > 1 else "")
+            + f"Counterparty notice addresses: {j(_notice_addresses(members if cid != 'cross' else None))}\n\n"
             f"Findings (status verified/ruled are confirmed; open = unconfirmed):\n{j(_slim_findings(findings))}\n\n"
             f"Timeline & exposure:\n{j(_slim_timeline(tl))}\n\nViolations:\n{j(viols)[:5000]}\n\n"
             f"Cited clause text (quote from here):\n{_cited_clauses(findings, viols)}\n\n"
@@ -127,8 +148,12 @@ def decide_event(state: dict) -> dict:
     findings = [repo.get("finding", f) for f in state.get("finding_ids", [])]
     cids = state.get("contract_ids") or []
     tl = tool("compute_timeline", {"contract_id": cids[0] if len(cids) == 1 else None})
+    holidays = [{k: h.get(k) for k in ("date", "name", "observed_by")} for h in repo.query("holiday")]
     user = (f"Today (simulated): {repo.sim_now()}\nCompany context:\n{j(company_ctx())}\n\n"
-            f"<email>\n{j({k: ev.get(k) for k in ('event_type', 'occurred_at', 'amount', 'description')})}\n</email>\n\n"
+            f"Counterparty notice addresses: {j(_notice_addresses(None))}\n"
+            + (f"Observed holidays: {j(holidays)}\n" if holidays else "") + "\n"
+            f"<email>\n{j({k: ev.get(k) for k in ('event_type', 'occurred_at', 'sender', 'recipient', 'channel', 'subject', 'amount', 'description')})}\n</email>\n\n"
+            f"HEIMDALL's reading: {j(ev.get('effect', ''))}\n\n"
             f"Suspected violations:\n{j(viols)}\n\nRisk findings after debate:\n{j(findings)}\n\n"
             f"Timeline & exposure:\n{j(_slim_timeline(tl))}\n\n"
             f"Cited clause text (quote from here):\n{_cited_clauses(findings, viols)}")

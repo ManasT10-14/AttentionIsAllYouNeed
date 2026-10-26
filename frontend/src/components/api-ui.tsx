@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useState, type ReactNode } from 'react';
 import { ExternalLink, LoaderCircle, RefreshCw } from 'lucide-react';
 import { apiUrl, dateText, formatMoney, id, list, record, text, viewerLink, type ApiRecord, type Citation } from '@/lib/api';
+import { citationLabel } from '@/lib/odin';
 import { useWorkspace } from './providers';
 import { Badge, Button, EmptyState } from './ui';
 
@@ -21,7 +22,7 @@ export function CitationChip({ value }: { value: unknown }) {
   const c = record(value);
   if (!c.contract_id || !c.clause_number) return <span className="muted-note">No citation supplied</span>;
   return <Link className={'citation-chip ' + (c.verified === false ? 'citation-warning' : '')} href={viewerLink(c as Citation)} aria-label={'Open section ' + text(c.clause_number) + ' of contract ' + text(c.contract_id) + (typeof c.page === 'number' ? ', page ' + c.page : '') + (c.verified === false ? '. Quote not found in contract' : '')} title={c.verified === false ? 'Quote not found in contract' : text(c.quote,'Open reference')}>
-    {text(c.contract_id)} · §{text(c.clause_number)}{typeof c.page === 'number' ? ' · p.' + c.page : ''}{c.verified === false ? ' · Quote not found in contract' : ''}<ExternalLink size={11} />
+    {citationLabel(c)}{typeof c.page === 'number' ? ' · p.' + c.page : ''}{c.verified === false ? ' · Quote not found in contract' : ''}<ExternalLink size={11} />
   </Link>;
 }
 export function Citations({ values }: { values: unknown }) { return <div className="citation-list">{Array.isArray(values) && values.map((c,i) => <CitationChip key={i} value={c} />)}</div>; }

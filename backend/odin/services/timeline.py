@@ -4,6 +4,7 @@ relative due rules (see agents/norns.py)."""
 from __future__ import annotations
 
 import hashlib
+import re
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
 from functools import lru_cache
@@ -41,6 +42,19 @@ def prev_business_day(d: date, country: str) -> date:
     return d
 
 
+def add_business_days(start: date, days: int, schedule: list[dict], observed_by: str = "Quillhub") -> date:
+    """Use the provided observed-date schedule verbatim; never repair its named holidays."""
+    if days < 0:
+        raise ValueError("Business-day duration must be nonnegative")
+    excluded = {date.fromisoformat(h["date"]) for h in schedule
+                if h.get("observed_by", "All").casefold() in ("all", observed_by.casefold())}
+    while days:
+        start += timedelta(days=1)
+        if start.weekday() < 5 and start not in excluded:
+            days -= 1
+    return start
+
+
 def _eid(*parts) -> str:
     return "tl-" + hashlib.sha1("|".join(map(str, parts)).encode()).hexdigest()[:12]
 
@@ -67,6 +81,8 @@ class ContractInputs:
     actions: list[dict] = field(default_factory=list)     # approved / sent ActionDraft dicts
     currency: str = "INR"
     owners: dict = field(default_factory=dict)            # timeline id → owner
+    holidays: list[dict] = field(default_factory=list)
+    ledger: list[dict] = field(default_factory=list)
     company_names: list[str] = field(default_factory=list)
 
     def incoming(self, payee: str) -> bool:
@@ -86,6 +102,28 @@ class ContractTimeline:
 
 def _cite(f) -> Optional[Citation]:
     return f.citation if f is not None else None
+
+
+def _invoice_schedule(p, effective, horizon, schedule):
+    """Derive a recurring due date only when invoice day AND payment period are stated."""
+    evidence = " ".join((p.due_rule + " " + (p.citation.quote if p.citation else "")).split())
+    period = re.search(r"(?:payment period[: ]+|within\s+)(\d+)\s+(business\s+)?days", evidence, re.I)
+    if p.frequency != "monthly" or not effective or not period or not re.search(r"first business day of (?:each|every) (?:calendar )?month", evidence, re.I):
+        return None
+    holidays_set = {date.fromisoformat(h["date"]) for h in schedule if h.get("observed_by", "").lower() == "all" or h.get("observed_by", "").lower() in p.payee.lower()}
+    month = effective.replace(day=1)
+    dates = []
+    for _ in range(120):
+        invoice = month
+        while invoice.weekday() >= 5 or invoice in holidays_set:
+            invoice += timedelta(days=1)
+        due = add_business_days(invoice, int(period.group(1)), schedule, p.payee) if period.group(2) else invoice + timedelta(days=int(period.group(1)))
+        if invoice >= effective and due <= horizon:
+            dates.append(due)
+        if due > horizon:
+            break
+        month += relativedelta(months=1)
+    return dates
 
 
 def compute(ci: ContractInputs, now: date, horizon_months: int = 12, apply_actions: bool = True) -> ContractTimeline:
@@ -148,7 +186,14 @@ def compute(ci: ContractInputs, now: date, horizon_months: int = 12, apply_actio
         if not p.amount:
             continue
         step = FREQ_MONTHS.get(p.frequency)
-        first = p.first_due or (p.first_due_at.date() if p.first_due_at else None) or eff
+        rule = p.due_rule.lower()
+        anchored_to_event = bool(re.search(r"(?:after|from|of|upon)\s+(?:the\s+)?(?:receipt|invoice|acceptance|delivery)", rule))
+        first = p.first_due or (p.first_due_at.date() if p.first_due_at else None)
+        if not first and not anchored_to_event:
+            first = eff
+        derived = _invoice_schedule(p, eff, horizon, ci.holidays)
+        if not first and derived:
+            first = derived[0]
         if not first:
             assumptions.append(f"{ci.contract_id}: payment '{p.description}' has no first due date — not scheduled.")
             continue
@@ -163,11 +208,19 @@ def compute(ci: ContractInputs, now: date, horizon_months: int = 12, apply_actio
                 dates.append(d)
                 d = first + relativedelta(months=step * (n + 1))
                 n += 1
+        if derived is not None:
+            dates = [d for d in derived if not step or d <= last]
+            assumptions.append(f"{ci.contract_id}: monthly payment dates assume invoices are issued on the stated first business day; actual receipts may change them.")
         incoming = ci.incoming(p.payee)
         for d in dates:
             st = _status(d, now)
             missed = any(abs((m - d).days) <= 45 and m >= d for m in missed_dates)
             paid = any(abs((m - d).days) <= 45 and m >= d for m in paid_dates)
+            matching_ledger = [r for r in ci.ledger if f"{d:%B %Y}".lower() in r.get("reference", "").lower()
+                               and r.get("status", "").lower() == "paid"
+                               and abs(float(r.get("amount", 0)) - p.amount.amount) < 0.01]
+            if len(matching_ledger) == 1:
+                paid = True
             if missed and not paid and "payment_instruction" not in acts:
                 st = "missed"
             elif paid:
@@ -201,8 +254,31 @@ def compute(ci: ContractInputs, now: date, horizon_months: int = 12, apply_actio
                                               amount=Money(amount=round(fee, 2), currency=p.amount.currency),
                                               month=now.strftime("%Y-%m"), clause_type="penalty", citation=p.citation))
 
+    # Stated milestone dates and receipt-triggered acceptance windows.
+    for i, milestone in enumerate(x.milestones):
+        if milestone.due_date:
+            entries.append(TimelineEntry(id=_eid(ci.contract_id, "milestone", i), contract_id=ci.contract_id,
+                                         date=milestone.due_date, kind="obligation", status=_status(milestone.due_date, now),
+                                         title=f"{milestone.name}: {milestone.description}"[:160], citation=milestone.citation))
+        window = re.search(r"(?:\(\s*(\d+)\s*\)|\b(\d+))\s+business\s+days", milestone.acceptance_rule, re.I)
+        if not window or not milestone.name:
+            continue
+        for ev in ci.events:
+            if ev.event_type != "DELIVERY_RECEIVED" or not re.search(r"(?<!\w)" + re.escape(milestone.name) + r"(?!\w)", ev.subject + " " + ev.description, re.I):
+                continue
+            due = add_business_days(ev.occurred_at.date(), int(window.group(1) or window.group(2)), ci.holidays)
+            entries.append(TimelineEntry(id=_eid(ci.contract_id, "review", ev.id, milestone.name),
+                                         contract_id=ci.contract_id, date=due, kind="obligation", status=_status(due, now),
+                                         title=f"{milestone.name}: acceptance review deadline; verify rejection history",
+                                         citation=milestone.citation))
+            assumptions.append(f"{milestone.name}: review deadline uses the recorded receipt date; no conclusion about acceptance without checking rejection/correction notices.")
+
     # ── obligations with dates ──
     for i, o in enumerate(x.obligations):
+        conditional = re.search(r"cancel|materially reduc|non-renew|incident|after receipt|upon receipt", o.due_rule, re.I)
+        if conditional and not ci.events:
+            assumptions.append(f"{ci.contract_id}: trigger for '{o.description}' has not been recorded; deadline remains unknown.")
+            continue
         due = o.due_date or (o.due_at.date() if o.due_at else None)
         if due:
             entries.append(TimelineEntry(id=_eid(ci.contract_id, "obl", i, due), contract_id=ci.contract_id,
@@ -226,7 +302,11 @@ def compute(ci: ContractInputs, now: date, horizon_months: int = 12, apply_actio
 
     # ── worst case: every un-triggered penalty with a number fires once ──
     for pen in x.penalties:
+        if pen.direction == "receivable":
+            continue
         amt = pen.amount or pen.cap
+        if amt and pen.cap and amt.currency == pen.cap.currency and amt.amount > pen.cap.amount:
+            amt = pen.cap
         if amt:
             worst_extra.append(ExposureLine(contract_id=ci.contract_id, label=f"Penalty if triggered: {pen.trigger}"[:120],
                                             amount=amt, month=(end or horizon).strftime("%Y-%m"), clause_type="penalty",
@@ -237,6 +317,12 @@ def compute(ci: ContractInputs, now: date, horizon_months: int = 12, apply_actio
 
     expected = sum(l.amount.amount for l in lines)
     worst = expected + sum(l.amount.amount for l in worst_extra)
+    for i, line in enumerate(worst_extra):
+        when = date.fromisoformat(line.month + "-01") if line.month else horizon
+        entries.append(TimelineEntry(id=_eid(ci.contract_id, "worst_case", i), contract_id=ci.contract_id,
+                                     date=max(now, when), kind="penalty_trigger", scenario="worst_case",
+                                     status="upcoming", title="If no action: " + line.label,
+                                     amount=line.amount, citation=line.citation))
     entries.sort(key=lambda e: e.date)
     return ContractTimeline(ci.contract_id, entries,
                             Exposure(as_of=now, expected=round(expected, 2), worst_case=round(worst, 2), currency=cur,

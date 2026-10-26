@@ -97,10 +97,21 @@ def tool(name: str, args=None, **kw):
     return REGISTRY.invoke(current().agent, name, args, **kw)
 
 
+def override_note(o: dict) -> str:
+    return (f"[SUPERSEDED — as amended by {o.get('by_doc')} {o.get('by_ref')} effective {o.get('effective')}. "
+            f"Effective text from that date: {(o.get('new_text') or '').strip()[:1500]}]")
+
+
 def doc_block(rows: list[ClauseRow], max_chars: int = 90000) -> str:
+    """Clauses tagged with the citation standard (`A2 §3.2`); amended clauses carry their effective text."""
+    from odin.core.models import clause_ref
+    from odin.services.insights import clause_overrides
+    over = {(o.get("doc"), str(o.get("number"))): o for o in clause_overrides()} if rows else {}
     out, n = [], 0
     for r in rows:
-        chunk = f"[{r.contract_id} | clause {r.number} | p.{r.page}]\n{r.text}\n"
+        o = over.get((r.contract_id, r.number))
+        chunk = (f"[{r.contract_id} {getattr(r, 'ref', None) or clause_ref(r.number)} | clause_number {r.number} | {getattr(r, 'heading', '')} "
+                 f"| p.{r.page}]\n{r.text}\n" + (override_note(o) + "\n" if o else ""))
         if n + len(chunk) > max_chars:
             out.append("…(document truncated — ask for specific clauses with get_clause)")
             break
@@ -109,7 +120,7 @@ def doc_block(rows: list[ClauseRow], max_chars: int = 90000) -> str:
         HOOKS.record("document", current().agent, None,
                      {"contract_id": r.contract_id, "version": r.version, "clause_number": r.number,
                       "company_id": r.company_id, "text": r.text}, {})
-    cid = rows[0].contract_id if rows else "?"
+    cid = ",".join(dict.fromkeys(r.contract_id for r in rows)) or "?"
     return f'<document contract_id="{cid}">\n' + "\n".join(out) + "\n</document>"
 
 

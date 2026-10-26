@@ -7,11 +7,12 @@ Two families:
 """
 from __future__ import annotations
 
+import re
 import uuid
 from datetime import date, datetime
 from typing import Annotated, Literal, Optional
 
-from pydantic import BaseModel, BeforeValidator, Field
+from pydantic import BaseModel, BeforeValidator, Field, model_serializer, model_validator
 
 
 def _clamp_severity(v):
@@ -41,13 +42,63 @@ class Money(BaseModel):
     currency: str = "INR"
 
 
+_REF_PREFIX = re.compile(r"^(?:section|sec\.?|clause|§)\s*", re.I)
+
+
+def clause_number_of(ref: str) -> str:
+    """'§3.2' / 'Section B' / 'Section 4.3' / 'Section D §3.3' -> stored number '3.2' / 'B' / '4.3' / '3.3'."""
+    s = (ref or "").strip().rstrip(".")
+    if re.match(r"^section\s+[A-Z]\s*§", s, re.I):          # cover-page sub-clause, e.g. "Section D §3.3"
+        return s.split("§", 1)[1].strip()
+    return _REF_PREFIX.sub("", s).strip() or s
+
+
+def clause_ref(number: str) -> str:
+    """Display reference as written in the dev-pack documents: '3.2' -> '§3.2', 'B' / '1' / 'I.1' -> 'Section …'."""
+    n = (number or "").strip()
+    if re.fullmatch(r"\d+(?:\.\d+)+", n):
+        return f"§{n}"
+    if re.fullmatch(r"\d+|[A-Z](?:\.\d+)*", n):
+        return f"Section {n}"
+    return n
+
+
 class Citation(BaseModel):
-    contract_id: str = Field(description="CONTRACT ID from the cover block, e.g. MSA-2026-001")
-    clause_number: str = Field(description='Clause number exactly as printed, e.g. "2.2" or "SCHEDULE A"')
-    quote: str = Field(description="Verbatim supporting text copied from the clause (<= 300 chars)")
+    contract_id: str = Field(description='Document ID = file name stem, e.g. "A1", "STD", "B2"')
+    clause_number: str = Field(description='Clause number without prefix, e.g. "3.2" for §3.2, "B" for Section B')
+    quote: str = Field(description="Verbatim supporting text copied from the clause (<= 300 chars, one passage)")
+    ref: Optional[str] = Field(None, description='Clause reference as written, e.g. "§3.2", "Section B", "Section 1"')
     page: Optional[int] = None
     version: Optional[int] = None
     verified: bool = False          # set by the citation guard, never by the LLM
+
+    @model_validator(mode="before")
+    @classmethod
+    def _split_ref(cls, d):
+        # models write "§3.2" / "Section B" into clause_number: keep it as ref, store the bare number
+        if isinstance(d, dict) and d.get("clause_number"):
+            raw = str(d["clause_number"]).strip()
+            num = clause_number_of(raw)
+            if num != raw:
+                d = {**d, "clause_number": num, "ref": d.get("ref") or raw}
+        return d
+
+    @model_serializer(mode="wrap")
+    def _with_ref(self, nxt):
+        out = nxt(self)
+        if isinstance(out, dict):   # derived at dump time: a guard-corrected clause_number never leaves a stale ref
+            out["ref"] = self.display_ref
+        return out
+
+    @property
+    def display_ref(self) -> str:
+        r = self.ref
+        return r if r and clause_number_of(r) == self.clause_number else clause_ref(self.clause_number)
+
+    @property
+    def label(self) -> str:
+        """`A2 §3.2` — the citation standard's DocID + clause reference."""
+        return f"{self.contract_id} {self.display_ref}"
 
 
 FieldStatus = Literal["found", "ambiguous", "missing", "contradictory", "unverified"]
@@ -64,6 +115,15 @@ class Party(BaseModel):
                                     'e.g. "Controller", "Processor", "Supplier", "Customer", "Landlord"')
 
 
+class InsurancePolicy(BaseModel):
+    type: str = ""                      # e.g. "Commercial General Liability"
+    insurer: str = ""
+    policy_number: str = ""
+    coverage: str = ""                  # as written, e.g. "$2,000,000 per occurrence / $5,000,000 aggregate"
+    effective: Optional[date] = None
+    expiry: Optional[date] = None
+
+
 class CompanyContext(BaseModel):
     name: str = ""
     industry: str = ""
@@ -75,6 +135,8 @@ class CompanyContext(BaseModel):
     contacts: list[str] = []
     priorities: str = ""
     critical_deps: str = ""
+    insurance: list[InsurancePolicy] = []
+    notice_address: str = ""
     raw_text: str = ""
 
 
@@ -194,7 +256,44 @@ class PeriodField(Sourced):
 class RelatedContractField(Sourced):
     contract_ref: str = Field(description="Contract ID exactly as written, e.g. C01")
     relation: Literal["depends_on", "supplies", "replaces", "does_not_replace", "separate_agreement", "amends",
-                      "related"]
+                      "incorporates", "addendum_to", "related"]
+
+
+class ServiceLevelField(Sourced):
+    """An uptime / availability commitment and how it is remedied."""
+    provider: str = Field("", description="Party that gives the commitment")
+    target_pct: Optional[float] = Field(None, description="e.g. 99.9")
+    measurement: str = Field("", description='e.g. "calendar month, excluding Scheduled Maintenance"')
+    maintenance_rule: str = Field("", description="Notice / length / frequency that makes maintenance excluded")
+    credit_rule: str = Field("", description='e.g. "15% of Monthly Fee"; tiers as written')
+    credit_cap: str = Field("", description='e.g. "20% of the Monthly Fee per month"')
+    claim_window_days: Optional[int] = Field(None, description="Days after month end to request a credit")
+    sole_remedy: Optional[bool] = None
+    termination_right: str = Field("", description="Termination right for persistent misses, if any")
+
+
+class ExclusivityField(Sourced):
+    grantee: str = ""
+    product: str = Field("", description="Product / tiers covered")
+    sector: str = Field("", description="Customer segment as defined")
+    territory: str = Field("", description='e.g. "headquartered in Washington and Oregon"')
+
+
+class InsuranceRequirementField(Sourced):
+    insured: str = Field("", description="Party that must hold the insurance")
+    coverage_type: str = Field("", description='e.g. "Commercial General Liability"')
+    min_limit: Optional[Money] = None
+    limit_basis: str = Field("", description='e.g. "per occurrence", "per claim"')
+    duration: str = Field("", description='e.g. "throughout the Subscription Period"')
+    lapse_consequence: str = Field("", description="Notice duty and remedy if the policy lapses")
+
+
+class MilestoneField(Sourced):
+    name: str = Field("", description='e.g. "M3"')
+    description: str = ""
+    due_date: Optional[date] = None
+    amount: Optional[Money] = None
+    acceptance_rule: str = Field("", description='e.g. "10 business days review, else deemed accepted"')
 
 
 class NoticeField(Sourced):
@@ -225,13 +324,20 @@ class ContractExtraction(BaseModel):
     notice: Optional[NoticeField] = None
     periods: list[PeriodField] = []
     related_contracts: list[RelatedContractField] = []
+    service_levels: list[ServiceLevelField] = []
+    exclusivity: list[ExclusivityField] = []
+    insurance_requirements: list[InsuranceRequirementField] = []
+    milestones: list[MilestoneField] = []
+    precedence: list[SimpleField] = Field([], description='Order-of-precedence statements, e.g. '
+                                          '"Cover Page controls over the Standard Terms"')
     flags: list[AmbiguityFlag] = []
 
 
 # Every Sourced field of ContractExtraction, in one place (merge, digest, citation guard).
 EXTRACTION_ONE_FIELDS = ("term", "renewal", "liability_cap", "governing_law", "forum", "notice")
 EXTRACTION_LIST_FIELDS = ("payments", "obligations", "penalties", "compliance", "termination", "periods",
-                          "related_contracts")
+                          "related_contracts", "service_levels", "exclusivity", "insurance_requirements",
+                          "milestones", "precedence")
 
 
 class ClauseReextraction(BaseModel):
@@ -249,6 +355,7 @@ TimelineKind = Literal["payment", "renewal", "notice_deadline", "penalty_trigger
 
 
 class TimelineEntry(BaseModel):
+    scenario: Literal["baseline", "worst_case"] = "baseline"
     id: str
     contract_id: str
     date: date
@@ -294,6 +401,10 @@ class LokiFindingDraft(BaseModel):
     severity: Score5
     likelihood: Unit
     other_contract_ids: list[str] = Field(default=[], description="For cross-contract conflicts")
+    who: str = Field("", description="Who did / can do what (party + action or event, with date)")
+    why: str = Field("", description='Why it matters: the clause and threshold, as "DocID ref"')
+    consequence: str = Field("", description="Legal / financial consequence: who pays whom, how much, breach status")
+    exposure: Optional[Money] = Field(None, description="Amount at stake computed only from contract numbers")
 
 
 class ClarificationDraft(BaseModel):
@@ -383,11 +494,15 @@ class Event(ParsedEvent):
     sender: str = ""
     subject: str = ""
     raw: str = ""
-    parse_method: Literal["strict", "llm", "manual", "demo"] = "strict"
+    parse_method: Literal["strict", "llm", "manual", "demo", "jsonl", "free_text"] = "strict"
     parse_confidence: float = 1.0
-    status: Literal["received", "processing", "processed", "rejected", "noise", "quarantined"] = "received"
+    status: Literal["received", "processing", "processed", "rejected", "noise", "quarantined", "needs_review"] = "received"
     reject_reason: str = ""
     scenario_id: Optional[str] = None
+    channel: str = ""                 # email | system | status_log | phone | ...
+    recipient: str = ""               # "to" of the pack event / email
+    source: str = "manual"            # drop1 | drop2 | gmail | manual
+    line: Optional[int] = None        # line number in the drop file
 
 
 class ViolationDraft(BaseModel):
@@ -401,6 +516,7 @@ class ViolationDraft(BaseModel):
 
 
 class EventMapping(BaseModel):
+    event_type: Optional[EventType] = Field(None, description="Classify the actual event; DELIVERY_RECEIVED only for an actual deliverable receipt, not a promise or planned delivery")
     """Heimdall's reading of one event (FR5.1/5.3)."""
     is_noise: bool
     noise_reason: str = ""

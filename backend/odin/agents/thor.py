@@ -30,8 +30,10 @@ def extract(state: dict) -> dict:
         return {}
     rows = repo.clauses(cid, ver, current_only=False)
     c = repo.contract(cid)
+    rels = [r for r in insights.doc_relations() if cid in (r.get("from_doc"), r.get("to_doc"))]
     user = (f"Company context:\n{j(company_ctx())}\n\nContract cover metadata:\n{j(c.meta)}\n\n"
-            f"Contract text (clauses):\n{doc_block(rows)}")
+            + (f"Document relations (recorded at ingest):\n{j(rels)}\n\n" if rels else "")
+            + f"Contract text (clauses):\n{doc_block(rows)}")
     x = structured("thor", ContractExtraction, prompt("thor"), user, meta={"contract_id": cid, "version": ver})
     tool("save_extraction", {"contract_id": cid, "version": ver, "extraction": x.model_dump(mode="json")})
     s = summarize(insights.extraction(cid, ver))

@@ -2,9 +2,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Activity, Coins, Gauge, Hash, ShieldCheck, ShieldOff, Timer, Workflow } from 'lucide-react';
+import { activityTimeText } from '@/lib/activity-time';
+import { useWorkspace } from './providers';
 import { useResource } from '@/lib/use-resource';
 import { runTitle } from '@/lib/run-presentation';
-import { dateTimeText, list, number, query, record, text, type ApiRecord } from '@/lib/api';
+import { list, number, query, record, text, type ApiRecord } from '@/lib/api';
 import { PageTitle, Panel, PanelTitle } from './ui';
 import { FieldValue, ResourceState, SourceBadge, Status, TraceLink } from './api-ui';
 import '@/app/insights-views.css';
@@ -18,6 +20,7 @@ function Bar({ value, max }: { value: number; max: number }) { return <span clas
 function Kpi({ icon: Icon, label, value, hint, tone }: { icon: typeof Activity; label: string; value: string; hint?: string; tone?: string }) { return <div className={'ob-kpi' + (tone ? ' ' + tone : '')}><span><Icon size={14} aria-hidden />{label}</span><strong>{value}</strong>{hint && <small>{hint}</small>}</div>; }
 
 export function ObservabilityView() {
+  const { timeZone } = useWorkspace(); const dateTimeText = (value: unknown) => activityTimeText(value, timeZone);
   const contracts = useResource('/api/contracts'); const events = useResource('/api/events');
   const r = useResource('/api/observability'); const tools = useResource('/api/tools'); const calibration = useResource('/api/insights/calibration');
   const [selected, setSelected] = useState(''); const [step, setStep] = useState(0); const [agent, setAgent] = useState(''); const [tool, setTool] = useState(''); const [blocked, setBlocked] = useState(false);

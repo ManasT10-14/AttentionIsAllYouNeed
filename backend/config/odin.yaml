@@ -47,7 +47,7 @@ agents:
   tyr: {models: {openai: moonshotai.kimi-k2.5, bedrock: moonshotai.kimi-k2.5}, max_tokens: 4000}        # rulings + ready-to-send drafts
   synth: {models: {openai: moonshotai.kimi-k2.5, bedrock: moonshotai.kimi-k2.5}, max_tokens: 1500}
   email_parse: {models: {openai: moonshotai.kimi-k2.5, bedrock: moonshotai.kimi-k2.5}, max_tokens: 1500}
-  ask: {models: {openai: moonshotai.kimi-k2.5, bedrock: moonshotai.kimi-k2.5}, max_tokens: 2000}
+  ask: {models: {openai: moonshotai.kimi-k2.5, bedrock: moonshotai.kimi-k2.5}, max_tokens: 2000, max_retries: 0, timeout_s: 45, schema_repair: false, fallback: [bedrock]}
 
 limits:
   max_clarify_rounds: 2
@@ -76,7 +76,7 @@ email:
   poll_seconds: 15
   subject_prefix: "[ODIN-EVENT]"
   processed_label: "ODIN/processed"
-  auto_reply_on_reject: true
+  auto_reply_on_reject: false
 
 # Runtime guard (odin/security): injection detection on uploads / emails / tool results, secret+PII redaction
 # of LLM inputs, tool scope + tenant checks. Detections are `security_event` records (Security page).

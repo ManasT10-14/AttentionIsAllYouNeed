@@ -82,3 +82,34 @@ test('development proxy preserves the static frontend and handles callback befor
  assert.ok(!Array.isArray(rewrites)&&rewrites.beforeFiles?.some(rule=>rule.source==='/api/:path*'));
  assert.ok(!Array.isArray(rewrites)&&rewrites.beforeFiles?.some(rule=>rule.source==='/auth/google/callback'));
 });
+
+test('Ask gets a longer timeout while other requests retain the default and caller abort still works', async () => {
+ const { api } = await client;
+ const originalFetch = globalThis.fetch; const originalTimeout = AbortSignal.timeout;
+ const deadlines: number[] = []; const caller = new AbortController();
+ AbortSignal.timeout = (ms: number) => { deadlines.push(ms); return new AbortController().signal; };
+ globalThis.fetch = async (_url, init) => {
+  assert.ok(init?.signal);
+  if (String(_url).endsWith('/api/ask')) { caller.abort(); assert.equal(init?.signal?.aborted, true); }
+  return Response.json({ answer: 'stubbed' });
+ };
+ try {
+  await api('/api/ask', { method: 'POST', signal: caller.signal });
+  await api('/api/actions/test', { method: 'POST' });
+  assert.deepEqual(deadlines, [240000, 30000]);
+ } finally { globalThis.fetch = originalFetch; AbortSignal.timeout = originalTimeout; }
+});
+
+test('compiled local mode retains API and auth proxy without static export or route compilation', async () => {
+ const previous = process.env.ODIN_LOCAL_SERVER;
+ try {
+  process.env.ODIN_LOCAL_SERVER = '1';
+  const config = (await import('../next.config')).default('phase-production-build');
+  assert.equal(config.output, undefined);
+  assert.equal(config.distDir, '.next-local');
+  assert.equal(config.compress, false);
+  const rules = await config.rewrites!();
+  assert.ok(!Array.isArray(rules) && rules.beforeFiles?.some(r => r.source === '/api/:path*'));
+  assert.ok(!Array.isArray(rules) && rules.beforeFiles?.some(r => r.source === '/auth/google/callback'));
+ } finally { if (previous === undefined) delete process.env.ODIN_LOCAL_SERVER; else process.env.ODIN_LOCAL_SERVER = previous; }
+});

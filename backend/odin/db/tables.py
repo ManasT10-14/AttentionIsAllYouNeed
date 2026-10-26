@@ -89,6 +89,8 @@ class ClauseRow(Base):
     version: Mapped[int] = mapped_column(Integer)
     is_current: Mapped[bool] = mapped_column(Boolean, default=True)
     number: Mapped[str] = mapped_column(String)
+    ref: Mapped[str | None] = mapped_column(String, nullable=True)          # as written: §3.2, Section B
+    parent_ref: Mapped[str | None] = mapped_column(String, nullable=True)   # enclosing section (Section D)
     heading: Mapped[str] = mapped_column(Text, default="")
     text: Mapped[str] = mapped_column(Text)
     clause_type: Mapped[str] = mapped_column(String, default="general")

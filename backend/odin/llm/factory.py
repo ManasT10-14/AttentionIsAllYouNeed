@@ -42,10 +42,10 @@ def max_tokens_for(agent: str) -> int | None:
 
 
 @lru_cache(maxsize=64)
-def chat_model(name: str, temperature: float = 0.0, model: str | None = None, max_tokens: int | None = None):
+def chat_model(name: str, temperature: float = 0.0, model: str | None = None, max_tokens: int | None = None, timeout_s: float = 120):
     cfg = {**provider_cfg(name), **({"model": model} if model else {})}
     kind = cfg["kind"]
-    common = dict(temperature=temperature, max_retries=0, timeout=120)
+    common = dict(temperature=temperature, max_retries=0, timeout=timeout_s)
     if kind == "openai":
         from langchain_openai import ChatOpenAI
         kw = dict(model=cfg["model"], api_key=cfg["api_key"], seed=7, **common)

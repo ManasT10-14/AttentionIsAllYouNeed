@@ -11,7 +11,7 @@ from fastapi.responses import RedirectResponse
 from sse_starlette.sse import EventSourceResponse
 from starlette.middleware.sessions import SessionMiddleware
 
-from odin.api import auth, quality, routes, workflow
+from odin.api import auth, quality, routes, workflow, pack
 from odin.api.deps import current_user
 from odin.core import bus
 from odin.core.config import settings
@@ -25,6 +25,8 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name
 async def lifespan(app: FastAPI):
     settings()
     init_db()
+    from odin.services.runs import recover_interrupted_runs
+    recover_interrupted_runs()
     bus.bind_loop(asyncio.get_running_loop())
     from odin.email import poller
     poller.start()
@@ -40,6 +42,7 @@ app.add_middleware(CORSMiddleware, allow_origins=[settings().frontend_url], allo
 app.include_router(auth.router, prefix="/api")
 app.include_router(auth.router)                # Google redirect URI (/auth/google/callback)
 app.include_router(routes.router, prefix="/api")
+app.include_router(pack.router, prefix="/api")
 app.include_router(workflow.router, prefix="/api")
 app.include_router(quality.router, prefix="/api")      # security + evals (installs both hooks)
 

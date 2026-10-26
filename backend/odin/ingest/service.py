@@ -12,7 +12,8 @@ from odin.core.config import DATA_DIR, odin_config
 from odin.core.hooks import HOOKS
 from odin.core.models import CompanyContext, new_id
 from odin.db.session import db
-from odin.db.tables import ClauseRow, Company, Contract, ContractVersion
+from odin.db.tables import ClauseRow, Company, Contract, ContractVersion, Record
+from odin.ingest import pack
 from odin.ingest.parse import docx_to_pdf, image_to_pdf, parse_money, parse_pdf, text_to_pdf
 from odin.retrieval.hybrid import chunk_header, embed_passages
 
@@ -35,7 +36,10 @@ def _safe(name: str) -> str:
     return re.sub(r"[^A-Za-z0-9_.-]+", "_", name)[:80]
 
 
-def ingest_contract(company_id: str, filename: str, content: bytes) -> IngestResult:
+def ingest_contract(company_id: str, filename: str, content: bytes, *, twin_pdf: bytes | None = None,
+                    doc_id: str | None = None, title: str | None = None) -> IngestResult:
+    """doc_id forces the Document ID (bundle: filename stem); otherwise cover CONTRACT ID, else the stem.
+    A dev-pack .txt is the canonical citation text; twin_pdf (or a rendering of the txt) feeds the viewer."""
     ext = Path(filename).suffix.lower()
     if ext not in (".pdf", ".docx", ".txt", ".md", *IMAGE_EXTS):
         raise ValueError(f"Unsupported file type {ext} — use PDF, DOCX or a scanned image (PNG/JPG/TIFF).")
@@ -46,7 +50,18 @@ def ingest_contract(company_id: str, filename: str, content: bytes) -> IngestRes
     src.write_bytes(content)
     pdf = stage / "document.pdf"
     warnings: list[str] = []
-    if ext == ".pdf":
+    canonical = None
+    if ext in (".txt", ".md"):
+        canonical = content.decode("utf-8-sig", errors="replace").replace("\r\n", "\n").replace("\r", "\n")
+        if not pack.is_pack(canonical):
+            canonical = None
+    if canonical is not None:
+        if twin_pdf:
+            pdf.write_bytes(twin_pdf)
+        else:
+            text_to_pdf(canonical, pdf)
+            warnings.append("No PDF twin — viewer shows a rendering of the canonical text.")
+    elif ext == ".pdf":
         pdf.write_bytes(content)
     elif ext == ".docx":
         warnings += docx_to_pdf(src, pdf)
@@ -55,7 +70,15 @@ def ingest_contract(company_id: str, filename: str, content: bytes) -> IngestRes
     else:
         text_to_pdf(content.decode("utf-8", errors="replace"), pdf)
 
-    doc = parse_pdf(pdf, fallback_id=_safe(Path(filename).stem).upper())
+    fallback = _safe(Path(filename).stem).upper()
+    if canonical is not None:
+        doc, doc.extra = pack.parse_pack(canonical, pdf, doc_id, fallback, title or "")
+    else:
+        doc = parse_pdf(pdf, fallback_id=fallback)
+        if doc_id:
+            doc.cover.contract_id = doc_id
+        if title:
+            doc.cover.title = title
     HOOKS.on_ingest(doc.text, {"company_id": company_id, "filename": filename})
     warnings += doc.warnings
     cover = doc.cover
@@ -74,20 +97,28 @@ def ingest_contract(company_id: str, filename: str, content: bytes) -> IngestRes
             version = max(prev + 1, cover.version or 0)
         else:
             prev = None
-            version = cover.version or 1
+            deleted = s.scalars(select(Record).where(Record.company_id == company_id,
+                                 Record.contract_id == cid, Record.kind == "contract_deletion")).all()
+            last_deleted = max((r.data.get("last_version", 0) for r in deleted), default=0)
+            version = max(last_deleted + 1, cover.version or 1)
 
     final = DATA_DIR / company_id / _safe(cid) / f"v{version}"
-    final.mkdir(parents=True, exist_ok=True)
-    (final / src.name).write_bytes(src.read_bytes())
-    (final / "document.pdf").write_bytes(pdf.read_bytes())
 
     headers = [chunk_header(cid, version, c.number, c.heading) + "\n" + c.text[:1800] for c in doc.clauses]
     vectors = (embed_passages(headers) if odin_config()["retrieval"].get("dense_enabled", True)
                else [None] * len(headers)) if headers else []
 
-    cover_json = cover.model_dump(mode="json")
+    cover_json = {**cover.model_dump(mode="json"), **getattr(doc, "extra", {})}
     cover_json["version"] = version
+    expected_id = existing.id if existing else None
     with db() as s:
+        s.scalar(select(Company).where(Company.id == company_id).with_for_update())
+        current = s.scalar(select(Contract).where(Contract.company_id == company_id, Contract.contract_id == cid))
+        if (current.id if current else None) != expected_id or (current and current.current_version != prev):
+            raise ValueError("Contract changed or was deleted during upload; retry the upload")
+        final.mkdir(parents=True, exist_ok=True)
+        (final / src.name).write_bytes(src.read_bytes())
+        (final / "document.pdf").write_bytes(pdf.read_bytes())
         if prev is None:
             s.add(Contract(id=new_id("ctr"), company_id=company_id, contract_id=cid, title=cover.title or cid,
                            type=cover.type, current_version=version, meta=cover_json, status="ingested"))
@@ -103,6 +134,7 @@ def ingest_contract(company_id: str, filename: str, content: bytes) -> IngestRes
         for c, v in zip(doc.clauses, vectors):
             s.add(ClauseRow(id=f"{company_id}:{cid}:v{version}:{c.number}", company_id=company_id, contract_id=cid,
                             version=version, is_current=True, number=c.number, heading=c.heading, text=c.text,
+                            ref=getattr(c, "ref", None), parent_ref=getattr(c, "parent_ref", None),
                             clause_type=c.clause_type, page=c.page, char_start=c.char_start,
                             char_end=c.char_end, bboxes=c.bboxes, embedding=v))
     return IngestResult(cid, version, prev is not None, prev, len(doc.clauses), warnings)
@@ -115,7 +147,80 @@ _CTX_KEYS = {"COMPANY NAME": "name", "INDUSTRY": "industry", "HQ / JURISDICTIONS
              "STRATEGIC PRIORITIES": "priorities", "CRITICAL DEPENDENCIES": "critical_deps"}
 
 
+def _sections(text: str) -> dict[str, list[str]]:
+    """ALL-CAPS heading underlined with dashes → its lines (dev-pack company/context.txt)."""
+    out: dict[str, list[str]] = {"": []}
+    cur = ""
+    lines = text.splitlines()
+    for i, ln in enumerate(lines):
+        if i + 1 < len(lines) and re.fullmatch(r"[A-Z][A-Z0-9 &/'-]{2,60}(?:\([a-z ]+\))?", ln.strip()) and re.fullmatch(r"-{3,}", lines[i + 1].strip()):
+            cur = ln.strip().upper()
+            out[cur] = []
+        elif not re.fullmatch(r"[-=]{3,}", ln.strip()):
+            out[cur].append(ln)
+    return out
+
+
+def parse_pack_context(text: str) -> CompanyContext:
+    """Dev-pack context.txt: LEGAL NAME / JURISDICTION header, signatories, notice addresses, insurance."""
+    from odin.core.models import InsurancePolicy
+    from odin.ingest.parse import parse_date
+    sec = _sections(text)
+    head = {m.group(1).strip().upper(): m.group(2).strip()
+            for m in re.finditer(r"^([A-Z][A-Z ]+):\s+(.+)$", "\n".join(sec[""]), re.M)}
+    contacts: list[str] = []
+    sig = sec.get("AUTHORIZED SIGNATORIES", [])
+    for i, ln in enumerate(sig):
+        m = re.match(r"^\s*\d+\.\s+(.+?),\s+(.+)$", ln)
+        if m:
+            mail = next((re.search(r"\S+@\S+", x).group(0) for x in sig[i + 1:i + 3] if "@" in x), "")
+            contacts.append(f"{m.group(1)}, {m.group(2)} (authorized signatory) <{mail}>")
+    for ln in sec.get("KEY PERSONNEL (OPERATIONS)", []):
+        m = re.match(r"^\s*(.+?),\s+(.+?)\s+[—–-]\s+(\S+@\S+)", ln)
+        if m:
+            contacts.append(f"{m.group(1)}, {m.group(2)} <{m.group(3)}>")
+    notice, blocks, cur = "", [], None
+    for ln in sec.get("NOTICE ADDRESSES", []):
+        if re.match(r"^For .+:$", ln.strip()):
+            cur = [ln.strip().rstrip(":")]
+            blocks.append(cur)
+        elif cur is not None and ln.strip():
+            cur.append(ln.strip().replace("Email: ", ""))
+    for b in blocks:
+        if "contractual" in b[0].lower() or "legal" in b[0].lower():
+            notice = ", ".join(b[1:])
+        else:
+            contacts.append(f"{b[0]}: " + ", ".join(b[1:]))
+    insurance, pol = [], None
+    keys = {"policy": "type", "insurer": "insurer", "policy no.": "policy_number", "coverage": "coverage",
+            "effective": "effective", "expiry": "expiry"}
+    for ln in sec.get("INSURANCE", []):
+        m = re.match(r"^\s*([A-Za-z. ]+?):\s+(.+)$", ln)
+        if not m or m.group(1).lower() not in keys:
+            continue
+        k, v = keys[m.group(1).lower()], m.group(2).strip()
+        if k == "type":
+            pol = {}
+            insurance.append(pol)
+        if pol is not None:
+            pol[k] = parse_date(v) if k in ("effective", "expiry") else v
+    desc = " ".join(" ".join(sec.get("BUSINESS DESCRIPTION", [])).split())
+    sentences = re.split(r"(?<=\.)\s+(?=[A-Z])", desc)
+    if head.get("PRINCIPAL OFFICE"):
+        contacts.insert(0, f"Principal office: {head['PRINCIPAL OFFICE']}")
+    fy = parse_date((head.get("FISCAL YEAR") or "").split("–")[0].split("-")[0] + " 2000")
+    juris = head.get("JURISDICTION", "")
+    return CompanyContext(name=head.get("LEGAL NAME", ""), industry=sentences[0][:300],
+                          critical_deps=" ".join(x for x in sentences if "relies on" in x or "third-party" in x),
+                          jurisdictions=[juris] if juris else [],
+                          base_currency="USD" if "United States" in juris else "INR",
+                          fiscal_year_start=fy.strftime("%m-%d") if fy else "01-01", contacts=contacts,
+                          insurance=[InsurancePolicy(**p) for p in insurance], notice_address=notice, raw_text=text)
+
+
 def parse_company_context(text: str) -> CompanyContext:
+    if re.search(r"^LEGAL NAME:", text, re.M):
+        return parse_pack_context(text)
     vals: dict = {"raw_text": text}
     for line in text.splitlines():
         m = re.match(r"^\s*([A-Z][A-Z /]+?)\s*:\s*(.+?)\s*$", line)

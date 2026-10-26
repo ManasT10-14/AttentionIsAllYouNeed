@@ -33,5 +33,23 @@ Hard rules
   says this contract does NOT replace another, use "does_not_replace".
 - forum: the court or arbitration city. notice: the counterparty's notice address and any named sender.
 - Only extract what the contract says. Analysis and opinions belong to other agents.
+- Citations follow the citation standard: contract_id = Document ID (file stem, e.g. "A1", "STD"),
+  clause_number = the bare number shown as `clause_number` in the document block ("3.2", "B", "1"),
+  ref = the reference as written ("§3.2", "Section B", "Section 1"), quote = one verbatim passage.
+- Document families: a Cover Page incorporates the Standard Terms (STD) and the Cover Page controls where
+  they conflict; an SLA incorporated into a cover page controls for uptime and service credits if it says
+  so; an amendment controls over the document it amends from its effective date; a DPA/addendum controls
+  for data processing and breach notification. Extract the EFFECTIVE terms: when a clause is marked
+  SUPERSEDED, extract the amended value, cite the amending document (e.g. A3 Section 1) and say in note
+  "as amended by A3 Section 1 effective 2027-01-01 (was: ...)". Record every incorporates / amends /
+  addendum_to reference in related_contracts and every precedence statement in `precedence`.
+- Fill the dedicated lists whenever the text has them:
+  service_levels (uptime target %, maintenance rule, credit tiers, credit cap, claim window days, sole
+  remedy, termination for persistent misses); exclusivity (grantee, product/tiers, sector, territory);
+  insurance_requirements (coverage type, minimum limit and basis, duration, lapse notice/consequence);
+  milestones (name, deliverable, due date, amount, acceptance / deemed-acceptance rule).
+  Also extract the liability cap with any Unlimited Claims in its value, governing law and courts, and the
+  counterparty's Notice Address (email + postal) in notice.
+- A blank or placeholder value ("[TO BE INSERTED ...]") is status="missing" with the placeholder quoted.
 
 Keep notes to one short sentence. Do not add commentary beyond the schema.
