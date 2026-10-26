@@ -6,14 +6,14 @@ import threading
 from datetime import date, datetime, timezone
 from functools import lru_cache
 
-from sqlalchemy import select
-
 from odin.core.context import run_ctx
+from odin.core.hooks import HOOKS, Blocked
 from odin.core.models import Event
 from odin.db import repo
 from odin.db.session import db
 from odin.db.tables import Company, Record, Run
 from odin.services import bundle, insights
+from sqlalchemy import select
 
 
 @lru_cache(maxsize=128)
@@ -26,11 +26,12 @@ def state():
     if not s:
         raise ValueError("Import the official bundle first")
     return {**s, "sim_now": repo.sim_now().isoformat(),
-            "pending_events": len(repo.query("simulation_pending", status="queued"))}
+            "pending_events": len(repo.query("simulation_pending", status="queued")),
+            "held_events": len(repo.query("simulation_pending", status="quarantined"))}
 
 
 def _store_state(s):
-    bundle.save("simulation", "official:simulation", {k: v for k, v in s.items() if k not in ("sim_now", "pending_events")})
+    bundle.save("simulation", "official:simulation", {k: v for k, v in s.items() if k not in ("sim_now", "pending_events", "held_events")})
 
 
 def load_drop(company_id: str, n: int):
@@ -104,7 +105,7 @@ def snapshot(checkpoint):
             "ledger": bundle.ledger_as_of(checkpoint),
             "events": repo.query("event"),
             "analysis_complete": all(x is not None for x in extractions) and bool(extractions)
-                                 and not any(e.get("status") in ("received", "processing", "needs_review") or e.get("impact_review_required") for e in repo.query("event"))}
+                                 and not any(e.get("status") in ("received", "processing", "needs_review", "quarantined", "reviewing") or e.get("impact_review_required") for e in repo.query("event"))}
     # Date objects in exposure/read-side views must be JSON-safe in PostgreSQL and SQLite.
     data = json.loads(json.dumps(data, default=str))
     bundle.save("simulation_checkpoint", f"official:checkpoint:{checkpoint}", data)
@@ -116,6 +117,17 @@ def advance(company_id: str, target: date | None = None, *, one: bool = False, a
     from odin.graphs import event as event_graph
     with _lock(company_id), run_ctx(company_id, agent="system"):
         s = state()
+        # A later play/advance request must not skip an earlier security hold.
+        # Only an explicit review outcome can remove it from the pending queue.
+        for held in repo.query("simulation_pending", status="quarantined"):
+            event = repo.get("event", held["event"]["id"] + ":event") or {}
+            if event.get("status") == "rejected" and event.get("review_decision") == "confirm":
+                repo.set_status(held["id"], "rejected")
+            elif event.get("review_release_status") == "released":
+                repo.set_status(held["id"], "delivered")
+            else:
+                return {**state(), "processed": 0, "blocked_by_security": True,
+                        "held_event_id": event.get("id"), "reason": "Review the held event before advancing"}
         now = repo.sim_now()
         pending = sorted(repo.query("simulation_pending", status="queued"), key=lambda x: (x["event"]["occurred_at"], x["id"]))
         if one:
@@ -140,18 +152,30 @@ def advance(company_id: str, target: date | None = None, *, one: bool = False, a
         processed = 0
         for p in selected:
             ev = Event.model_validate(p["event"])
+            event_id = ev.id + ":event"
+            existing = repo.get("event", event_id)
+            if existing and existing.get("status") in ("processed", "noise", "needs_review"):
+                repo.set_status(p["id"], "delivered")
+                continue
+            # Scheduled JSONL bypasses email parsing, but never the security ingress policy.
+            # Scan at delivery time: loading a future drop must not disclose it to models.
+            try:
+                HOOKS.on_email(f"Subject: {ev.subject}\nFrom: {ev.sender}\nTo: {ev.recipient}\n"
+                               f"{ev.description}\n{ev.raw}",
+                               {"company_id": company_id, "event_id": event_id, "source": "scheduled_event"})
+            except Blocked as exc:
+                from odin.services.events import quarantine_event
+                quarantine_event(company_id, ev.model_copy(update={"id": event_id}), str(exc))
+                repo.set_status(p["id"], "quarantined")
+                return {**state(), "processed": processed, "blocked_by_security": True,
+                        "held_event_id": event_id, "reason": "Review the held event before advancing"}
             event_day = ev.occurred_at.date()
             while cps and cps[0] < event_day:
                 cp = cps.pop(0)
                 _clock(company_id, cp)
                 snapshot(cp)
             _clock(company_id, max(now, event_day))
-            existing = repo.get("event", ev.id + ":event")
-            if existing and existing.get("status") in ("processed", "noise", "needs_review"):
-                repo.set_status(p["id"], "delivered")
-                continue
             # Different record kinds require distinct logical IDs.
-            event_id = ev.id + ":event"
             ev.id = event_id
             repo.put("event", ev)
             if assess:

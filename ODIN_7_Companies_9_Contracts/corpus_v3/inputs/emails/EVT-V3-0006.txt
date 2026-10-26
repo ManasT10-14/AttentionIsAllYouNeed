@@ -1,0 +1,10 @@
+Subject: [ODIN-EVENT] RENEWAL_NOTICE_RECEIVED AUR-2027-002
+
+EVENT_ID: EVT-V3-0006
+EVENT_TYPE: RENEWAL_NOTICE_RECEIVED
+OCCURRED_AT: 2027-12-02T10:00:00+05:30
+CONTRACT_ID: AUR-2027-002
+COUNTERPARTY: Willow Housing Private Limited
+REFERENCE: WIL-NONRENEW-01
+DESCRIPTION:
+Willow sent a written notice today requesting non-renewal of RESIDENT-ONE at December 31. Aurora received it at 10:00 IST today. No earlier notice, waiver or amendment exists in this case.

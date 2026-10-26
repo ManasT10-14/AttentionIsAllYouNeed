@@ -1,0 +1,21 @@
+ODIN - SEVEN COMPANIES / NINE CONTRACTS
+
+Open corpus_v3/README.md for the portfolio overview.
+
+Contracts to upload: corpus_v3/inputs/contracts/ (9 PDFs).
+Company context: corpus_v3/inputs/company_context.md and .json.
+Company-wise copies: corpus_v3/company_contracts/ (7 folders).
+Shared agreements appear in both signatories' folders; there are 9 unique contracts.
+
+Email events: corpus_v3/inputs/emails/ (.eml and copy-ready .txt).
+Event index: corpus_v3/EMAIL_EVENTS.md.
+Use the actual logged-in company Gmail inbox instead of placeholder .example addresses.
+Each business case resets independently; do not combine all cases into one ledger.
+
+Golden JSONL expected results: corpus_v3/oracle/.
+Trusted event release schedule: corpus_v3/harness/.
+Keep oracle answer keys and future schedules out of agent inputs.
+
+All agreements have Aurora as Party A and one of six counterparties as Party B.
+30 business event cases cover all 16 types; 37 email files include parser/dedup fixtures.
+Validation and PDF visual review completed. Actual agents/Gmail/Groq were not run.

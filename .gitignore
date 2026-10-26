@@ -2,6 +2,8 @@
 .venv/
 node_modules/
 data/
+!corpus/odin_dev_pack/bundle/data/
+!corpus/odin_dev_pack/bundle/data/*.csv
 __pycache__/
 *.pyc
 .pytest_cache/

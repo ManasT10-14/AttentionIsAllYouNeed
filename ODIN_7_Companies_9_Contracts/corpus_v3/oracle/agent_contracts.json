@@ -1,0 +1,144 @@
+{
+  "agents": {
+    "odin": {
+      "input": [
+        "company context",
+        "selected contract inventory",
+        "clock and released arrivals",
+        "actual agent outputs and workstream statuses",
+        "iteration/call/token limits"
+      ],
+      "output": [
+        "one workstream per known contract plus a cross-contract workstream",
+        "delegation and status tracking",
+        "clarification/debate coordination",
+        "cited per-contract and company reports",
+        "prioritized actions and honest stopping/completion status"
+      ],
+      "forbidden": [
+        "Claim a whole-company total from a scoped subtotal",
+        "Mark failed/pending workstreams complete",
+        "Automatically replace an agreement because parties match"
+      ]
+    },
+    "thor": {
+      "input": [
+        "raw selected PDF bytes",
+        "company identity and canonical party IDs",
+        "optional targeted clause re-extraction request"
+      ],
+      "output": [
+        "parties, scope, dates, payments, obligations and remedies",
+        "field values with exact source quotes and page/clause IDs",
+        "model-produced confidence",
+        "missing or ambiguous terms and targeted questions"
+      ],
+      "forbidden": [
+        "Read evaluator answer keys",
+        "Invent an absent Schedule B or blank percentage",
+        "Treat event observations as contractual text"
+      ]
+    },
+    "norns": {
+      "input": [
+        "actual Thor structured facts and evidence",
+        "simulated clock",
+        "visible payment/event history or verified ledger updates",
+        "prior obligation state and calendar rules"
+      ],
+      "output": [
+        "past/current/future obligations",
+        "notice, grace, cure and payment dates",
+        "contract-supported monetary calculations with direction and conditions",
+        "inaction projections with explicit assumptions",
+        "history/replay state"
+      ],
+      "forbidden": [
+        "Compound simple late interest",
+        "Add a credit receivable to gross payable exposure",
+        "Treat future obligations as current fines",
+        "Retain future facts after reset"
+      ]
+    },
+    "loki": {
+      "input": [
+        "actual Thor extraction and uncertainty",
+        "actual Norns timeline/projection",
+        "relevant cross-contract clauses",
+        "company risk appetite and priorities"
+      ],
+      "output": [
+        "evidence-backed risk hypotheses and attack paths",
+        "cross-contract contradictions and dependencies",
+        "reasoned severity and likelihood",
+        "targeted clarification where evidence is insufficient"
+      ],
+      "forbidden": [
+        "Treat different jurisdictions alone as invalidity",
+        "Invent liabilities to make a case risky",
+        "Force a disagreement when agents agree",
+        "Repeat whole-document extraction for an already resolved question"
+      ]
+    },
+    "heimdall": {
+      "input": [
+        "only released emails/observations",
+        "actual Thor evidence and entity/service references",
+        "actual Norns ledger/timeline",
+        "actual Loki hypotheses",
+        "clock and event identity history"
+      ],
+      "output": [
+        "event-to-contract/clause mappings",
+        "verification or challenge with event and clause evidence",
+        "deduplication/correction treatment",
+        "supported exposure/state changes",
+        "prioritized alerts and filtered noise"
+      ],
+      "forbidden": [
+        "Read future received_at records early",
+        "Trust sender SEVERITY_HINT as a finding",
+        "Duplicate a payment or outage from repeated records",
+        "Map an event solely because a vendor name matches"
+      ]
+    },
+    "tyr": {
+      "input": [
+        "actual disputed Loki/Heimdall findings, if any",
+        "verified source and event evidence",
+        "actual current timeline and money state",
+        "company contacts, approval policy and unresolved questions"
+      ],
+      "output": [
+        "reasoned rulings when a dispute exists",
+        "cited drafts or escalation/clarification proposals",
+        "explicit human-approval and confidence markings",
+        "unresolved issues where evidence cannot decide"
+      ],
+      "forbidden": [
+        "Fabricate a dispute or compulsory ruling",
+        "Guess a missing fee to force resolution",
+        "Send or execute a drafted action",
+        "Silently choose between contradictory notice periods"
+      ]
+    }
+  },
+  "confidence_policy": "Require a numeric agent-generated confidence in [0,1] with evidence/uncertainty rationale. Do not compare against a fixed golden score.",
+  "assessment_policy": "Severity, likelihood and narrative wording are rubric-scored. Equivalent supported explanations pass.",
+  "approval_policy": "Company threshold is INR 1000000; above-threshold actions require approval. All externally usable drafts in this corpus remain approval-marked and draft-only.",
+  "modes": {
+    "unit": "Harness injects a controlled upstream state for the single agent under test. Clearly label it as a test fixture, not an execution trace.",
+    "end_to_end": "Agents receive actual upstream outputs only. No golden file or expected answer is exposed to agents."
+  },
+  "recommended_loop": [
+    "Odin plan",
+    "Thor extraction",
+    "Norns baseline",
+    "Loki review",
+    "Heimdall released-event verification",
+    "Norns affected-state update",
+    "Tyr if dispute/action is needed",
+    "Odin synthesis"
+  ],
+  "feedback": "Targeted Thor clarification and Loki/Heimdall/Tyr feedback are conditional. Use configured evidence, iteration and budget stopping rules; no exact call count or mandatory disagreement is imposed."
+}

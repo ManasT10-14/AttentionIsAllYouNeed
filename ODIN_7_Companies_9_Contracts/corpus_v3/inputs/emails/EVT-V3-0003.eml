@@ -1,0 +1,22 @@
+From: event-desk@aurora.example
+To: odin-inbox@aurora.example
+Subject: [ODIN-EVENT] SLA_BREACH AUR-2027-001
+Date: Tue, 16 Feb 2027 11:00:00 +0530
+Message-ID: <EVT-V3-0003@odin-fixtures.example>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+EVENT_ID: EVT-V3-0003
+EVENT_TYPE: SLA_BREACH
+OCCURRED_AT: 2027-02-16T11:00:00+05:30
+CONTRACT_ID: AUR-2027-001
+COUNTERPARTY: Nimbus Cloud Private Limited
+REFERENCE: INC-MAINT-02
+SEVERITY_HINT: high
+DESCRIPTION:
+Incident INC-MAINT-02 interrupted PROD-AUR and RESIDENT-ONE for 45 minutes to=
+day, from 10:15 to 11:00 IST. Nimbus maintenance approval was issued at 09:00=
+ IST on February 14, more than 48 hours beforehand. Both parties filed any av=
+ailable credit claim today. This is the only incident in this reset case. The=
+ sender believes severity is high.

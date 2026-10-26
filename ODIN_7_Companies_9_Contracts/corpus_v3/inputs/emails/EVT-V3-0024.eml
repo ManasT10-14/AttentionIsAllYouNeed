@@ -1,0 +1,20 @@
+From: event-desk@aurora.example
+To: odin-inbox@aurora.example
+Subject: [ODIN-EVENT] CUSTOM AUR-2027-008
+Date: Thu, 16 Dec 2027 10:00:00 +0530
+Message-ID: <EVT-V3-0024@odin-fixtures.example>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+EVENT_ID: EVT-V3-0024
+EVENT_TYPE: CUSTOM
+OCCURRED_AT: 2027-12-16T10:00:00+05:30
+CONTRACT_ID: AUR-2027-008
+COUNTERPARTY: Nimbus Cloud Private Limited
+REFERENCE: BACKUP-EXPIRY-CHECK
+DESCRIPTION:
+Aurora asks whether Nimbus must accept a new production recovery ticket today=
+ under the backup schedule. No renewal or variation exists. The recovery serv=
+ice ended December 15; the hosting and portal agreements continue through Dec=
+ember 31. There is no new outage or actual recovery failure in this case.

@@ -1,0 +1,11 @@
+Subject: [ODIN-EVENT] INVOICE_RECEIVED AUR-2027-001
+
+EVENT_ID: EVT-V3-0001
+EVENT_TYPE: INVOICE_RECEIVED
+OCCURRED_AT: 2027-02-01T10:00:00+05:30
+CONTRACT_ID: AUR-2027-001
+COUNTERPARTY: Nimbus Cloud Private Limited
+AMOUNT: INR 2,00,000
+REFERENCE: NIM-JAN-01
+DESCRIPTION:
+Nimbus issued invoice NIM-JAN-01 for the January hosting fee of INR 200,000 for PROD-AUR. No payment has yet been recorded. Please record the invoice; this email does not allege that it is already overdue.

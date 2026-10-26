@@ -1,0 +1,11 @@
+Subject: [ODIN-EVENT] INVOICE_RECEIVED AUR-2027-003
+
+EVENT_ID: EVT-V3-0009
+EVENT_TYPE: INVOICE_RECEIVED
+OCCURRED_AT: 2027-05-24T10:00:00+05:30
+CONTRACT_ID: AUR-2027-003
+COUNTERPARTY: Forge Electronics Private Limited
+AMOUNT: INR 5,60,000
+REFERENCE: FORGE-BAL-01
+DESCRIPTION:
+Forge issued balance invoice FORGE-BAL-01 for INR 560,000 after the complete lot arrived May 23. Technical tests remain open and no acceptance signed by Mira Sen exists. The invoice text demands payment within ten days of invoice receipt.

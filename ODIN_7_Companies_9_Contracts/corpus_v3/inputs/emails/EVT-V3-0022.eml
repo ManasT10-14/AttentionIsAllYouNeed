@@ -1,0 +1,20 @@
+From: event-desk@aurora.example
+To: odin-inbox@aurora.example
+Subject: [ODIN-EVENT] SLA_BREACH AUR-2027-008
+Date: Mon, 15 Mar 2027 16:00:00 +0530
+Message-ID: <EVT-V3-0022@odin-fixtures.example>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+EVENT_ID: EVT-V3-0022
+EVENT_TYPE: SLA_BREACH
+OCCURRED_AT: 2027-03-15T16:00:00+05:30
+CONTRACT_ID: AUR-2027-008
+COUNTERPARTY: Nimbus Cloud Private Limited
+REFERENCE: RESTORE-01
+DESCRIPTION:
+Nimbus received valid priority-one restore request RESTORE-01 at 10:00 IST to=
+day. Recovery completed at 16:00 IST, after six hours. The environment was av=
+ailable and no excused delay applies. Aurora claims today. There were no othe=
+r March recovery credits in this reset case.

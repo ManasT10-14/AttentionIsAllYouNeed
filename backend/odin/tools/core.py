@@ -1,23 +1,33 @@
 """Every capability an agent has, as a registered tool. Agents get explicit allowlists at the bottom."""
 from __future__ import annotations
 
+import ipaddress
 import json
+import os
 from datetime import date
 from typing import Optional
+from urllib.parse import urlparse
 
 import httpx
-from pydantic import BaseModel, Field
-
 from odin.core import citations
 from odin.core.config import settings
 from odin.core.context import current
 from odin.core.hooks import HOOKS
-from odin.core.models import (ActionDraft, Alert, ContractExtraction, Finding, Ruling, Verification, Violation,
-                              new_id)
+from odin.core.models import (
+    ActionDraft,
+    Alert,
+    ContractExtraction,
+    Finding,
+    Ruling,
+    Verification,
+    Violation,
+    new_id,
+)
 from odin.db import repo
 from odin.retrieval import hybrid
 from odin.services import insights
-from odin.tools.registry import REGISTRY
+from odin.tools.registry import REGISTRY, ToolDenied
+from pydantic import BaseModel, Field
 
 
 # ───────────────────────────── arg models ─────────────────────────────
@@ -99,13 +109,19 @@ class DependencyArgs(BaseModel):
 
 
 class GmailArgs(BaseModel):
+    model_config = {"extra": "forbid"}
     to: str
     subject: str
     body: str
     thread_id: Optional[str] = None
 
 
+class SystemReplyArgs(GmailArgs):
+    event_id: str
+
+
 class AmendArgs(BaseModel):
+    model_config = {"extra": "forbid"}
     action_id: str
 
 
@@ -281,9 +297,39 @@ def send_gmail(a: GmailArgs) -> dict:
     return send_message(current().company_id, a.to, a.subject, a.body, a.thread_id)
 
 
-@REGISTRY.tool(args=GmailArgs, scope="external_send", side_effect=True, pii=True, llm_visible=False)
-def send_system_reply(a: GmailArgs) -> dict:
+@REGISTRY.tool(args=SystemReplyArgs, scope="external_send", side_effect=True, pii=True, llm_visible=False)
+def send_system_reply(a: SystemReplyArgs) -> dict:
     """System auto-reply (e.g. malformed event email template). No approval: fixed template only."""
+    from odin.email import event_parser
+    from odin.services.approvals import _EMAIL
+    event = repo.get("event", a.event_id)
+    if (current().scenario_id or not event or event.get("status") != "rejected"
+        or event.get("parse_method") != "strict" or not _EMAIL.fullmatch(a.to)
+        or event.get("sender") != a.to or a.subject != f"Re: {event.get('subject', '')}"
+        or a.thread_id != event.get("thread_id") or "\r" in a.subject or "\n" in a.subject):
+        raise ToolDenied("system reply requires a matching strict-parser rejection")
+    try:
+        event_parser.parse(event["subject"], event["raw"])
+    except event_parser.EventParseError as error:
+        problems = error.problems
+    else:
+        raise ToolDenied("system reply requires an actual parser rejection")
+    if event.get("reject_problems") != problems or a.body != event_parser.reply_body(problems):
+        raise ToolDenied("system reply must match the fixed rejection template")
+    from odin.db.session import db
+    from odin.db.tables import Record
+    from sqlalchemy import update
+    # A timeout leaves a durable claim; resending could duplicate an already delivered reply.
+    with db() as s:
+        row = s.get(Record, repo._pk(current().company_id, a.event_id))
+        if not row or row.data != event or row.data.get("system_reply_claim"):
+            raise ToolDenied("rejection reply is changed or already claimed")
+        claimed = {**event, "system_reply_claim": new_id("reply")}
+        result = s.execute(update(Record).where(Record.id == row.id, Record.company_id == current().company_id,
+            Record.kind == "event", Record.status == "rejected", Record.data == event).values(data=claimed),
+            execution_options={"synchronize_session": False})
+        if result.rowcount != 1:
+            raise ToolDenied("rejection reply was already claimed")
     from odin.email.gmail import send_message
     return send_message(current().company_id, a.to, a.subject, a.body, a.thread_id)
 
@@ -292,7 +338,9 @@ def send_system_reply(a: GmailArgs) -> dict:
 def apply_amendment(a: AmendArgs) -> dict:
     """Apply an approved amendment's redlines → new DOCX version → re-ingest (update flow)."""
     from odin.services.amend import apply
-    return apply(a.action_id)
+    from odin.services.approvals import dispatch_sources
+    sources = dispatch_sources(a.action_id, "apply_amendment", a.model_dump(mode="json"))
+    return apply(a.action_id, expected_sources=sources)
 
 
 @REGISTRY.tool(args=WebhookArgs, scope="external_send", side_effect=True, llm_visible=False)
@@ -301,8 +349,25 @@ def post_webhook(a: WebhookArgs) -> dict:
     url = settings().webhook_url
     if not url:
         return {"skipped": "WEBHOOK_URL not set"}
-    body = {"text": f"[Odin] {a.event}: {a.payload.get('title', '')}", "event": a.event, "payload": a.payload}
-    r = httpx.post(url, content=json.dumps(body, default=str), headers={"content-type": "application/json"}, timeout=10)
+    # Webhooks are an operator-configured notification capability, never action approval.
+    # Require an explicit HTTPS host allowlist; no arbitrary/private destinations or redirects.
+    parsed = urlparse(url)
+    allowed = {host.strip().lower() for host in os.getenv("ODIN_WEBHOOK_ALLOWED_HOSTS", "").split(",") if host.strip()}
+    hostname = (parsed.hostname or "").lower()
+    try:
+        ipaddress.ip_address(hostname)
+        literal_ip = True
+    except ValueError:
+        literal_ip = False
+    if (parsed.scheme != "https" or parsed.username or parsed.password or parsed.port not in (None, 443)
+        or hostname not in allowed or literal_ip or hostname == "localhost" or "." not in hostname):
+        raise ToolDenied("webhook destination is not allowed by operator policy")
+    if a.event not in {"alert", "violation"}:
+        raise ToolDenied("webhook event is not an allowed notification")
+    from odin.core.privacy import redact
+    body = redact({"text": f"[Odin] {a.event}: {a.payload.get('title', '')}", "event": a.event, "payload": a.payload})
+    r = httpx.post(url, content=json.dumps(body, default=str), headers={"content-type": "application/json"}, timeout=10,
+                   follow_redirects=False)
     return {"status": r.status_code}
 
 

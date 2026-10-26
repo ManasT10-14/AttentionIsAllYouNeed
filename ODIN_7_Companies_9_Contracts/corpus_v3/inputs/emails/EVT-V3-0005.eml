@@ -1,0 +1,20 @@
+From: event-desk@aurora.example
+To: odin-inbox@aurora.example
+Subject: [ODIN-EVENT] SERVICE_OUTAGE AUR-2027-002
+Date: Tue, 02 Mar 2027 09:45:00 +0530
+Message-ID: <EVT-V3-0005@odin-fixtures.example>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+EVENT_ID: EVT-V3-0005
+EVENT_TYPE: SERVICE_OUTAGE
+OCCURRED_AT: 2027-03-02T09:45:00+05:30
+CONTRACT_ID: AUR-2027-002
+COUNTERPARTY: Willow Housing Private Limited
+REFERENCE: PORT-45
+DESCRIPTION:
+RESIDENT-ONE incident PORT-45 lasted from 09:00 to 09:45 IST on March 2. The =
+customer submitted a claim today. The outage was planned hosting maintenance =
+approved 72 hours beforehand. No other March incidents exist in this case. Pl=
+ease check the customer promise separately from the upstream hosting terms.

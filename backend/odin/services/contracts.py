@@ -73,6 +73,11 @@ def delete_contract(company_id: str, cid: str, confirmation: str, actor_id: str)
             contract = s.scalar(select(Contract).where(Contract.company_id == company_id, Contract.contract_id == cid))
             if not contract:
                 raise HTTPException(404, "Contract not found")
+            from odin.services.approvals import ApprovalRequired, assert_source_mutation_allowed
+            try:
+                assert_source_mutation_allowed(s, company_id, cid)
+            except ApprovalRequired as exc:
+                raise HTTPException(409, str(exc)) from exc
             if s.scalar(select(Run.id).where(Run.company_id == company_id, Run.status == "running").limit(1)):
                 raise HTTPException(409, "Wait for running agents to finish before deleting a contract")
             # Freeze any surviving older company report before its latest copy is invalidated.

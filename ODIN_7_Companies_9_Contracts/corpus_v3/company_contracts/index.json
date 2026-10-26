@@ -1,0 +1,39 @@
+{
+  "unique_contracts": 9,
+  "pdf_copies": 18,
+  "folders": {
+    "Aurora_Software": [
+      "AUR-2027-001",
+      "AUR-2027-002",
+      "AUR-2027-003",
+      "AUR-2027-004",
+      "AUR-2027-005",
+      "AUR-2027-006",
+      "AUR-2027-007",
+      "AUR-2027-008",
+      "AUR-2027-009"
+    ],
+    "Forge_Electronics": [
+      "AUR-2027-003",
+      "AUR-2027-009"
+    ],
+    "Willow_Housing": [
+      "AUR-2027-002",
+      "AUR-2027-005"
+    ],
+    "Nimbus_Cloud": [
+      "AUR-2027-001",
+      "AUR-2027-008"
+    ],
+    "Copperline_Components": [
+      "AUR-2027-004"
+    ],
+    "SwiftRoute_Logistics": [
+      "AUR-2027-006"
+    ],
+    "Sentinel_Security": [
+      "AUR-2027-007"
+    ]
+  },
+  "policy": "Identical browsing copies; ingest canonical PDFs only once. All nine are initial in this portfolio."
+}

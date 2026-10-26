@@ -1,0 +1,11 @@
+Subject: [ODIN-EVENT] PAYMENT_MISSED AUR-2027-005
+
+EVENT_ID: EVT-V3-0030
+EVENT_TYPE: PAYMENT_MISSED
+OCCURRED_AT: 2027-01-12T18:00:00+05:30
+CONTRACT_ID: AUR-2027-005
+COUNTERPARTY: Willow Housing Private Limited
+AMOUNT: INR 1,00,000
+REFERENCE: RENT-JAN-NOPAY
+DESCRIPTION:
+Aurora has made no payment toward January UNIT-A rent of INR 100,000 as of January 12 at 18:00 IST. This is a reset case with no partial payment and no rent credit. The grace period ended January 10. Security-deposit duties are outside this invoice scope.

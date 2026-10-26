@@ -1,0 +1,21 @@
+From: event-desk@aurora.example
+To: odin-inbox@aurora.example
+Subject: [ODIN-EVENT] PAYMENT_MADE AUR-2027-005
+Date: Wed, 13 Jan 2027 12:00:00 +0530
+Message-ID: <EVT-V3-0013@odin-fixtures.example>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+EVENT_ID: EVT-V3-0013
+EVENT_TYPE: PAYMENT_MADE
+OCCURRED_AT: 2027-01-08T10:00:00+05:30
+CONTRACT_ID: AUR-2027-005
+COUNTERPARTY: Willow Housing Private Limited
+AMOUNT: INR 60,000
+REFERENCE: TX-RENT-60000
+DESCRIPTION:
+Bank confirmation TX-RENT-60000 shows Aurora paid INR 60,000 toward January r=
+ent on January 8. This notification arrives January 13. January rent was INR =
+100,000. There are no other rent payments, credits or prior charges. The secu=
+rity deposit is a separate balance and must not be applied to rent.

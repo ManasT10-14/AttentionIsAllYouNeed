@@ -18,7 +18,8 @@ from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, Tool
 from odin.core import budget as budget_mod
 from odin.core.config import limits, odin_config
 from odin.core.context import maybe_current
-from odin.core.hooks import HOOKS
+from odin.core.hooks import HOOKS, Blocked
+from odin.core.privacy import redact, redact_text
 from odin.core.telemetry import traced
 from odin.llm.factory import chain_for, chat_model, max_tokens_for, model_for, price
 from odin.llm.fake import fake_instance
@@ -48,7 +49,7 @@ def _run_config(agent: str, provider: str, prompt_hash: str, extra: dict | None)
         if c.scenario_id:
             tags.append("whatif")
     meta["run_kind"] = (extra or {}).get("run_kind") or (c.agent if c else None)
-    return {"run_name": f"{agent}:{provider}", "tags": tags, "metadata": {k: v for k, v in meta.items() if v is not None}}
+    return redact({"run_name": f"{agent}:{provider}", "tags": tags, "metadata": {k: v for k, v in meta.items() if v is not None}})
 
 
 @traced("odin:structured")
@@ -81,6 +82,7 @@ def structured(agent: str, schema: Type[T], system: str, user: str, *, tools: li
                 if tools:
                     convo, tin, tout = _tool_phase(agent, model, convo, tools, cfg)
                 runnable = model.with_structured_output(schema, method="function_calling", include_raw=True)
+                convo = HOOKS.pre_llm(agent, convo)
                 res = runnable.invoke(convo, config=cfg)
                 a, b = _usage(res["raw"])
                 tin, tout = tin + a, tout + b
@@ -92,6 +94,7 @@ def structured(agent: str, schema: Type[T], system: str, user: str, *, tools: li
                     convo += [res["raw"] if isinstance(res["raw"], AIMessage) else AIMessage(str(res["raw"])),
                               HumanMessage(f"Your output did not match the schema: {err}. "
                                            f"Call the {schema.__name__} tool again with valid arguments.")]
+                    convo = HOOKS.pre_llm(agent, convo)
                     res = runnable.invoke(convo, config=cfg)
                     a, b = _usage(res["raw"])
                     tin, tout = tin + a, tout + b
@@ -101,18 +104,18 @@ def structured(agent: str, schema: Type[T], system: str, user: str, *, tools: li
                 bud.charge(agent, tin, tout, price(prov, tin, tout), prov,
                            (time.perf_counter() - t0) * 1000, fallback=i > 0)
                 return _finish(agent, schema, messages, out, prov, meta)
-            except budget_mod.BudgetExceeded:
+            except (budget_mod.BudgetExceeded, Blocked):
                 raise
             except Exception as e:  # noqa: BLE001 — any provider error → retry / next provider
-                errors.append(f"{prov}#{attempt}: {type(e).__name__}: {str(e)[:200]}")
-                log.warning("LLM %s via %s failed (attempt %s): %s", agent, prov, attempt, e)
+                errors.append(redact_text(f"{prov}#{attempt}: {type(e).__name__}"))
+                log.warning("LLM %s via %s failed (attempt %s): %s", redact_text(agent), redact_text(prov), attempt, type(e).__name__)
                 time.sleep(min(2 ** attempt, 8) * 0.5)
     raise LLMFailure("; ".join(errors[-6:]) or "no provider available")
 
 
 def _finish(agent, schema, messages, out, prov, meta):
     out = HOOKS.post_llm(agent, out)
-    HOOKS.record("llm", agent, [m.content for m in messages], out, {"provider": prov, **(meta or {})})
+    HOOKS.record("llm", agent, redact([m.content for m in messages]), redact(out), redact({"provider": prov, **(meta or {})}))
     return out
 
 
@@ -126,6 +129,7 @@ def _tool_phase(agent: str, model, convo: list, tool_names: list[str], cfg: dict
     bound = model.bind_tools(lc_tools)
     tin = tout = 0
     for _ in range(limits()["max_tool_steps"]):
+        convo = HOOKS.pre_llm(agent, convo)
         ai = bound.invoke(convo, config=cfg)
         a, b = _usage(ai)
         tin, tout = tin + a, tout + b
@@ -136,7 +140,7 @@ def _tool_phase(agent: str, model, convo: list, tool_names: list[str], cfg: dict
         for tc in calls:
             result = REGISTRY.invoke(agent, tc["name"], tc.get("args") or {})
             rendered = REGISTRY.render(result)
-            HOOKS.record("model_context", agent, None, rendered, {"tool": tc["name"]})
+            HOOKS.record("model_context", agent, None, redact_text(rendered), redact({"tool": tc["name"]}))
             convo.append(ToolMessage(content=rendered, tool_call_id=tc["id"]))
     convo.append(HumanMessage("Now produce your final answer using the required output tool."))
     return convo, tin, tout

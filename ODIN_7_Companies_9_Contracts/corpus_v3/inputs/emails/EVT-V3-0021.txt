@@ -1,0 +1,11 @@
+Subject: [ODIN-EVENT] CUSTOM AUR-2027-007
+
+EVENT_ID: EVT-V3-0021
+EVENT_TYPE: CUSTOM
+OCCURRED_AT: 2027-03-12T15:00:00+05:30
+CONTRACT_ID: AUR-2027-007
+COUNTERPARTY: Sentinel Security Private Limited
+REFERENCE: SOC-ADVICE-01
+SEVERITY_HINT: high
+DESCRIPTION:
+Aurora sent a low-priority advisory question to Sentinel on March 10 at 15:00 IST and has no answer as of March 12 at 15:00 IST. It is not a priority-one alert. No separately agreed response target exists. The sender calls this a high-severity SLA breach.

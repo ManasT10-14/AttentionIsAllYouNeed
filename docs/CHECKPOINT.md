@@ -1,7 +1,7 @@
 # Corpus evaluation checkpoint
 
 This repository now contains the backend, corpus, evaluator, locked Python
-dependencies, configs, tests and CI. Work from this repository root; no parent
+dependencies, configs and tests. Work from this repository root; no parent
 workspace files are required. Frontend work is unchanged.
 
 ## Fresh clone
@@ -17,8 +17,8 @@ uv run --locked --all-extras pytest -q
 ```
 
 On Windows, `./scripts/checkpoint.ps1` runs the offline checkpoint checks.
-GitHub Actions runs the offline suite on Windows and Linux after pushing.
-Live providers and Gmail are never used by the ordinary test suite or CI.
+GitHub Actions CI is deferred for now; run the checks locally.
+Live providers and Gmail are never used by the ordinary test suite.
 
 Copy `.env.example` to an ignored `.env` and supply your own provider/LangSmith
 credentials. Existing shell settings override the file. The parser correctly

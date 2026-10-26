@@ -1,0 +1,11 @@
+Subject: [ODIN-EVENT] INVOICE_RECEIVED AUR-2027-009
+
+EVENT_ID: EVT-V3-0025
+EVENT_TYPE: INVOICE_RECEIVED
+OCCURRED_AT: 2027-03-20T10:00:00+05:30
+CONTRACT_ID: AUR-2027-009
+COUNTERPARTY: Forge Electronics Private Limited
+AMOUNT: INR 3,00,000
+REFERENCE: INT-M1-01
+DESCRIPTION:
+Forge issued M1 invoice INT-M1-01 for INR 300,000 on March 1. As of March 20 there is still no acceptance signed by Mira Sen, and test failures remain open. Forge demands a late-payment penalty. No variation removes the signed acceptance gate.

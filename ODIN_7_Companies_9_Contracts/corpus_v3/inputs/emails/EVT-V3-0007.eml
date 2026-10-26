@@ -1,0 +1,20 @@
+From: event-desk@aurora.example
+To: odin-inbox@aurora.example
+Subject: [ODIN-EVENT] DELIVERY_LATE AUR-2027-003
+Date: Sun, 23 May 2027 18:00:00 +0530
+Message-ID: <EVT-V3-0007@odin-fixtures.example>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+EVENT_ID: EVT-V3-0007
+EVENT_TYPE: DELIVERY_LATE
+OCCURRED_AT: 2027-05-23T18:00:00+05:30
+CONTRACT_ID: AUR-2027-003
+COUNTERPARTY: Forge Electronics Private Limited
+REFERENCE: PO-AX9-100
+DESCRIPTION:
+The complete PO-AX9-100 lot reached UNIT-A at 17:00 IST on May 23, three cale=
+ndar dates after its May 20 deadline. A signed receiving scan confirms delive=
+ry. Mira Sen has not yet signed the technical acceptance record. There is no =
+agreed extension or evidenced force majeure.

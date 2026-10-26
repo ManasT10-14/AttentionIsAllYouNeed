@@ -1,0 +1,20 @@
+From: event-desk@aurora.example
+To: odin-inbox@aurora.example
+Subject: [ODIN-EVENT] REGULATORY_CHANGE ALL
+Date: Thu, 01 Apr 2027 10:00:00 +0530
+Message-ID: <EVT-V3-0028@odin-fixtures.example>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+EVENT_ID: EVT-V3-0028
+EVENT_TYPE: REGULATORY_CHANGE
+OCCURRED_AT: 2027-04-01T10:00:00+05:30
+CONTRACT_ID: ALL
+REFERENCE: REG-APR-01
+DESCRIPTION:
+Aurora compliance distributes advisory REG-APR-01 concerning possible new per=
+sonal-data reporting guidance. No operative instrument, effective date, manda=
+tory fine or authoritative text is attached. Review the processing and incide=
+nt duties in hosting, resident portal, monitoring and backups; do not invent =
+a statutory change from this advisory.

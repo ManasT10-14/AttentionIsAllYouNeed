@@ -1,0 +1,21 @@
+From: event-desk@aurora.example
+To: odin-inbox@aurora.example
+Subject: [ODIN-EVENT] PAYMENT_LATE AUR-2027-002
+Date: Wed, 10 Feb 2027 18:00:00 +0530
+Message-ID: <EVT-V3-0004@odin-fixtures.example>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+EVENT_ID: EVT-V3-0004
+EVENT_TYPE: PAYMENT_LATE
+OCCURRED_AT: 2027-02-10T18:00:00+05:30
+CONTRACT_ID: AUR-2027-002
+COUNTERPARTY: Willow Housing Private Limited
+AMOUNT: INR 1,20,000
+REFERENCE: PORT-JAN-01
+DESCRIPTION:
+Willow has not paid the January portal invoice PORT-JAN-01 for INR 120,000. I=
+t was issued January 31 and fell due February 7 at 17:00 IST. The bank confir=
+ms no payment or set-off through February 10 at 18:00 IST. No other invoice i=
+s within this case.

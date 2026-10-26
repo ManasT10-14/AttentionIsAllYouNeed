@@ -26,7 +26,8 @@ def _default(o):
 def publish(company_id: str, kind: str, data: dict) -> None:
     if _loop is None or not _subs.get(company_id):
         return
-    msg = json.dumps({"kind": kind, "data": data}, default=_default)
+    from odin.core.privacy import redact
+    msg = json.dumps(redact({"kind": kind, "data": data}), default=_default)
     for q in list(_subs[company_id]):
         _loop.call_soon_threadsafe(q.put_nowait, msg)
 

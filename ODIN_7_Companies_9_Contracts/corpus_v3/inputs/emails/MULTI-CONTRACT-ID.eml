@@ -1,0 +1,19 @@
+From: event-desk@aurora.example
+To: odin-inbox@aurora.example
+Subject: [ODIN-EVENT] SERVICE_OUTAGE AUR-2027-001,AUR-2027-002
+Date: Wed, 10 Feb 2027 18:00:00 +0530
+Message-ID: <MULTI-CONTRACT-ID@odin-fixtures.example>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+EVENT_ID: EVT-V3-MULTI
+EVENT_TYPE: SERVICE_OUTAGE
+OCCURRED_AT: 2027-02-15T13:00:00+05:30
+CONTRACT_ID: AUR-2027-001,AUR-2027-002
+REFERENCE: INC-PROD-01
+DESCRIPTION:
+Independent parser/routing case: PROD-AUR and RESIDENT-ONE were unavailable f=
+or 180 minutes from 10:00 to 13:00 IST today. No maintenance approval or earl=
+ier February incident exists; both relevant credit claims were submitted toda=
+y.

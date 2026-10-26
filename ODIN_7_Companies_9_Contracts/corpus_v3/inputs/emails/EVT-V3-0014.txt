@@ -1,0 +1,10 @@
+Subject: [ODIN-EVENT] TERMINATION_NOTICE_RECEIVED AUR-2027-005
+
+EVENT_ID: EVT-V3-0014
+EVENT_TYPE: TERMINATION_NOTICE_RECEIVED
+OCCURRED_AT: 2027-05-20T10:00:00+05:30
+CONTRACT_ID: AUR-2027-005
+COUNTERPARTY: Willow Housing Private Limited
+REFERENCE: WIL-LEASE-END-01
+DESCRIPTION:
+Willow served a written convenience termination notice received by Aurora today. It specifies termination on June 19 at 17:00 IST, at least 30 calendar days after receipt. No relocation consent, alternative office or portal amendment exists. Aurora still owes the UNIT-A support-desk promise through December 31.

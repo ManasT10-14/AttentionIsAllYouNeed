@@ -7,40 +7,24 @@ import tempfile
 from pathlib import Path
 
 from .models import RunReport
+from .privacy import redact as shared_redact
 
 STATUSES = ("passed", "failed", "error", "skipped", "invalid")
-SENSITIVE_KEYS = {
-    "authorization",
-    "api_key",
-    "apikey",
-    "password",
-    "secret",
-    "access_token",
-    "refresh_token",
-    "cookie",
-    "set-cookie",
-    "x-api-key",
-}
-KEY_PATTERN = re.compile(r"\b(?:lsv2_[A-Za-z0-9_-]{10,}|sk-[A-Za-z0-9_-]{12,})\b")
-BEARER_PATTERN = re.compile(r"\bBearer\s+[A-Za-z0-9._~+/=-]+", re.IGNORECASE)
-
-
 def redact(value, secrets=()):
-    if isinstance(value, dict):
-        return {
-            redact(key, secrets): "[REDACTED]"
-            if key.lower() in SENSITIVE_KEYS
-            else redact(item, secrets)
-            for key, item in value.items()
-        }
-    if isinstance(value, list):
-        return [redact(item, secrets) for item in value]
-    if isinstance(value, str):
-        for secret in sorted(set(secrets), key=len, reverse=True):
-            if secret:
-                value = re.sub(re.escape(secret), "[REDACTED]", value, flags=re.IGNORECASE)
-        return BEARER_PATTERN.sub("Bearer [REDACTED]", KEY_PATTERN.sub("[REDACTED]", value))
-    return value
+    """Shared credential policy with legacy export markers; retain PII for evidence review.
+
+    This adapter runs after scoring. Explicit case canaries and environment literals are
+    redacted even when they do not resemble a provider credential.
+    """
+    def legacy_markers(item):
+        if isinstance(item, str):
+            return re.sub(r"\[REDACTED(?::[^\]]+)?\]", "[REDACTED]", item)
+        if isinstance(item, dict):
+            return {legacy_markers(key): legacy_markers(value) for key, value in item.items()}
+        if isinstance(item, (list, tuple)):
+            return [legacy_markers(value) for value in item]
+        return item
+    return legacy_markers(shared_redact(value, pii=False, secrets=secrets))
 
 
 def exit_code(cases) -> int:

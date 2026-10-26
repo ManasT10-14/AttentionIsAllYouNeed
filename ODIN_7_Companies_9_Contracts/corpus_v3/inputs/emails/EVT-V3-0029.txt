@@ -1,0 +1,9 @@
+Subject: [ODIN-EVENT] SERVICE_OUTAGE UNKNOWN
+
+EVENT_ID: EVT-V3-0029
+EVENT_TYPE: SERVICE_OUTAGE
+OCCURRED_AT: 2027-04-03T12:00:00+05:30
+CONTRACT_ID: UNKNOWN
+REFERENCE: INC-UNKNOWN-01
+DESCRIPTION:
+Service PROD-AUR and resident application RESIDENT-ONE were unavailable continuously from 11:00 to 12:00 IST today. Incident INC-UNKNOWN-01 is supported by Nimbus monitoring and Willow screenshots. No maintenance was approved. Both relevant parties claim today; no other April outage or credit exists in this reset case. The sender omitted the agreement number.

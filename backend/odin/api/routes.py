@@ -1,17 +1,19 @@
 """REST API (plan §8). Every handler runs inside the caller's company scope."""
 from __future__ import annotations
 
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 from pathlib import Path
 from typing import Optional
 
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
 from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse, Response
 from odin.api.deps import current_user, require_role
+from odin.api.responses import PrivateAPIRoute, RedactedJSONResponse
 from odin.core import citations
 from odin.core.config import limits, odin_config
 from odin.core.context import run_ctx
 from odin.core.models import new_id
+from odin.core.privacy import redact, redact_text
 from odin.db import repo
 from odin.db.session import db
 from odin.db.tables import ClauseRow, Company, ContractVersion, Record, Run, ToolCall, User
@@ -27,7 +29,7 @@ from odin.tools.registry import REGISTRY, ApprovalRequired
 from pydantic import BaseModel, Field
 from sqlalchemy import func, select
 
-router = APIRouter()
+router = APIRouter(default_response_class=RedactedJSONResponse, route_class=PrivateAPIRoute)
 admin = require_role("admin")
 
 
@@ -324,7 +326,7 @@ def get_alerts(as_of: Optional[date] = None, include_closed: bool = False, u: Us
 
 
 @router.post("/alerts/{alert_id}", tags=["alerts"])
-def update_alert(alert_id: str, body: AlertUpdate, u: User = Depends(current_user)):
+def update_alert(alert_id: str, body: AlertUpdate, u: User = Depends(admin)):
     if body.status not in ("acknowledged", "snoozed", "resolved", "open"):
         raise HTTPException(400, "bad status")
     with scope(u):
@@ -405,37 +407,60 @@ def get_action(aid: str, u: User = Depends(current_user)):
 @router.patch("/actions/{aid}", tags=["actions"])
 def edit_action(aid: str, body: ActionEdit, u: User = Depends(admin)):
     with scope(u):
-        a = repo.get("action", aid)
-        if not a or a["status"] not in ("draft",):
-            raise HTTPException(400, "only drafts can be edited")
+        from odin.services import approvals
         upd = {k: v for k, v in body.model_dump().items() if v is not None}
-        return repo.set_status(aid, "draft", **upd, edited_by=u.email)
+        try:
+            return approvals.edit(aid, upd, reviewer=u.email)
+        except ApprovalRequired as e:
+            raise HTTPException(409, str(e))
 
 
 @router.post("/actions/{aid}/{decision}", tags=["actions"])
 def decide_action(aid: str, decision: str, u: User = Depends(admin)):
     with scope(u):
+        from odin.services import approvals
         a = repo.get("action", aid)
         if not a:
             raise HTTPException(404)
         if decision == "approve":
-            return repo.set_status(aid, "approved", approved_by=u.email, approved_at=datetime.utcnow().isoformat())
-        if decision == "reject":
-            return repo.set_status(aid, "rejected", rejected_by=u.email)
-        if decision == "send":
-            if "@" not in (a.get("to") or ""):
-                raise HTTPException(400, "recipient is not an email address — edit 'to' first")
             try:
-                r = REGISTRY.invoke("system", "send_gmail", {"to": a["to"], "subject": a["subject"],
-                                                             "body": a["body_md"]}, approval_id=aid)
+                return approvals.approve(aid, reviewer=u.email)
+            except ApprovalRequired as e:
+                raise HTTPException(409, str(e))
+        if decision == "reject":
+            try:
+                return approvals.reject(aid, reviewer=u.email)
+            except ApprovalRequired as e:
+                raise HTTPException(409, str(e))
+        if decision == "send":
+            try:
+                tool, payload = approvals.action_payload(a)
+                if tool != "send_gmail":
+                    raise ApprovalRequired("amendment approval only permits applying its local proposal")
+                REGISTRY.invoke("system", tool, payload, approval_id=aid)
             except ApprovalRequired as e:
                 raise HTTPException(403, str(e))
-            return repo.set_status(aid, "sent", sent_at=datetime.utcnow().isoformat(), gmail=r)
+            return repo.get("action", aid)
         if decision == "apply":
             try:
-                return REGISTRY.invoke("system", "apply_amendment", {"action_id": aid}, approval_id=aid)
+                tool, payload = approvals.action_payload(a)
+                if tool != "apply_amendment":
+                    raise ApprovalRequired("only amendment approvals permit applying a local proposal")
+                result = REGISTRY.invoke("system", tool, payload, approval_id=aid)
             except ApprovalRequired as e:
                 raise HTTPException(403, str(e))
+            if result.get("is_update"):
+                # Application is already completed and its lease released. Analysis failure
+                # must not turn the applied proposal into a retryable external effect.
+                try:
+                    result["run_id"] = update_graph.run(u.company_id, result["contract_id"],
+                        result["previous_version"], result["version"])
+                except Exception:
+                    result["analysis_warning"] = "Local proposal applied; automatic analysis could not start. Start analysis separately."
+                    repo.set_status(aid, "applied", analysis_warning=result["analysis_warning"])
+                else:
+                    repo.set_status(aid, "applied", analysis_run_id=result["run_id"])
+            return result
         raise HTTPException(400, "decision must be approve|reject|send|apply")
 
 
@@ -453,7 +478,7 @@ def list_events(u: User = Depends(current_user)):
 
 
 @router.post("/events", tags=["events"])
-def post_event(ev: EventIn, u: User = Depends(current_user)):
+def post_event(ev: EventIn, u: User = Depends(admin)):
     """Manual fallback when Gmail is unavailable — same parser, same graph."""
     return events_svc.receive(u.company_id, subject=ev.subject, body=ev.body, sender=ev.sender, method="manual")
 
@@ -466,6 +491,8 @@ def reprocess_event(event_id: str, u: User = Depends(admin)):
         ev = repo.get("event", event_id)
         if not ev:
             raise HTTPException(404, "Event not found")
+        if ev.get("review_release_status") in ("release_pending", "release_failed"):
+            raise HTTPException(409, "Security release requires manual recovery; ordinary reassessment is blocked")
         if ev.get("status") not in ("noise", "needs_review"):
             raise HTTPException(409, "Only unrelated or unresolved events can be reassessed here")
         if any(r["status"] == "running" for r in runs_svc.runs_for(u.company_id, event_id=event_id)):
@@ -480,7 +507,7 @@ def email_template(u: User = Depends(current_user)):
 
 
 @router.post("/email/poll-now", tags=["events"])
-def poll_now(u: User = Depends(current_user)):
+def poll_now(u: User = Depends(admin)):
     from odin.email import poller
     return poller.poll_company(u.company_id)
 
@@ -493,7 +520,7 @@ def email_status(u: User = Depends(current_user)):
 
 # ───────────────────────────── what-if ─────────────────────────────
 @router.post("/whatif", tags=["whatif"])
-def whatif(ev: EventIn, u: User = Depends(current_user)):
+def whatif(ev: EventIn, u: User = Depends(admin)):
     sid = new_id("wif")
     r = events_svc.receive(u.company_id, subject=ev.subject, body=ev.body, sender="", method="manual",
                            scenario_id=sid)
@@ -507,11 +534,16 @@ def whatif_result(sid: str, u: User = Depends(current_user)):
             rows = s.scalars(select(Record).where(Record.company_id == u.company_id, Record.scenario_id == sid)).all()
             by_kind: dict = {}
             for r in rows:
+                if r.kind not in {"event", "extraction", "finding", "verification", "ruling", "violation",
+                                   "action", "alert", "report", "dependency", "clarification"}:
+                    continue
                 by_kind.setdefault(r.kind, []).append(r.data)
         run = None
         with db() as s:
-            rr = s.scalars(select(Run).where(Run.scenario_id == sid)).first()
+            rr = s.scalars(select(Run).where(Run.company_id == u.company_id, Run.scenario_id == sid)).first()
             run = repo.run_dict(rr) if rr else None
+        if not rows and not rr:
+            raise HTTPException(404, "scenario not found")
         base = None
         with run_ctx(u.company_id, agent="system"):
             base = insights.exposure_summary()
@@ -521,8 +553,14 @@ def whatif_result(sid: str, u: User = Depends(current_user)):
 
 
 @router.delete("/whatif/{sid}", tags=["whatif"])
-def whatif_drop(sid: str, u: User = Depends(current_user)):
-    repo.drop_scenario(sid)
+def whatif_drop(sid: str, u: User = Depends(admin)):
+    with scope(u):
+        with db() as session:
+            owned = session.scalar(select(Record.id).where(Record.company_id == u.company_id, Record.scenario_id == sid))
+            run = session.scalar(select(Run.id).where(Run.company_id == u.company_id, Run.scenario_id == sid))
+        if not owned and not run:
+            raise HTTPException(404, "scenario not found")
+        repo.drop_scenario(sid)
     return {"dropped": sid}
 
 
@@ -552,6 +590,7 @@ def report(which: str, contract_id: Optional[str] = None, format: str = "json", 
         r = repo.get("report", rid)
         if not r:
             raise HTTPException(404, "report not generated yet — run an analysis")
+        r = redact(r)
         if format == "json":
             return r
         body = report_render.company_html(r) if which == "company" else report_render.contract_html(r)
@@ -562,7 +601,7 @@ def report(which: str, contract_id: Optional[str] = None, format: str = "json", 
 
 
 @router.post("/reports/refresh", tags=["reports"])
-def refresh_reports(u: User = Depends(current_user), contract_id: Optional[str] = None):
+def refresh_reports(u: User = Depends(admin), contract_id: Optional[str] = None):
     from odin.agents import synth
     from odin.graphs import analysis
     from odin.services import runs as runs_svc
@@ -612,14 +651,14 @@ def counterparties(u: User = Depends(current_user)):
 @router.get("/export/calendar.ics", tags=["export"])
 def export_ics(u: User = Depends(current_user)):
     with scope(u):
-        return Response(insights.ics(), media_type="text/calendar",
+        return Response(redact_text(insights.ics()), media_type="text/calendar",
                         headers={"content-disposition": "attachment; filename=odin-deadlines.ics"})
 
 
 @router.get("/export/actions.csv", tags=["export"])
 def export_csv(u: User = Depends(current_user)):
     with scope(u):
-        return Response(insights.actions_csv(), media_type="text/csv",
+        return Response(redact_text(insights.actions_csv()), media_type="text/csv",
                         headers={"content-disposition": "attachment; filename=odin-actions.csv"})
 
 
@@ -629,7 +668,7 @@ class OwnerReq(BaseModel):
 
 
 @router.post("/owners", tags=["insights"])
-def set_owner(req: OwnerReq, u: User = Depends(current_user)):
+def set_owner(req: OwnerReq, u: User = Depends(admin)):
     with scope(u):
         cur = insights.owners()
         cur[req.timeline_id] = req.owner
@@ -702,6 +741,10 @@ def workspace_reset(u: User = Depends(admin)):
     from sqlalchemy import delete
     cid = u.company_id
     with db() as s:
+        s.scalar(select(Company).where(Company.id == cid).with_for_update())
+        if s.scalar(select(Record.id).where(Record.company_id == cid, Record.kind == "action",
+                    Record.data["approval_execution"]["state"].as_string() == "executing").limit(1)):
+            raise HTTPException(409, "An action is executing; reconcile or wait before resetting the workspace")
         for t in (ToolCall, AgentMessageRow, Run, Record, ClauseRow, ContractVersion, Contract):
             s.execute(delete(t).where(t.company_id == cid))
         co = s.get(Company, cid)
@@ -711,6 +754,6 @@ def workspace_reset(u: User = Depends(admin)):
 
 
 @router.post("/demo/play", tags=["demo"])
-def demo_play(delay_seconds: float = 20, u: User = Depends(current_user)):
+def demo_play(delay_seconds: float = 20, u: User = Depends(admin)):
     from odin.services import demo
     return demo.play(u.company_id, delay_seconds)

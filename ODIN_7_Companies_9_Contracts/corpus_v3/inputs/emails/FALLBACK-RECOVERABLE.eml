@@ -1,0 +1,13 @@
+From: event-desk@aurora.example
+To: odin-inbox@aurora.example
+Subject: [ODIN-EVENT] PAYMENT_LATE AUR-2027-002
+Date: Wed, 10 Feb 2027 18:00:00 +0530
+Message-ID: <FALLBACK-RECOVERABLE@odin-fixtures.example>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+CONTRACT_ID: AUR-2027-002
+DESCRIPTION:
+Payment is late. Observation time: 2027-02-10T18:00:00+05:30. January portal =
+invoice remains unpaid.
