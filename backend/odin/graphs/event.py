@@ -8,13 +8,14 @@ from functools import lru_cache
 
 from langgraph.graph import END, START, StateGraph
 
-from odin.agents import heimdall, loki, tyr
+from odin.agents import heimdall, loki, tyr, synth
 from odin.agents.base import agent_node, say
 from odin.core import budget as budget_mod
 from odin.core.config import limits
 from odin.graphs.checkpoint import checkpointer
 from odin.graphs.state import EventState
 from odin.services import insights, runs
+from odin.db import repo
 
 
 @agent_node("norns")
@@ -71,6 +72,12 @@ def run(company_id: str, event_id: str, scenario_id: str | None = None, backgrou
                               "event_id": event_id, "debate_round": 0, "finding_ids": []},
                              config=runs.graph_config(run_id, "whatif" if scenario_id else "event",
                                                       company_id=company_id, event_id=event_id))
+        if out.get("errors") or out.get("budget_hit"):
+            repo.set_status(event_id, "needs_review", impact_review_required=True,
+                            reject_reason="Assessment incomplete: " + "; ".join(out.get("errors") or [str(out.get("budget_hit"))]))
+        if not scenario_id and not out.get("noise") and out.get("contract_ids"):
+            synth.synthesize({"company_id": company_id, "run_id": run_id,
+                              "contract_ids": out.get("contract_ids") or []})
         if out.get("noise"):
             return "done"
         return "partial" if out.get("errors") or out.get("budget_hit") else "done"

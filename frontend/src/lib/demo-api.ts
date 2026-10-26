@@ -42,7 +42,7 @@ export async function demoRequest(path: string, options: RequestInit = {}): Prom
     const run = (await demoRequest('/api/runs') as ApiRecord[])[0];
     return { run, workstreams: record(run.workplan).workstreams, timeline: { running: false, tool_call_count: 0, agents: {}, steps: p.findings.map(f => ({ id: f.id, sender: f.agent, receiver: 'odin', kind: f.kind.toLowerCase(), summary: f.body, ended_at: f.timestamp, tool_calls: [] })) }, outputs: { finding: [], violation: [], alert: [], action: [] }, debate: [], reports: [], remarks: { decision: 'partial', complete: false, gaps: [{ contract_id: 'Preview', status: 'partial', reason: 'Sample text only; no agents ran and no verified report was generated.' }] } };
   }
-  if (route === '/api/runs/preview-run') return { id: 'preview-run', status: 'partial', messages: p.findings.map(f => ({ sender: f.agent, summary: f.body, ts: f.timestamp, kind: f.kind.toLowerCase() })), tool_calls: [], budget: { per_agent: {} } };
+  if (route === '/api/runs/preview-run') return { id: 'preview-run', status: 'partial', messages: p.findings.map(f => ({ id: f.id, run_id: 'preview-run', sender: f.agent, receiver: 'odin', summary: f.body, ts: f.timestamp, kind: f.kind.toLowerCase(), payload: { preview: true, obligation_id: f.obligationId } })), tool_calls: [], budget: { per_agent: {} } };
   if (route === '/api/violations') return [];
   if (route === '/api/email/template') return 'Subject: Payment update\nContract: [contract id]\nDate: [YYYY-MM-DD]\nAmount: [amount and currency]\nDetails: [event details]';
   if (route === '/api/email/status') return { status: 'preview', error: 'Gmail is not connected in preview.' };

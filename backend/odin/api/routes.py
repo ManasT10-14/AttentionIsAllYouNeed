@@ -7,9 +7,6 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
 from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse, Response
-from pydantic import BaseModel
-from sqlalchemy import func, select
-
 from odin.api.deps import current_user, require_role
 from odin.core import citations
 from odin.core.config import limits, odin_config
@@ -27,6 +24,8 @@ from odin.services import ask as ask_svc
 from odin.services import events as events_svc
 from odin.services import insights, report_render
 from odin.tools.registry import REGISTRY, ApprovalRequired
+from pydantic import BaseModel, Field
+from sqlalchemy import func, select
 
 router = APIRouter()
 admin = require_role("admin")
@@ -82,6 +81,8 @@ def list_contracts(u: User = Depends(current_user)):
             out.append({"contract_id": c.contract_id, "title": c.title, "type": c.type, "version": c.current_version,
                         "parties": c.meta.get("parties", []), "effective_date": c.meta.get("effective_date"),
                         "governing_law": c.meta.get("governing_law"), "status": c.status,
+                        "external_id": c.meta.get("external_id"),
+                        "relations": [r for r in insights.doc_relations() if c.contract_id in (r.get("from_doc"), r.get("to_doc"))],
                         "warnings": v.parse_warnings if v else [], "health": insights.health(c.contract_id),
                         "analysed": insights.extraction(c.contract_id) is not None})
         return out
@@ -107,7 +108,20 @@ def get_contract(cid: str, u: User = Depends(current_user)):
 
 def _clause_json(r: ClauseRow) -> dict:
     return {"id": r.id, "number": r.number, "heading": r.heading, "text": r.text, "page": r.page,
-            "clause_type": r.clause_type, "version": r.version, "bboxes": r.bboxes}
+            "clause_type": r.clause_type, "version": r.version, "bboxes": r.bboxes,
+            "ref": r.ref, "parent_ref": r.parent_ref,
+            "override": next((o for o in insights.clause_overrides(r.contract_id) if o.get("number") == r.number), None)}
+
+
+class ContractDeleteIn(BaseModel):
+    confirm_contract_id: str
+
+
+@router.delete("/contracts/{cid}", tags=["contracts"])
+def delete_contract(cid: str, req: ContractDeleteIn, u: User = Depends(admin)):
+    from odin.services.contracts import delete_contract as remove
+    with scope(u):
+        return remove(u.company_id, cid, req.confirm_contract_id, u.id)
 
 
 @router.get("/contracts/{cid}/versions/{v}/pdf", tags=["contracts"])
@@ -224,11 +238,19 @@ class ClockReq(BaseModel):
 @router.get("/clock", tags=["clock"])
 def get_clock(u: User = Depends(current_user)):
     with scope(u):
-        return {"sim_now": repo.sim_now(), "real_today": date.today()}
+        sim = repo.get("simulation", "official:simulation")
+        return {"sim_now": repo.sim_now(), "real_today": date.today(),
+                "simulation": {"start_date": sim["start_date"], "end_date": sim["checkpoints"][-1]} if sim else None}
 
 
 @router.post("/clock", tags=["clock"])
-def set_clock(req: ClockReq, u: User = Depends(current_user)):
+def set_clock(req: ClockReq, u: User = Depends(admin)):
+    with scope(u):
+        if repo.get("simulation", "official:simulation"):
+            from odin.api.pack import _launch
+            target = req.sim_now or (repo.sim_now() + timedelta(days=req.days or 0))
+            result = _launch(u, target)
+            return {**result, "sim_now": repo.sim_now(), "requested_date": target}
     with db() as s:
         c = s.get(Company, u.company_id)
         base = c.sim_now or date.today()
@@ -243,10 +265,22 @@ def set_clock(req: ClockReq, u: User = Depends(current_user)):
 def timeline(as_of: Optional[date] = None, contract_id: Optional[str] = None, u: User = Depends(current_user)):
     with scope(u):
         now = _as_of(as_of)
-        return {"as_of": now, "contracts": [
-            {"contract_id": t.contract_id, "term_end": t.term_end, "notice_deadline": t.notice_deadline,
-             "entries": [e.model_dump(mode="json") for e in t.entries], "exposure": t.exposure.model_dump(mode="json")}
-            for t in insights.timelines(now) if not contract_id or t.contract_id == contract_id]}
+        tls = [t for t in insights.timelines(now) if not contract_id or t.contract_id == contract_id]
+        entries = [e.model_dump(mode="json") for t in tls for e in t.entries]
+        from odin.services.bundle import ledger_as_of
+        history = [{"id": f"ledger:{i}", "date": r["date"], "contract_id": r.get("contract_id", ""),
+                    "title": r.get("reference", "Payment ledger entry"), "status": r.get("status", ""),
+                    "amount": {"amount": float(r["amount"]), "currency": r.get("currency", "USD")},
+                    "source": "ledger", "kind": "payment", "from": r.get("from"), "to": r.get("to")}
+                   for i, r in enumerate(ledger_as_of(now)) if not contract_id or r.get("contract_id") == contract_id]
+        cs = [c for c in repo.contracts() if not contract_id or c.contract_id == contract_id]
+        return {"as_of": now, "entries": [e for e in entries if e["scenario"] == "baseline"],
+                "history": history, "projections": [e for e in entries if e["scenario"] == "worst_case"],
+                "unanalysed_contracts": [c.contract_id for c in cs if not insights.extraction(c.contract_id)],
+                "contracts": [{"contract_id": t.contract_id, "term_end": t.term_end, "notice_deadline": t.notice_deadline,
+                               "entries": [e.model_dump(mode="json") for e in t.entries],
+                               "exposure": t.exposure.model_dump(mode="json")} for t in tls]}
+
 
 
 @router.get("/exposure", tags=["views"])
@@ -424,6 +458,22 @@ def post_event(ev: EventIn, u: User = Depends(current_user)):
     return events_svc.receive(u.company_id, subject=ev.subject, body=ev.body, sender=ev.sender, method="manual")
 
 
+@router.post("/events/{event_id}/reprocess", tags=["events"])
+def reprocess_event(event_id: str, u: User = Depends(admin)):
+    from odin.graphs import event as event_graph
+    from odin.services import runs as runs_svc
+    with scope(u):
+        ev = repo.get("event", event_id)
+        if not ev:
+            raise HTTPException(404, "Event not found")
+        if ev.get("status") not in ("noise", "needs_review"):
+            raise HTTPException(409, "Only unrelated or unresolved events can be reassessed here")
+        if any(r["status"] == "running" for r in runs_svc.runs_for(u.company_id, event_id=event_id)):
+            raise HTTPException(409, "This event already has a running assessment")
+        repo.set_status(event_id, "processing", reject_reason="")
+    return {"run_id": event_graph.run(u.company_id, event_id), "event_id": event_id}
+
+
 @router.get("/email/template", tags=["events"])
 def email_template(u: User = Depends(current_user)):
     return PlainTextResponse(event_parser.TEMPLATE)
@@ -477,14 +527,22 @@ def whatif_drop(sid: str, u: User = Depends(current_user)):
 
 
 # ───────────────────────────── ask / reports / insights ─────────────────────────────
+class AskTurn(BaseModel):
+    question: str = Field(min_length=1, max_length=4000)
+    contract_ids: list[str] = Field(default_factory=list, max_length=50)
+
+
 class AskReq(BaseModel):
-    question: str
-    contract_ids: Optional[list[str]] = None
+    question: str = Field(min_length=1, max_length=4000)
+    contract_ids: Optional[list[str]] = Field(default=None, max_length=50)
+    history: list[AskTurn] = Field(default_factory=list, max_length=4)
 
 
 @router.post("/ask", tags=["ask"])
 def ask(req: AskReq, u: User = Depends(current_user)):
-    return ask_svc.ask(u.company_id, req.question, req.contract_ids)
+    if not req.question.strip():
+        raise HTTPException(400, "Enter a question.")
+    return ask_svc.ask(u.company_id, req.question.strip(), req.contract_ids, [turn.model_dump() for turn in req.history])
 
 
 @router.get("/reports/{which}", tags=["reports"])
@@ -504,19 +562,33 @@ def report(which: str, contract_id: Optional[str] = None, format: str = "json", 
 
 
 @router.post("/reports/refresh", tags=["reports"])
-def refresh_reports(u: User = Depends(current_user)):
+def refresh_reports(u: User = Depends(current_user), contract_id: Optional[str] = None):
     from odin.agents import synth
+    from odin.graphs import analysis
     from odin.services import runs as runs_svc
 
+    with scope(u):
+        cids = [contract_id] if contract_id else [c.contract_id for c in repo.contracts()]
+        if not cids or any(not repo.contract(cid) for cid in cids):
+            raise HTTPException(404, "No matching contracts to generate reports for")
+        missing = [cid for cid in cids if not insights.extraction(cid)]
+    if missing:
+        # Synthesis cannot replace missing extraction/review. Run the actual analysis first.
+        return {"run_id": analysis.run(u.company_id, contract_ids=cids), "mode": "analysis",
+                "reason": "Missing contract analysis; extracting and reviewing before synthesis."}
+
     def go(rid: str) -> str:
-        cached = {}
-        for w in (repo.get("report", f"report:{c.contract_id}") or {} for c in repo.contracts()):
-            if w:
-                cached[w["contract_id"]] = {"contract_id": w["contract_id"], "status": w.get("completeness"),
-                                            "reason": w.get("gaps"), "evidence": w.get("evidence_score")}
-        synth.synthesize({"company_id": u.company_id, "run_id": rid, "ws_results": list(cached.values())})
-        return "done"
-    return {"run_id": runs_svc.start(u.company_id, "report", go)}
+        cached = []
+        for cid in cids:
+            saved = repo.get("report", f"report:{cid}") or {}
+            status = saved.get("completeness")
+            cached.append({"contract_id": cid, "status": status if status in ("done", "partial", "failed") else "partial",
+                           "reason": saved.get("gaps") or ("Original workstream completion not recorded." if status not in ("done", "partial", "failed") else ""),
+                           "evidence": saved.get("evidence_score")})
+        result = synth.synthesize({"company_id": u.company_id, "run_id": rid,
+                                  "contract_ids": cids, "ws_results": cached})
+        return "partial" if result.get("errors") or result.get("budget_hit") else "done"
+    return {"run_id": runs_svc.start(u.company_id, "report", go), "mode": "synthesis"}
 
 
 @router.get("/insights/health", tags=["insights"])
@@ -624,9 +696,10 @@ def demo_seed(analyze: bool = True, u: User = Depends(admin)):
 def workspace_reset(u: User = Depends(admin)):
     """Delete this company's contracts, events and analysis; keep users and the Gmail link."""
     import shutil
-    from sqlalchemy import delete
+
     from odin.core.config import DATA_DIR
     from odin.db.tables import AgentMessageRow, Contract
+    from sqlalchemy import delete
     cid = u.company_id
     with db() as s:
         for t in (ToolCall, AgentMessageRow, Run, Record, ClauseRow, ContractVersion, Contract):

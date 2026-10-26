@@ -11,6 +11,22 @@ npm run dev
 
 Open http://127.0.0.1:3000. Without backend configuration, use **Explore demo workspace**. Preview fixtures are clearly labelled; failed live requests never fall back to fixtures. Preview can edit/approve local drafts, but cannot send email, upload documents, run agents or generate answers. The old root HTML/CSS/JS files are historical design references and are not used by Next.js.
 
+## Fast local use (no compilation during tab navigation)
+
+Stop the development server on port 3000, keep the backend running, then run:
+
+```sh
+npm run local
+```
+
+This builds every route first, then runs Next's production server at http://127.0.0.1:3000.
+The existing API, Google callback and SSE proxy stay enabled. It uses a separate `.next-local`
+build directory. Startup includes a build; subsequent tab navigation does not compile pages.
+Source edits need a restart/rebuild. Use `npm run dev` while editing code; its cold-route
+compilation indicator is development overhead, not an agent or database operation.
+This does not cache API responses or change live data freshness. Static export/deployment
+commands retain their existing behavior. The backend target still comes from `API_PROXY_TARGET`.
+
 ## Connect the backend
 
 The confirmed local backend address is `http://localhost:8000`. Copy `.env.example` to `.env.local`:

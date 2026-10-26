@@ -15,8 +15,6 @@ import time
 from typing import Type, TypeVar
 
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
-from pydantic import BaseModel
-
 from odin.core import budget as budget_mod
 from odin.core.config import limits, odin_config
 from odin.core.context import maybe_current
@@ -24,6 +22,7 @@ from odin.core.hooks import HOOKS
 from odin.core.telemetry import traced
 from odin.llm.factory import chain_for, chat_model, max_tokens_for, model_for, price
 from odin.llm.fake import fake_instance
+from pydantic import BaseModel
 
 log = logging.getLogger("odin.llm")
 T = TypeVar("T", bound=BaseModel)
@@ -61,7 +60,8 @@ def structured(agent: str, schema: Type[T], system: str, user: str, *, tools: li
     messages = [SystemMessage(system), HumanMessage(user)]
     messages = HOOKS.pre_llm(agent, messages)
     prompt_hash = hashlib.sha1(system.encode()).hexdigest()[:10]
-    retries = odin_config()["defaults"].get("max_retries", 2)
+    agent_options = odin_config()["agents"].get(agent) or {}
+    retries = agent_options.get("max_retries", odin_config()["defaults"].get("max_retries", 2))
     providers = chain_for(agent)
     errors = []
 
@@ -75,7 +75,7 @@ def structured(agent: str, schema: Type[T], system: str, user: str, *, tools: li
             try:
                 cfg = _run_config(agent, prov, prompt_hash, meta)
                 model = chat_model(prov, odin_config()["defaults"].get("temperature", 0), model_for(agent, prov),
-                                   max_tokens_for(agent))
+                                   max_tokens_for(agent), timeout_s=agent_options.get("timeout_s", 120))
                 convo = list(messages)
                 tin = tout = 0
                 if tools:
@@ -86,6 +86,8 @@ def structured(agent: str, schema: Type[T], system: str, user: str, *, tools: li
                 tin, tout = tin + a, tout + b
                 out = res["parsed"]
                 if out is None:   # schema-repair retry: show the model its own error
+                    if not agent_options.get("schema_repair", True):
+                        raise LLMFailure(f"schema mismatch: {res.get('parsing_error')}")
                     err = res.get("parsing_error")
                     convo += [res["raw"] if isinstance(res["raw"], AIMessage) else AIMessage(str(res["raw"])),
                               HumanMessage(f"Your output did not match the schema: {err}. "

@@ -8,7 +8,8 @@
     "start": "serve out --listen tcp://127.0.0.1:3000 --no-clipboard",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test tests/*.test.ts",
-    "gen:api": "node scripts/generate-api.mjs"
+    "gen:api": "node scripts/generate-api.mjs",
+    "local": "node scripts/local-server.mjs"
   },
   "dependencies": {
     "@dagrejs/dagre": "^3.1.3",

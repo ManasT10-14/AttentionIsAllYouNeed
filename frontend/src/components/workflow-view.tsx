@@ -2,13 +2,19 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { dateTimeText, list, number, query, record, text } from '@/lib/api';
+import { list, number, query, record, text } from '@/lib/api';
 import { runTitle } from '@/lib/run-presentation';
+import { activityTimeText } from '@/lib/activity-time';
+import { useWorkspace } from './providers';
+import { enrichWorkflowSteps } from '@/lib/message-context';
+import { MessageDetails } from './message-details';
+import { AgentHandoffView } from './agent-handoff-view';
 import { useResource } from '@/lib/use-resource';
 import { Badge, PageTitle, Panel, PanelTitle } from './ui';
 import { Citations, DownloadLink, ResourceState, SourceBadge, Status, TraceLink } from './api-ui';
 
 export function WorkflowView() {
+ const { timeZone } = useWorkspace(); const dateTimeText = (value: unknown) => activityTimeText(value, timeZone);
  const router = useRouter(); const params = useSearchParams();
  const [agentFilter, setAgentFilter] = useState('');
  const contract = params.get('contract') ?? ''; const event = params.get('event') ?? ''; const runParam = params.get('run') ?? '';
@@ -16,14 +22,15 @@ export function WorkflowView() {
  const contracts = useResource('/api/contracts'); const events = useResource('/api/events');
  const rows = list(runs.data); const runId = runParam || text(rows[0]?.id, '');
  const wf = useResource(runId ? '/api/workflow/' + encodeURIComponent(runId) : null);
+ const messageRecord = useResource(runId ? '/api/runs/' + encodeURIComponent(runId) : null);
  const w = record(wf.data); const run = record(w.run); const tl = record(w.timeline); const remarks = record(w.remarks); const outputs = record(w.outputs);
  const title = (r: Record<string, unknown>) => runTitle(r, list(contracts.data), list(events.data));
  const pick = (id: string) => { setAgentFilter(''); router.push(query('/dashboard/workflow', { run: id, contract, event })); };
- const steps = list(tl.steps); const visibleSteps = steps.filter(s => !agentFilter || s.sender === agentFilter);
+ const steps = enrichWorkflowSteps(list(tl.steps), list(record(messageRecord.data).messages)); const visibleSteps = steps.filter(s => !agentFilter || s.sender === agentFilter);
  const agents = [...new Set(steps.map(s => text(s.sender)))];
  return <><PageTitle eyebrow="WORKFLOW EXECUTION" title="Follow every agent, step by step." description="Inspect the work plan, evidence, decisions and outputs of each run.">{(contract || event) && <Link className="button button-secondary" href="/dashboard/workflow">Show all runs</Link>}</PageTitle>
  <div className="master-detail-layout workflow-layout"><aside className="master-list">
- <Panel><PanelTitle title="Runs" description="Newest first. Select a run to inspect." /><ResourceState resource={runs} empty={runs.data !== undefined && !rows.length}><div className="run-choice-list">{rows.map(r => <button key={text(r.id)} className="run-choice" aria-current={text(r.id) === runId ? 'true' : undefined} onClick={() => pick(text(r.id))}><strong>{title(r)}</strong><span><Status value={r.status} /><small>{dateTimeText(r.started_at)}</small></span><code>{text(r.id).slice(0, 8)}</code></button>)}</div></ResourceState></Panel>
+ <Panel><PanelTitle title="Runs" description="Newest first. Select a run to inspect." /><ResourceState resource={runs} empty={runs.data !== undefined && !rows.length}><div className="run-choice-list">{rows.map(r => <button key={text(r.id)} className="run-choice" title={'Server start: ' + text(r.started_at)} aria-current={text(r.id) === runId ? 'true' : undefined} onClick={() => pick(text(r.id))}><strong>{title(r)}</strong><span><Status value={r.status} /><small>{dateTimeText(r.started_at)}</small></span><code>{text(r.id).slice(0, 8)}</code></button>)}</div></ResourceState></Panel>
  </aside><div className="detail-pane">
  {!runId ? <Panel><p className="muted-note">Your agent workflows will appear here after a run starts.</p></Panel> : <ResourceState resource={wf}>{wf.data !== undefined && <>
  <Panel className="workflow-summary"><PanelTitle title={title(run)} description={'Started ' + dateTimeText(run.started_at)}><Status value={run.status} /></PanelTitle>
@@ -31,8 +38,10 @@ export function WorkflowView() {
  {tl.running ? <p role="status" className="workflow-live"><i className="status-dot" /> Working now: <strong>{text(tl.current_agent, 'odin')}</strong></p> : null}
  <div className="workflow-metrics"><div><strong>{list(w.workstreams).length}</strong><span>Workstreams</span></div><div><strong>{steps.length}</strong><span>Recorded steps</span></div><div><strong>{text(tl.tool_call_count, '0')}</strong><span>Tool calls</span></div><div><strong>{list(outputs.action).length}</strong><span>Drafted actions</span></div></div></Panel>
  <Panel><PanelTitle title="Work plan" description="Progress and evidence for each agreement"><SourceBadge value="analysis" /></PanelTitle>{list(w.workstreams).length ? <div className="workflow-streams">{list(w.workstreams).map(s => <article key={text(s.id ?? s.contract_id)}><header><strong>{s.contract_id === 'cross' ? 'Cross-contract review' : text(list(contracts.data).find(c => (c.id ?? c.contract_id) === s.contract_id)?.title, text(s.contract_id))}</strong><Status value={s.status} /></header><label>Evidence coverage <b>{number(s.evidence_score) === undefined ? 'Not supplied' : Math.round(number(s.evidence_score)! * 100) + '%'}</b></label>{number(s.evidence_score) !== undefined && <progress max="1" value={Math.min(1, Math.max(0, number(s.evidence_score)!))} />}{s.reason ? <p>{text(s.reason)}</p> : null}</article>)}</div> : <p className="muted-note">This run follows a fixed pipeline rather than per-contract workstreams.</p>}</Panel>
+ <AgentHandoffView key={runId} context={w} messages={steps} running={run.status === 'running'} scope="Recorded communication for the selected run. Select an arrow or replay messages below." />
+ {messageRecord.error && <p className="form-error">Additional message context could not be loaded: {messageRecord.error} <button className="text-link" onClick={messageRecord.reload}>Retry</button></p>}
  <Panel><PanelTitle title="Agent activity" description={`${steps.length} recorded steps · ${text(tl.tool_call_count, '0')} tool calls. Step times follow recorded messages and can include overlapping work.`} /><div className="filter-bar workflow-filter"><label>Show agent<select value={agentFilter} onChange={e => setAgentFilter(e.target.value)}><option value="">All agents</option>{agents.map(a => <option key={a}>{a}</option>)}</select></label></div>
- <ol className="workflow-steps">{visibleSteps.map(s => <li key={text(s.id)}><span className={'agent-avatar agent-' + text(s.sender).toLowerCase()} aria-hidden="true">{text(s.sender)[0].toUpperCase()}</span><article><header><strong>{text(s.sender)}</strong><span className="workflow-recipient">to {text(s.receiver)}</span><Status value={s.kind} />{Boolean(s.contract_id) && <Badge>{text(s.contract_id)}</Badge>}</header><p>{text(s.summary)}</p><div className="workflow-step-meta"><span>{dateTimeText(s.ended_at)}</span><span>{number(s.duration_s) === undefined ? 'Duration not recorded' : text(s.duration_s) + 's recorded interval'}</span></div>{list(s.tool_calls).length > 0 && <details><summary>{list(s.tool_calls).length} tool calls</summary><div className="workflow-tool-list">{list(s.tool_calls).map((c, i) => <div key={i}><code>{text(c.tool)}</code><Status value={c.blocked ? 'blocked' : c.ok === false ? 'failed' : 'done'} /><span>{text(c.ms)}ms</span></div>)}</div></details>}</article></li>)}</ol>
+ <ol className="workflow-steps">{visibleSteps.map(s => <li key={text(s.id)}><span className={'agent-avatar agent-' + text(s.sender).toLowerCase()} aria-hidden="true">{text(s.sender)[0].toUpperCase()}</span><article><header><strong>{text(s.sender)}</strong><span className="workflow-recipient">to {text(s.receiver)}</span><Status value={s.kind} />{Boolean(s.contract_id) && <Badge>{text(s.contract_id)}</Badge>}</header><p>{text(s.summary)}</p><div className="workflow-step-meta"><span>{dateTimeText(s.ended_at)}</span><span>{number(s.duration_s) === undefined ? 'Duration not recorded' : text(s.duration_s) + 's recorded interval'}</span></div><MessageDetails message={s} context={w} /></article></li>)}</ol>
  {!visibleSteps.length && <p className="muted-note">{steps.length ? 'No steps match this agent.' : 'No agent messages recorded yet.'}</p>}
  <h3 className="detail-section-title">Per-agent usage</h3><div className="workflow-agent-usage">{Object.entries(record(tl.agents)).map(([a, raw]) => { const v = record(raw); return <article key={a}><strong>{a}</strong><dl><div><dt>LLM calls</dt><dd>{text(v.calls)}</dd></div><div><dt>Tokens</dt><dd>{text(v.tokens)}</dd></div><div><dt>Cost</dt><dd>${number(v.usd)?.toFixed(4) ?? '—'}</dd></div><div><dt>LLM time</dt><dd>{Math.round((number(v.latency_ms) ?? 0) / 1000)}s</dd></div></dl></article>; })}</div></Panel>
  <Panel><PanelTitle title="Debate & decisions" description="Loki's findings, Heimdall's verifications and Tyr's rulings" />{list(w.debate).map((d, i) => { const f = record(d.finding); const ru = record(d.ruling); return <article className="workflow-debate" key={i}><header><Badge tone="amber">Loki</Badge><strong>{text(f.claim)}</strong><Status value={f.severity} severity /></header><Citations values={f.citations} />{list(d.verifications).map((v, j) => <div className="workflow-verdict" key={j}><Badge tone="purple">Heimdall</Badge><Status value={v.verdict} /><p>{text(v.rationale)}</p></div>)}{d.ruling ? <div className="ruling-box"><Badge tone="green">Tyr</Badge><p>{text(ru.rationale)}</p><small>Decision: {text(ru.winner)} · Severity {text(ru.final_severity)}/5</small></div> : <p className="muted-note">No arbitration ruling recorded.</p>}</article>; })}{!list(w.debate).length && <p className="muted-note">No findings to debate in this run.</p>}</Panel>

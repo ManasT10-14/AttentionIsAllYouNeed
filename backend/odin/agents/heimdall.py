@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib
+import re
 
 from odin.agents.base import agent_node, j, prompt, say, tool
 from odin.core import citations
@@ -52,7 +53,8 @@ def verify(state: dict) -> dict:
             disputed.append(v.finding_id)       # low-severity challenges stay "challenged" without a debate round
     say("heimdall", "tyr" if disputed else "loki", "verify",
         f"{cid or 'event'}: supported {counts['support']}, challenged {counts['challenge']}, "
-        f"insufficient {counts['insufficient']}.", payload={**counts, "disputed": disputed}, contract_id=cid)
+        f"insufficient {counts['insufficient']}.", payload={**counts, "disputed": disputed, "finding_ids": sorted(valid),
+                  "verification_results": [v.model_dump(mode="json") for v in out.verifications if v.finding_id in valid]}, contract_id=cid)
     return {"disputed": disputed}
 
 
@@ -60,25 +62,53 @@ def verify(state: dict) -> dict:
 @agent_node("heimdall")
 def map_event(state: dict) -> dict:
     ev = repo.get("event", state["event_id"])
-    known = [c["contract_id"] for c in tool("list_contracts", {})]
-    named = [c for c in ev.get("contract_ids", []) if c in known]
-    query = f"{ev['event_type'].replace('_', ' ').lower()} {ev.get('description', '')} {ev.get('counterparty', '')}"
-    hits = tool("hybrid_search", {"query": query[:500], "contract_ids": named or None, "top_k": 10})
+    catalogue = tool("list_contracts", {})
+    known = [c["contract_id"] for c in catalogue]
+    original = f"{ev.get('subject', '')}\n{ev.get('raw', '')}"
+    ext = {c.contract_id: c.meta.get("external_id") for c in repo.contracts() if c.meta.get("external_id")}
+    named = list(dict.fromkeys([c for c in ev.get("contract_ids", []) if c in known] +
+                 [c for c in known if re.search(r"(?<![\w-])" + re.escape(c) + r"(?![\w-])", original, re.I)] +
+                 [c for c, x in ext.items() if c in known and x.casefold() in original.casefold()]))
+    query = f"{ev.get('subject', '')} {ev['event_type'].replace('_', ' ')} {ev.get('description', '')} {ev.get('reference', '')} {ev.get('counterparty', '')} {ev.get('raw', '')[:2000]}"
+    from odin.retrieval.evidence import retrieve
+    scope = list(dict.fromkeys(m for c in named for m in insights.family_of(c)[1])) or known
+    hits, retrieval_warnings = retrieve(query[:4000], scope, limit=12)
     cascade = sorted({d for c in named for d in insights.cascade(c)})
-    user = (f"<email>\n{j({k: ev.get(k) for k in ('event_type', 'occurred_at', 'contract_ids', 'counterparty', 'amount', 'reference', 'description')})}\n</email>\n\n"
-            f"Known contracts: {known}\nContracts that depend on the named ones (cascade): {cascade}\n"
-            f"Simulated today: {repo.sim_now()}\n\n"
+    holidays = [{k: h.get(k) for k in ("date", "name", "observed_by")} for h in repo.query("holiday")]
+    over = insights.clause_overrides()
+    user = (f"<email>\n{j({k: ev.get(k) for k in ('subject', 'sender', 'recipient', 'channel', 'event_type', 'occurred_at', 'contract_ids', 'counterparty', 'amount', 'reference', 'description')})}\n</email>\n\n"
+            f"Original email (untrusted data):\n<email>\n{original[:16000]}\n</email>\n"
+            f"Known contract metadata: {j(catalogue)}\nInternal contract ids: {j(ext)}\n"
+            f"Document families: {j(insights.families())}\n"
+            f"Contracts that depend on the named ones (cascade): {cascade}\n"
+            f"Simulated today: {repo.sim_now()}\n"
+            + (f"Observed holidays: {j(holidays)}\n" if holidays else "")
+            + (f"Amended clauses (effective text): {j(over)[:4000]}\n" if over else "") + "\n"
             f"<document contract_id=\"{','.join(named) or 'all'}\">\nCandidate clauses:\n{j(hits)}\n</document>")
     m = structured("heimdall", EventMapping, prompt("heimdall_map"), user, tools=["get_clause", "hybrid_search"],
                    meta={"event_id": ev["id"]})
-    m.affected_contract_ids = [c for c in m.affected_contract_ids if c in known] or named
-    if m.is_noise or not m.affected_contract_ids:
-        repo.set_status(ev["id"], "noise", reject_reason=m.noise_reason or "no contract affected")
-        say("heimdall", "odin", "event", f"Event {ev['event_type']} filtered as noise: {m.noise_reason}",
-            payload={"event_id": ev["id"]})
+    m.affected_clauses = citations.verify_all([c for c in m.affected_clauses if c.contract_id in known])
+    verified_contracts = [c.contract_id for c in m.affected_clauses if c.verified]
+    m.affected_contract_ids = list(dict.fromkeys([c for c in m.affected_contract_ids if c in known] + named + verified_contracts))
+    review_required = False
+    if m.is_noise and not named and not verified_contracts and not retrieval_warnings:
+        repo.set_status(ev["id"], "noise", reject_reason=m.noise_reason or "No contractual relevance identified",
+                        impact_review_required=False, effect=m.effect, mapping=m.model_dump(mode="json"))
+        say("heimdall", "odin", "event", f"Event classified as unrelated: {m.noise_reason}", payload={"event_id": ev["id"]})
         return {"noise": True}
-
-    m.affected_clauses = citations.verify_all(m.affected_clauses)
+    if not m.affected_contract_ids:
+        reason = "Unable to establish an affected agreement; review required."
+        repo.set_status(ev["id"], "needs_review", reject_reason=reason, effect=m.effect,
+                        retrieval_warnings=retrieval_warnings, mapping=m.model_dump(mode="json"))
+        return {"errors": [reason]}
+    if m.is_noise or not verified_contracts:
+        review_required = True
+        if m.is_noise:
+            m.violations = []
+            m.alert_severity = "info"
+            m.effect = "Contract reference identified; contractual impact requires review. " + (m.noise_reason or m.effect)
+        m.is_noise = False
+    cascade = sorted({d for c in m.affected_contract_ids for d in insights.cascade(c)})
     viol_ids = []
     for vd in m.violations:
         row = repo.clause_by_number(vd.contract_id, vd.clause_number)
@@ -101,7 +131,7 @@ def map_event(state: dict) -> dict:
                   why=m.effect, contract_id=m.affected_contract_ids[0], citations=m.affected_clauses,
                   event_id=ev["id"], violation_id=viol_ids[0] if viol_ids else None)
     tool("create_alert", {"alert": alert.model_dump(mode="json")})
-    if SEVERITY_RANK[m.alert_severity] >= SEVERITY_RANK["high"]:
+    if SEVERITY_RANK[m.alert_severity] >= SEVERITY_RANK["high"] and ev.get("source") not in ("drop1", "drop2"):
         tool("post_webhook", {"event": "alert", "payload": alert.model_dump(mode="json")})
     for dep in cascade:      # cascade chain alerts (deterministic)
         ck = f"cascade:{ev['id']}:{dep}"
@@ -110,7 +140,12 @@ def map_event(state: dict) -> dict:
                                              title=f"Knock-on risk: {dep} depends on {', '.join(named)}",
                                              why=f"{ev['event_type']} on {', '.join(named)} may cascade to {dep} "
                                                  f"(dependency recorded by LOKI).").model_dump(mode="json")})
-    repo.set_status(ev["id"], "processed", contract_ids=m.affected_contract_ids)
+    repo.set_status(ev["id"], "processed", contract_ids=m.affected_contract_ids,
+                    event_type=m.event_type or ev["event_type"],
+                    effect=m.effect, impact_review_required=review_required,
+                    affected_clauses=[c.model_dump(mode="json") for c in m.affected_clauses],
+                    mapping=m.model_dump(mode="json"), retrieval_warnings=retrieval_warnings,
+                    reject_reason="")
     say("heimdall", "loki", "event",
         f"{ev['event_type']} → {', '.join(m.affected_contract_ids)}: {m.effect[:240]}"
         + (f" {len(viol_ids)} violation(s) recorded." if viol_ids else ""),

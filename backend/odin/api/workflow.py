@@ -12,7 +12,7 @@ from odin.api.deps import current_user
 from odin.api.routes import scope
 from odin.db import repo
 from odin.db.session import db
-from odin.db.tables import Record, Run, ToolCall, User
+from odin.db.tables import Record, Run, ToolCall, User, AgentMessageRow
 from odin.services import report_render, runs as runs_svc
 
 router = APIRouter()
@@ -152,12 +152,51 @@ def report_index(u: User = Depends(current_user)):
                       "completeness": r.data.get("completeness"), "run_id": r.run_id,
                       "generated_at": r.data.get("generated_at")} for r in rows if r.contract_id]
     with scope(u):
+        known = {c["contract_id"] for c in contracts}
+        contracts.extend({"contract_id": c.contract_id, "title": c.title, "version": c.current_version,
+                          "completeness": "not_generated", "run_id": None, "generated_at": None}
+                         for c in repo.contracts() if c.contract_id not in known)
         events = [{"event_id": e["id"], "subject": e.get("subject"), "event_type": e.get("event_type"),
                    "status": e.get("status"), "contract_ids": e.get("contract_ids", []), "date": e.get("occurred_at"),
                    "run_ids": [r["id"] for r in runs_svc.runs_for(u.company_id, event_id=e["id"])]}
                   for e in reversed(repo.query("event"))]
     runs = [{"run_id": r["run_id"], "run_kind": r["run_kind"], "generated_at": r["generated_at"],
              "completeness": r["report"].get("completeness"), "previous_run_id": r["previous_run_id"],
-             "new_findings": len(r["diff"]["new_findings"]), "resolved_findings": len(r["diff"]["resolved_findings"])}
+             "new_findings": len(r.get("diff", {}).get("new_findings", [])), "resolved_findings": len(r.get("diff", {}).get("resolved_findings", []))}
             for r in runs_svc.run_reports(u.company_id)]
     return {"contracts": contracts, "events": events, "runs": runs}
+
+
+@router.get("/agent-messages/{message_id}/result", tags=["agents"])
+def message_result(message_id: str, u: User = Depends(current_user)):
+    with db() as session:
+        row = session.get(AgentMessageRow, message_id)
+        if not row or row.company_id != u.company_id:
+            raise HTTPException(404, "message not found")
+        payload = row.payload or {}
+        if payload.get("contribution"):
+            return payload["contribution"]
+        sender, kind, cid, run_id = row.sender, row.kind, row.contract_id, row.run_id
+    from odin.services.message_results import capture_result
+    from odin.core.context import run_ctx
+    with scope(u), run_ctx(run_id=run_id):
+        if sender == "synth" and not payload.get("result_snapshot"):
+            snapshot = repo.get("report_run", f"reportrun:{run_id}")
+            report = (snapshot or {}).get("report")
+            if not report:
+                return {"source": "unavailable", "sections": [],
+                        "notice": "No historical Synth report was saved for this message's run. The latest company report is available separately."}
+            if cid:
+                report = next((r for r in snapshot.get("contract_reports", []) if r.get("contract_id") == cid), None)
+                if not report:
+                    return {"source": "unavailable", "sections": [],
+                            "notice": "No historical contract report was saved for this run."}
+            payload = {**payload, "result_snapshot": report}
+        result = capture_result(sender, kind, cid, payload)
+    if sender == "odin" and not result["sections"]:
+        run = _run(u, run_id)
+        result["sections"] = [{"title": "Persisted run work plan and completion gaps",
+                               "value": run.get("workplan") or {}}]
+    result["source"] = "available_records"
+    result["notice"] = "Loaded from available records. These records may have changed since this message; no message-time snapshot was saved."
+    return result

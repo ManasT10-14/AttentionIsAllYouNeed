@@ -248,6 +248,8 @@ class ParsedClause:
     char_end: int
     clause_type: str
     bboxes: list[list[float]]
+    ref: Optional[str] = None           # display reference as written (§3.2, Section B)
+    parent_ref: Optional[str] = None    # enclosing section for sub-clauses (Section D)
 
 
 @dataclass
@@ -256,6 +258,7 @@ class ParsedDoc:
     cover: CoverMeta
     clauses: list[ParsedClause]
     warnings: list[str]
+    extra: dict = field(default_factory=dict)   # cover meta beyond CoverMeta (external_id, canonical, ...)
 
 
 def parse_date(s: str) -> Optional[date]:
@@ -384,6 +387,12 @@ def parse_pdf(pdf_path: Path, fallback_id: str) -> ParsedDoc:
     text, lines = layout(pdf_path, warnings)
     if not text.strip():
         raise ValueError("Document has no extractable text, even after OCR.")
+    from odin.ingest import pack
+    if pack.is_pack(text):              # official dev-pack layout (e.g. an uploaded PDF twin)
+        doc, extra = pack.parse_pack(text, pdf_path, None, fallback_id)
+        doc.warnings[:0] = warnings
+        doc.extra = extra
+        return doc
     cover, clauses, w = segment(text, lines)
     warnings += w
     if cover is None:

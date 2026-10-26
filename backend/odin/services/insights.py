@@ -40,30 +40,47 @@ def _cid() -> str:
     return current().company_id
 
 
-def inputs(contract_id: str) -> ContractInputs | None:
+def inputs(contract_id: str, now: date | None = None) -> ContractInputs | None:
     c = repo.contract(contract_id)
     x = extraction(contract_id)
     if not c or not x:
         return None
+    # Retain uncertain source data in extraction, but never turn rejected evidence
+    # into a dated financial commitment.
+    x = x.model_copy(deep=True)
+    for field in ("payments", "obligations", "penalties", "milestones"):
+        setattr(x, field, [item for item in getattr(x, field) if item.status != "unverified"])
+    # A restatement of an existing fee in an amendment is not another payable.
+    amended_ids = {r.get("to_doc") for r in doc_relations() if r.get("from_doc") == contract_id and r.get("relation") == "amends"}
+    if amended_ids and x.payments:
+        signatures = {(p.amount.amount, p.amount.currency, p.frequency)
+                      for target in amended_ids for parent in [extraction(target)] if parent
+                      for p in parent.payments if p.amount}
+        x = x.model_copy(deep=True)
+        x.payments = [p for p in x.payments if not p.amount or (p.amount.amount, p.amount.currency, p.frequency) not in signatures]
+    now = now or repo.sim_now()
+    visible_events = [e for e in events_for(contract_id) if e.occurred_at.date() <= now]
+    visible_ids = {e.id for e in visible_events}
     ctx = (repo.company(_cid()).context or {})
     viols = [Violation.model_validate(v) for v in repo.query("violation", contract_id=contract_id)
-             if v.get("status") != "superseded"]
+             if v.get("status") != "superseded" and v.get("event_id") in visible_ids]
     acts = [a for a in repo.query("action", contract_id=contract_id, status=["approved", "sent", "applied"])]
     eff = c.meta.get("effective_date")
     names = [p["name"] for p in c.meta.get("parties", []) if p.get("role") == "company"] + \
             [p.name for p in x.parties if p.role == "company"] + [ctx.get("name", "")]
     return ContractInputs(contract_id=contract_id, extraction=x,
                           effective_date=date.fromisoformat(eff) if eff else None,
-                          governing_law=c.meta.get("governing_law", ""), events=events_for(contract_id),
+                          governing_law=c.meta.get("governing_law", ""), events=visible_events,
                           violations=viols, actions=acts, currency=ctx.get("base_currency", "INR"), owners=owners(),
-                          company_names=[n for n in names if n])
+                          company_names=[n for n in names if n], holidays=repo.query("holiday"),
+                          ledger=[r for r in repo.query("ledger") if r.get("contract_id") == contract_id and r["date"] <= now.isoformat()])
 
 
 def timelines(now: date | None = None) -> list[ContractTimeline]:
     now = now or repo.sim_now()
     out = []
     for c in repo.contracts():
-        ci = inputs(c.contract_id)
+        ci = inputs(c.contract_id, now)
         if ci:
             out.append(compute(ci, now))
     return out
@@ -102,7 +119,7 @@ def deadline_alerts(now: date) -> list[Alert]:
     out = []
     for t in timelines(now):
         for e in t.entries:
-            if e.kind not in ("notice_deadline", "payment", "renewal", "expiry", "obligation", "penalty_trigger"):
+            if e.scenario != "baseline" or e.kind not in ("notice_deadline", "payment", "renewal", "expiry", "obligation", "penalty_trigger"):
                 continue
             days = (e.date - now).days
             if e.status == "missed":
@@ -196,14 +213,19 @@ def calibration() -> dict:
 def counterparties(now: date | None = None) -> list[dict]:
     now = now or repo.sim_now()
     exp = {p["contract_id"]: p for p in exposure_summary(now)["contracts"]}
-    prof: dict = defaultdict(lambda: {"contracts": [], "worst_case": 0.0, "violations": 0, "late_payment_events": 0})
+    prof: dict = defaultdict(lambda: {"contracts": [], "worst_case": 0.0, "violations": 0, "late_payment_events": 0, "worst_case_by_currency": {}})
     for c in repo.contracts():
         for p in c.meta.get("parties", []):
             if p.get("role") == "company":
                 continue
             d = prof[p["name"]]
             d["contracts"].append(c.contract_id)
-            d["worst_case"] += exp.get(c.contract_id, {}).get("worst_case", 0)
+            exposure = exp.get(c.contract_id, {})
+            d["worst_case"] += exposure.get("worst_case", 0)
+            currency = exposure.get("currency")
+            if currency:
+                d["worst_case_by_currency"][currency] = d["worst_case_by_currency"].get(currency, 0) + exposure.get("worst_case", 0)
+            d["currency"] = next(iter(d["worst_case_by_currency"])) if len(d["worst_case_by_currency"]) == 1 else None
             d["violations"] += len(repo.query("violation", contract_id=c.contract_id))
             d["late_payment_events"] += sum(1 for e in events_for(c.contract_id)
                                             if e.event_type in ("PAYMENT_LATE", "PAYMENT_MISSED"))
@@ -236,6 +258,9 @@ def graph() -> dict:
             continue
         edges.append({"source": f"c:{d['from_contract']}", "target": f"c:{d['to_contract']}", "kind": d["kind"],
                       "reason": d.get("reason", ""), "citations": d.get("citations", [])})
+    for r in doc_relations():       # incorporates / amends / addendum_to recorded at ingest
+        edges.append({"source": f"c:{r['from_doc']}", "target": f"c:{r['to_doc']}", "kind": r["relation"],
+                      "reason": r.get("detail", ""), "citations": [r["citation"]] if r.get("citation") else []})
     for f in repo.query("finding", contract_id="cross"):
         if f.get("status") in ("withdrawn", "superseded"):
             continue
@@ -249,6 +274,66 @@ def graph() -> dict:
     known = {c.contract_id for c in repo.contracts()}
     cascades = {c: [x for x in cascade(c) if x in known] for c in known}
     return {"nodes": nodes, "edges": edges, "cascades": {k: v for k, v in cascades.items() if v}}
+
+
+# ───────────────────────────── document families (cover page + SLA + amendment + addendum) ─────────────────────────────
+FAMILY_RELATIONS = ("incorporates", "amends", "addendum_to")
+
+
+def doc_relations() -> list[dict]:
+    return [r for r in repo.query("doc_relation") if r.get("status") != "superseded"]
+
+
+def clause_overrides(doc: str | None = None) -> list[dict]:
+    return sorted([o for o in repo.query("clause_override")
+                   if (not doc or o.get("doc") == doc) and o.get("status") != "superseded"
+                   and (not o.get("effective") or o["effective"] <= repo.sim_now().isoformat())],
+                  key=lambda o: o.get("effective") or "")
+
+
+def shared_terms(rels: list[dict] | None = None) -> set[str]:
+    """Documents incorporated by two or more others (e.g. STD): shared terms, reviewed once, never a family glue."""
+    rels = doc_relations() if rels is None else rels
+    n = defaultdict(set)
+    for r in rels:
+        if r.get("relation") == "incorporates":
+            n[r["to_doc"]].add(r["from_doc"])
+    return {d for d, srcs in n.items() if len(srcs) >= 2}
+
+
+def families(rels: list[dict] | None = None) -> dict[str, list[str]]:
+    """head -> members (head first). A1+A2+A3 is one family (A1 incorporates A2, A3 amends A2/A1); B1+B2 another.
+    The head is the member nothing else in the family modifies or is incorporated into."""
+    rels = doc_relations() if rels is None else rels
+    shared = shared_terms(rels)
+    parent: dict[str, str] = {}
+
+    def root(x):
+        while parent.setdefault(x, x) != x:
+            x = parent[x]
+        return x
+    for r in rels:
+        a, b = r.get("from_doc"), r.get("to_doc")
+        if a and b and r.get("relation") in FAMILY_RELATIONS and not {a, b} & shared:
+            parent[root(a)] = root(b)
+    groups = defaultdict(set)
+    for d in list(parent):
+        groups[root(d)].add(d)
+    out = {}
+    for members in groups.values():
+        not_head = {r["to_doc"] for r in rels if r.get("relation") == "incorporates"} | \
+                   {r["from_doc"] for r in rels if r.get("relation") in ("amends", "addendum_to")}
+        head = min(members - not_head or members)
+        out[head] = [head] + sorted(members - {head})
+    return out
+
+
+def family_of(contract_id: str) -> tuple[str, list[str]]:
+    """(head, members) of the contract's family; a standalone contract is its own one-member family."""
+    for head, members in families().items():
+        if contract_id in members:
+            return head, members
+    return contract_id, [contract_id]
 
 
 def cascade(contract_id: str) -> list[str]:
@@ -273,7 +358,7 @@ def ics(now: date | None = None) -> str:
     out = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//RAGNAROK//Odin//EN"]
     for t in timelines(now):
         for e in t.entries:
-            if e.kind in ("notice_deadline", "payment", "renewal", "expiry", "obligation") and e.status not in ("past", "done"):
+            if e.scenario == "baseline" and e.kind in ("notice_deadline", "payment", "renewal", "expiry", "obligation") and e.status not in ("past", "done"):
                 out += ["BEGIN:VEVENT", f"UID:{e.id}@odin", f"DTSTART;VALUE=DATE:{e.date.strftime('%Y%m%d')}",
                         f"DTEND;VALUE=DATE:{(e.date + timedelta(days=1)).strftime('%Y%m%d')}",
                         f"SUMMARY:[{e.contract_id}] {e.title}"[:250],

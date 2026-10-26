@@ -39,3 +39,5 @@ def init_db() -> None:
     Base.metadata.create_all(engine())
     with engine().begin() as conn:   # ponytail: tiny additive migration; adopt Alembic when schema churns
         conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS gmail_address VARCHAR"))
+        conn.execute(text("ALTER TABLE clauses ADD COLUMN IF NOT EXISTS ref VARCHAR"))
+        conn.execute(text("ALTER TABLE clauses ADD COLUMN IF NOT EXISTS parent_ref VARCHAR"))

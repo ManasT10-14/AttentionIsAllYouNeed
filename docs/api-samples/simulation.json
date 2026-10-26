@@ -1,0 +1,14 @@
+{
+  "start_date": "2027-01-15",
+  "sim_now": "2027-01-15",
+  "checkpoints": [
+    "2027-03-15",
+    "2027-06-01",
+    "2027-09-15"
+  ],
+  "drops_loaded": [],
+  "pending_events": 0,
+  "running": false,
+  "run_ids": [],
+  "last_run": null
+}

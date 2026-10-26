@@ -1,15 +1,54 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useWorkspace } from './providers';
-import { record, text } from '@/lib/api';
-import { Button, PageTitle, Panel } from './ui';
+import { list, record, text } from '@/lib/api';
+import { askHistory, askReason, type AskMessage } from '@/lib/ask-conversation';
+import { useResource } from '@/lib/use-resource';
+import { Badge, Button, PageTitle, Panel } from './ui';
+import { ASK_STARTERS } from '@/lib/odin';
 import { Citations, FieldValue, SourceBadge } from './api-ui';
-const STARTERS=['What contracts do we have?','Which contracts renew next quarter?','What is our total exposure?','Who are our counterparties?','What needs attention this month?'];
+const STARTERS = ASK_STARTERS;
 export function AskView() {
- const {request,demo} = useWorkspace(); const [question,setQuestion] = useState(''); const [contracts,setContracts] = useState(''); const [pending,setPending] = useState(false); const [error,setError] = useState(''); const [messages,setMessages] = useState<{question:string;answer:Record<string,unknown>}[]>([]);
- async function submit(e:React.FormEvent) {
-  e.preventDefault(); setPending(true);setError('');
-  try{const answer=await request('/api/ask',{method:'POST',body:JSON.stringify({question,...(contracts.trim()?{contract_ids:contracts.split(',').map(s=>s.trim()).filter(Boolean)}:{})})});setMessages(m=>[...m,{question,answer:record(answer)}]);setQuestion('');}catch(cause){setError(cause instanceof Error?cause.message:'Could not answer.');}finally{setPending(false);}
+ const { request, demo } = useWorkspace();
+ const available = useResource('/api/contracts');
+ const [question, setQuestion] = useState(''); const [contracts, setContracts] = useState<string[]>([]);
+ const [pending, setPending] = useState(false); const [elapsed, setElapsed] = useState(0);
+ const [error, setError] = useState(''); const [messages, setMessages] = useState<AskMessage[]>([]);
+ const active = useRef<AbortController | null>(null);
+ useEffect(() => () => active.current?.abort(), []);
+ useEffect(() => {
+  if (!pending) return;
+  const timer = setInterval(() => setElapsed(s => s + 1), 1000);
+  return () => clearInterval(timer);
+ }, [pending]);
+ async function submit(e: React.FormEvent) {
+  e.preventDefault(); if (pending || !question.trim()) return;
+  const asked = question.trim(); const controller = new AbortController(); active.current = controller;
+  setPending(true); setElapsed(0); setError('');
+  try {
+   const answer = await request('/api/ask', { method: 'POST', signal: controller.signal, body: JSON.stringify({ question: asked, contract_ids: contracts.length ? contracts : undefined, history: askHistory(messages) }) });
+   setMessages(m => [...m, { question: asked, answer: record(answer) }]); setQuestion('');
+  } catch (cause) {
+   setError(controller.signal.aborted ? 'Stopped waiting for this answer. Server processing may still finish.' : cause instanceof Error && cause.name === 'TimeoutError' ? 'The answer took too long. Try selecting an agreement or asking a narrower question.' : cause instanceof Error ? cause.message : 'Could not answer. Please retry.');
+  } finally { active.current = null; setPending(false); }
  }
- return <><PageTitle eyebrow="ASK ODIN" title="Ask. Inspect the evidence." description="Answers grounded in your selected contracts, with retrieved passages available for review." /><Panel><div className="ask-messages">{!messages.length && <div className="empty-state"><h2>Start with a contract question.</h2><p>Ask about the whole portfolio, one contract, or a specific clause.</p><div className="citation-list">{STARTERS.map(s=><button type="button" key={s} className="citation-chip" onClick={()=>setQuestion(s)}>{s}</button>)}</div></div>}{messages.map((m,i)=><article key={i}><div className="question-bubble">{m.question}</div><div className="answer-bubble"><SourceBadge value="analysis" />{m.answer.insufficient_evidence===true && <p className="form-error">Insufficient verified evidence to answer this question.</p>}<p>{text(m.answer.answer)}</p><Citations values={m.answer.citations} />{Array.isArray(m.answer.sources) && m.answer.sources.length>0 && <div className="citation-list" aria-label="Sources">{m.answer.sources.map((s:unknown,j:number)=>{const r=record(s);return <span key={j} className="citation-chip">{text(r.title)||text(r.contract_id)}</span>;})}</div>}<details><summary>Retrieved passages</summary><FieldValue value={m.answer.passages} /></details></div></article>)}</div><form className="ask-form" onSubmit={submit}><label>Contract IDs · optional<input className="input" value={contracts} onChange={e=>setContracts(e.target.value)} placeholder="Comma-separated IDs, or leave empty for all" /></label><label>Your question<textarea rows={3} required value={question} onChange={e=>setQuestion(e.target.value)} placeholder="What needs our attention?" /></label><Button disabled={pending || !question.trim() || demo}>{pending?'Finding evidence…':'Ask Odin'}</Button>{error && <p className="form-error" role="alert">{error}</p>}{demo && <p className="muted-note">Connect the backend to ask questions. Preview does not generate answers.</p>}</form></Panel></>;
+ return <><PageTitle eyebrow="ASK ODIN" title="Ask. Inspect the evidence." description="Ask across your portfolio or select agreements. Follow-up questions use your recent conversation; legal claims require verified clause quotations." /><Panel>
+ <div className="ask-messages">{!messages.length && <div className="empty-state"><h2>Start with a contract question.</h2><p>Ask about the portfolio, one agreement, or a specific clause.</p><div className="citation-list">{STARTERS.map(s => <button type="button" key={s} className="citation-chip" disabled={pending} onClick={() => setQuestion(s)}>{s}</button>)}</div></div>}
+ {messages.map((m, i) => <article key={i}><div className="question-bubble">{m.question}</div><div className="answer-bubble"><div className="button-row"><SourceBadge value="analysis" />{m.answer.status === 'partial' && <Badge tone="amber">Partially answered</Badge>}</div>
+ {askReason(m.answer) && <p className={m.answer.insufficient_evidence ? 'form-error' : 'muted-note'}>{askReason(m.answer)}</p>}
+ {m.answer.answer ? <p className="ask-answer-text">{text(m.answer.answer)}</p> : null}<Citations values={m.answer.citations} />
+ {Array.isArray(m.answer.missing) && m.answer.missing.length > 0 && <div className="ask-limitations"><strong>{m.answer.insufficient_evidence ? 'What is needed' : 'Remaining gaps'}</strong><ul>{m.answer.missing.map((gap, j) => <li key={j}>{text(gap)}</li>)}</ul></div>}
+ {Array.isArray(m.answer.warnings) && m.answer.warnings.map((warning, j) => <p className="muted-note" key={j}>{text(warning)}</p>)}
+ {list(m.answer.sources).length > 0 && <details><summary>Agreement scope ({list(m.answer.sources).length})</summary><div className="citation-list">{list(m.answer.sources).map((s, j) => <span key={j} className="citation-chip">{text(s.title, text(s.contract_id))}</span>)}</div></details>}
+ <details><summary>Retrieved evidence ({list(m.answer.passages).length} passages)</summary>{m.answer.resolved_question && m.answer.resolved_question !== m.question ? <p className="muted-note">Search context: {text(m.answer.resolved_question)}</p> : null}<FieldValue value={m.answer.passages} /></details>
+ {m.answer.insufficient_evidence === true && <button type="button" className="text-link" disabled={pending} onClick={() => setQuestion(m.question)}>Edit and retry question</button>}</div></article>)}
+ </div>
+ <form className="ask-form" onSubmit={submit}><label>Agreement scope - optional<select multiple size={Math.min(5, Math.max(2, list(available.data).length))} value={contracts} disabled={pending} onChange={e => setContracts(Array.from(e.target.selectedOptions, o => o.value))}>{list(available.data).map(c => <option key={text(c.id ?? c.contract_id)} value={text(c.id ?? c.contract_id)}>{text(c.title)} ({text(c.id ?? c.contract_id)})</option>)}</select><small>No selection searches all agreements. Hold Ctrl or Command to select several.</small></label>
+ {contracts.length > 0 && <button type="button" className="text-link" disabled={pending} onClick={() => setContracts([])}>Clear selection</button>}
+ {available.error && <p className="form-error">Agreement names could not be loaded. <button type="button" className="text-link" onClick={available.reload}>Retry</button></p>}
+ <label>Your question<textarea rows={3} maxLength={4000} required value={question} disabled={pending} onChange={e => setQuestion(e.target.value)} placeholder="What needs our attention?" /></label>
+ <div className="button-row"><Button disabled={pending || !question.trim() || demo}>{pending ? 'Preparing verified answer...' : 'Ask Odin'}</Button>{pending && <Button type="button" variant="secondary" onClick={() => active.current?.abort()}>Stop waiting</Button>}{messages.length > 0 && !pending && <Button type="button" variant="ghost" onClick={() => setMessages([])}>New conversation</Button>}</div>
+ {pending && <p role="status" className="muted-note">Working on your question ({elapsed}s). Retrieval and evidence verification can take longer for complex questions.{elapsed >= 30 ? ' Still waiting for the answer service; you can stop waiting above.' : ''}</p>}
+ {error && <p className="form-error" role="alert">{error}</p>}{demo && <p className="muted-note">Connect the backend to ask questions. Preview does not generate answers.</p>}
+ </form></Panel></>;
 }

@@ -19,3 +19,9 @@ build/
 work/
 *.zip
 tokens/
+
+# Local compiled Next.js server output
+frontend/.next-local/
+
+# Synthetic deletion-test uploads
+backend/.test-tmp/

@@ -8,6 +8,10 @@ Every claim links back to the exact clause, highlighted in the original PDF.
 The repository also holds the evaluation and security pipeline (`eval/`) and the 15-contract test
 corpus (`corpus/`).
 
+## Official organiser pack
+
+The official Quillhub pack now has a bundle importer, exact canonical-text citations, amendment/family links, staged JSONL replay, observed-holiday calculations and checkpoint snapshots. The original 15-contract corpus remains separate and unchanged. See [official pack setup and verification](docs/official-pack-status.md).
+
 ## Status
 
 | Part | State |
@@ -126,7 +130,7 @@ Check it: http://localhost:8000/api/health returns `{"ok":true}`.
 
 ```powershell
 cd frontend
-npm run dev
+npm run local  # builds once, then serves without per-tab compilation
 ```
 
 Open **http://127.0.0.1:3000** (use `127.0.0.1`, not `localhost`, so the login cookie matches).

@@ -13,7 +13,35 @@ READ_TOOLS = ["get_clause", "hybrid_search", "get_extraction", "list_contracts"]
 CONFLICT_TOPICS = ["exclusivity exclusive supplier non-compete", "governing law jurisdiction courts arbitration seat",
                    "service level availability uptime service credits", "limitation of liability cap indemnity",
                    "term expiry renewal notice period", "assignment change of control subcontracting",
-                   "confidentiality data protection personal data", "premises lease location office"]
+                   "confidentiality data protection personal data", "premises lease location office",
+                   "exclusive right territory sector headquartered", "uptime target percent of the minutes",
+                   "service credit percent of monthly fee maximum credit sole and exclusive remedy",
+                   "credit request written request within days after the end of the calendar month",
+                   "scheduled maintenance advance notice hours per occurrence",
+                   "insurance coverage limits per occurrence per claim lapse",
+                   "security incident data breach notification hours", "unlimited claims general cap amount",
+                   "notice address written notice non-renewal"]
+
+
+def _family_note(cid: str, members: list[str]) -> str:
+    rels = insights.doc_relations()
+    shared = insights.shared_terms(rels)
+    mine = [r for r in rels if r.get("from_doc") in members or r.get("to_doc") in members]
+    lines = []
+    if len(members) > 1:
+        lines.append(f"You are reviewing the document FAMILY {'+'.join(members)} as ONE agreement: apply the effective "
+                     "(amended) terms, cite each passage with its own Document ID, and raise each issue once.")
+    if cid in shared:
+        users = sorted({r["from_doc"] for r in rels if r.get("relation") == "incorporates" and r.get("to_doc") == cid})
+        lines.append(f"{cid} is SHARED standard terms incorporated by {', '.join(users)}; each cover page controls over "
+                     "it. Raise each issue ONCE, list the affected cover pages in other_contract_ids and say where the "
+                     "company is Provider and where it is Customer.")
+    elif shared & {r["to_doc"] for r in mine}:
+        lines.append(f"Shared standard terms ({', '.join(sorted(shared))}) are reviewed separately: do not repeat generic "
+                     "standard-terms issues; cite them only where this family changes, overrides or collides with them.")
+    if mine:
+        lines.append("Document relations: " + j(mine))
+    return "\n".join(lines) + "\n\n" if lines else ""
 
 
 def _extraction_digest(cid: str) -> list[dict]:
@@ -52,10 +80,16 @@ def attack(state: dict) -> dict:
         for f in repo.query("finding", contract_id=cid, status=["open", "verified", "challenged", "ruled"]):
             if not f.get("event_id"):
                 repo.set_status(f["id"], "superseded")
-    rows = repo.clauses(cid, numbers=focus) if focus else repo.clauses(cid)
-    user = (f"Company context:\n{j(company_ctx())}\n\nOther contracts of the company:\n"
-            f"{j(tool('list_contracts', {}))}\n\nTHOR's extraction (fields, confidence, status, flags):\n"
-            f"{j(_extraction_digest(cid))[:12000]}\n\n"
+    head, members = insights.family_of(cid)
+    if head != cid and not focus:
+        say("loki", "heimdall", "attack", f"{cid}: reviewed together with its family {'+'.join(members)} "
+            f"under {head} (no separate findings).", payload={"finding_ids": [], "family": members}, contract_id=cid)
+        return {}
+    rows = repo.clauses(cid, numbers=focus) if focus else [r for m in members for r in repo.clauses(m)]
+    user = (f"Today (simulated): {repo.sim_now()}\nCompany context:\n{j(company_ctx())}\n\nOther contracts of the company:\n"
+            f"{j(tool('list_contracts', {}))}\n\n" + _family_note(cid, members)
+            + "THOR's extraction (fields, confidence, status, flags):\n"
+            + "\n".join(f"{m}: {j(_extraction_digest(m))[:12000 // len(members)]}" for m in members) + "\n\n"
             + (f"FOCUS: only these clauses changed in a new version: {focus}. Review them (and their interaction "
                f"with the rest of the contract).\n\n" if focus else "")
             + f"Contract under review:\n{doc_block(rows)}")
@@ -141,7 +175,7 @@ def rebut(state: dict) -> dict:
 
 @agent_node("loki")
 def cross(state: dict) -> dict:
-    """Cross-contract workstream (FR4.2)."""
+    """Cross-contract workstream (FR4.2): one view per document family, plus ledger and company facts."""
     contracts = tool("list_contracts", {})
     if len(contracts) < 2:
         say("loki", "odin", "attack", "Only one contract — no cross-contract conflicts possible.", contract_id="cross")
@@ -149,16 +183,28 @@ def cross(state: dict) -> dict:
     for f in repo.query("finding", contract_id="cross", status=["open", "verified", "challenged", "ruled"]):
         if not f.get("event_id"):
             repo.set_status(f["id"], "superseded")
-    digests = {c["contract_id"]: {"meta": c, "extraction": _extraction_digest(c["contract_id"])[:40]}
-               for c in contracts}
+    fams = insights.families()
+    in_family = {m for ms in fams.values() for m in ms}
+    groups = list(fams.values()) + [[c["contract_id"]] for c in contracts if c["contract_id"] not in in_family]
+    digests = {"+".join(ms): {"meta": [c for c in contracts if c["contract_id"] in ms],
+                              "extraction": [d for m in ms for d in _extraction_digest(m) if _key_field(d)][:60]}
+               for ms in groups}
     passages = []
     for topic in CONFLICT_TOPICS:
-        hits = tool("hybrid_search", {"query": topic, "top_k": 6})
+        hits = tool("hybrid_search", {"query": topic, "top_k": 8})
         if len({h["contract_id"] for h in hits}) > 1:
             passages.append({"topic": topic, "clauses": [{k: h[k] for k in ("contract_id", "clause_number", "text")}
                                                           for h in hits]})
-    user = (f"Company context:\n{j(company_ctx())}\n\nContracts:\n{j(digests)[:30000]}\n\n"
-            f"<document contract_id=\"multiple\">\nClauses retrieved per conflict topic:\n{j(passages)[:30000]}\n</document>")
+    over = insights.clause_overrides()
+    ledger = [{k: r.get(k) for k in ("date", "from", "to", "amount", "reference", "status", "contract_id")}
+              for r in repo.query("ledger")]
+    user = (f"Today (simulated): {repo.sim_now()}\nCompany context:\n{j(company_ctx())}\n\n"
+            f"Document families and relations:\n{j(fams)}\n{j(insights.doc_relations())[:4000]}\n"
+            f"Shared standard terms: {sorted(insights.shared_terms())}\n"
+            f"Effective amendments:\n{j(over)[:6000]}\n"
+            f"Contracts (key extracted terms):\n{j(digests)[:30000]}\n"
+            f"Payments ledger:\n{j(ledger)[:6000]}\n"
+            f'<document contract_id="multiple">\n{j(passages)[:40000]}\n</document>')
     out = structured("loki", LokiOutput, prompt("loki_cross"), user, tools=READ_TOOLS, meta={"contract_id": "cross"})
     for f in out.findings:
         f.kind = "conflict" if f.other_contract_ids else f.kind
@@ -166,6 +212,14 @@ def cross(state: dict) -> dict:
     say("loki", "heimdall", "attack", f"Cross-contract: {len(ids)} conflicts, {len(out.dependencies)} dependencies.",
         payload={"finding_ids": ids}, contract_id="cross")
     return {}
+
+
+KEY_FIELDS = {"term", "renewal", "liability_cap", "governing_law", "forum", "notice", "service_levels", "exclusivity",
+              "insurance_requirements", "penalties", "payments", "milestones", "precedence", "related_contracts"}
+
+
+def _key_field(d: dict) -> bool:
+    return d.get("field") in KEY_FIELDS
 
 
 @agent_node("loki")
