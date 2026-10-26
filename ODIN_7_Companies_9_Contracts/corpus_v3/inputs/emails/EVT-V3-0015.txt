@@ -1,0 +1,10 @@
+Subject: [ODIN-EVENT] CUSTOM AUR-2027-005
+
+EVENT_ID: EVT-V3-0015
+EVENT_TYPE: CUSTOM
+OCCURRED_AT: 2027-07-04T18:00:00+05:30
+CONTRACT_ID: AUR-2027-005
+COUNTERPARTY: Willow Housing Private Limited
+REFERENCE: HOLD-01
+DESCRIPTION:
+UNIT-A inspection HOLD-01 and Aurora's admission confirm Aurora has remained in possession continuously from July 1 through today, July 4, without a signed extension or termination variation. Keys have not been returned. There are no earlier occupation charges in this case. Rent and deposit arrears are outside this case scope.

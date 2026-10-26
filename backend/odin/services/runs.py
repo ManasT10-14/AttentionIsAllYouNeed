@@ -11,6 +11,7 @@ from odin.core import budget as budget_mod
 from odin.core.config import settings
 from odin.core.context import run_ctx
 from odin.core.models import Workstream
+from odin.core.privacy import redact_text
 from odin.db import repo
 from odin.db.session import db
 from odin.db.tables import Run, Company
@@ -71,15 +72,15 @@ def start(company_id: str, kind: str, fn: Callable[[str], str], *, scenario_id: 
                 status = fn(run_id) or "done"
                 _set_outputs(trace_run, {"status": status})
             except Exception as e:   # noqa: BLE001
-                log.exception("run %s failed", run_id)
-                err = f"{type(e).__name__}: {e}"[:1000]
+                log.error("run %s failed (%s)", run_id, type(e).__name__)
+                err = redact_text(f"{type(e).__name__}: {e}")[:1000]
             if kind in ("analysis", "update", "report", "event") and not scenario_id:
                 try:
                     snapshot_report(company_id, run_id, kind)
-                except Exception:   # noqa: BLE001
-                    log.exception("report snapshot for %s failed", run_id)
+                except Exception as exc:   # noqa: BLE001
+                    log.error("report snapshot for %s failed (%s)", run_id, type(exc).__name__)
         b = budget_mod.release(run_id)
-        repo.update_run(run_id, status=status, error=err, budget=b, finished_at=datetime.utcnow(),
+        repo.update_run(run_id, company_id=company_id, status=status, error=err, budget=b, finished_at=datetime.utcnow(),
                         trace_url=_trace_url(run_id))
         with _lock:
             _plans.pop(run_id, None)

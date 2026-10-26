@@ -1,0 +1,21 @@
+From: event-desk@aurora.example
+To: odin-inbox@aurora.example
+Subject: [ODIN-EVENT] CUSTOM AUR-2027-004
+Date: Wed, 03 Mar 2027 10:00:00 +0530
+Message-ID: <EVT-V3-0011@odin-fixtures.example>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+EVENT_ID: EVT-V3-0011
+EVENT_TYPE: CUSTOM
+OCCURRED_AT: 2027-03-03T10:00:00+05:30
+CONTRACT_ID: AUR-2027-004
+COUNTERPARTY: Copperline Components Private Limited
+REFERENCE: PO-AX9-EXTRA-02
+DESCRIPTION:
+Procurement audit found a separate signed purchase order PO-AX9-EXTRA-02 plac=
+ed by Aurora with Forge on February 10 for one AX9 lot for an Indian project.=
+ This is a distinct new lot, not PO-AX9-100. Copperline supplied a written co=
+nfirmation that it gave no prior consent. No other outside-supplier order is =
+proved in this case.

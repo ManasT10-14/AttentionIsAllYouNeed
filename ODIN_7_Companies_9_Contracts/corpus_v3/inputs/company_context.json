@@ -1,0 +1,207 @@
+{
+  "company_id": "P01",
+  "company_name": "Aurora Software Private Limited",
+  "industry": "B2B software and connected-device services",
+  "jurisdictions": [
+    "IN",
+    "EU"
+  ],
+  "headquarters": "Bengaluru, India",
+  "fiscal_year_start": "04-01",
+  "base_currency": "INR",
+  "risk_appetite": "low",
+  "approval_threshold_inr": "1000000",
+  "key_contacts": [
+    "aurora-legal@aurora.example",
+    "cfo@aurora.example",
+    "security@aurora.example"
+  ],
+  "strategic_priorities": [
+    "Preserve portal continuity",
+    "Reduce supplier lock-in",
+    "Align delivery commitments",
+    "Protect resident data"
+  ],
+  "critical_dependencies": [
+    "Nimbus PROD-AUR hosting and recovery",
+    "Willow UNIT-A office and RESIDENT-ONE customer",
+    "Forge AX9 devices and integration",
+    "Copperline AX9 sourcing",
+    "SwiftRoute consignment FR-AX9-100",
+    "Sentinel production monitoring"
+  ],
+  "parties": [
+    {
+      "company_id": "P01",
+      "legal_name": "Aurora Software Private Limited",
+      "role": "software",
+      "representative": "Mira Sen"
+    },
+    {
+      "company_id": "P02",
+      "legal_name": "Forge Electronics Private Limited",
+      "role": "electronics vendor",
+      "representative": "Anil Das"
+    },
+    {
+      "company_id": "P03",
+      "legal_name": "Willow Housing Private Limited",
+      "role": "housing operator and landlord",
+      "representative": "Kavya Paul"
+    },
+    {
+      "company_id": "P04",
+      "legal_name": "Nimbus Cloud Private Limited",
+      "role": "cloud and backup vendor",
+      "representative": "Rohan Mehta"
+    },
+    {
+      "company_id": "P05",
+      "legal_name": "Copperline Components Private Limited",
+      "role": "component supplier",
+      "representative": "Leena Rao"
+    },
+    {
+      "company_id": "P06",
+      "legal_name": "SwiftRoute Logistics Private Limited",
+      "role": "logistics provider",
+      "representative": "Arjun Shah"
+    },
+    {
+      "company_id": "P07",
+      "legal_name": "Sentinel Security Private Limited",
+      "role": "managed security vendor",
+      "representative": "Nisha Iyer"
+    }
+  ],
+  "contract_registry": [
+    {
+      "contract_id": "AUR-2027-001",
+      "title": "Managed Cloud Hosting Agreement",
+      "file": "inputs/contracts/AUR-2027-001.pdf",
+      "sha256": "762258731c2a30b03181bc1f3849f9b048499147f9156193f0e8d7bd6d683572",
+      "party_ids": [
+        "P01",
+        "P04"
+      ],
+      "effective_date": "2027-01-03",
+      "end_date": "2027-12-31",
+      "document_form": "Cloud service undertaking",
+      "initial": true
+    },
+    {
+      "contract_id": "AUR-2027-002",
+      "title": "Resident Portal Subscription Order",
+      "file": "inputs/contracts/AUR-2027-002.pdf",
+      "sha256": "afa6a30141096d3a7548c911064bbbde784c22921eefed911a37b9d72a6134b4",
+      "party_ids": [
+        "P01",
+        "P03"
+      ],
+      "effective_date": "2027-01-10",
+      "end_date": "2027-12-31",
+      "document_form": "Customer order acceptance",
+      "initial": true
+    },
+    {
+      "contract_id": "AUR-2027-003",
+      "title": "AX9 Device Purchase Order",
+      "file": "inputs/contracts/AUR-2027-003.pdf",
+      "sha256": "26ddc132364d1d28409bed681f3c7f273fceb632646023088d1876a6ddd4c554",
+      "party_ids": [
+        "P01",
+        "P02"
+      ],
+      "effective_date": "2027-01-07",
+      "end_date": "2027-06-30",
+      "document_form": "Device procurement conditions",
+      "initial": true
+    },
+    {
+      "contract_id": "AUR-2027-004",
+      "title": "Exclusive AX9 Sourcing Undertaking",
+      "file": "inputs/contracts/AUR-2027-004.pdf",
+      "sha256": "98749581e46d0328e377894ed8e2f6ee7989e8dac4729b7c6d5e61c2dbb0afe6",
+      "party_ids": [
+        "P01",
+        "P05"
+      ],
+      "effective_date": "2027-01-12",
+      "end_date": "2027-08-31",
+      "document_form": "Supplier exclusivity letter",
+      "initial": true
+    },
+    {
+      "contract_id": "AUR-2027-005",
+      "title": "UNIT-A Office Lease Deed",
+      "file": "inputs/contracts/AUR-2027-005.pdf",
+      "sha256": "4b21b3959d261f8a341b3c37ff467fb855e9719d7a30c09f60a829c81fe5c4a9",
+      "party_ids": [
+        "P01",
+        "P03"
+      ],
+      "effective_date": "2027-01-02",
+      "end_date": "2027-06-30",
+      "document_form": "Property lease deed",
+      "initial": true
+    },
+    {
+      "contract_id": "AUR-2027-006",
+      "title": "AX9 Freight Booking and Handling Terms",
+      "file": "inputs/contracts/AUR-2027-006.pdf",
+      "sha256": "6363534053fc9c64558daee3d1809857b577f85eb138107d22d356f926621631",
+      "party_ids": [
+        "P01",
+        "P06"
+      ],
+      "effective_date": "2027-01-15",
+      "end_date": "2027-06-15",
+      "document_form": "Carrier booking note",
+      "initial": true
+    },
+    {
+      "contract_id": "AUR-2027-007",
+      "title": "Managed Security Monitoring Statement",
+      "file": "inputs/contracts/AUR-2027-007.pdf",
+      "sha256": "5005e06db91e58ecae2d186859a7dee5271596ced9bd391ba061c6966fdb421f",
+      "party_ids": [
+        "P01",
+        "P07"
+      ],
+      "effective_date": "2027-01-18",
+      "end_date": "2027-12-17",
+      "document_form": "Security operations statement",
+      "initial": true
+    },
+    {
+      "contract_id": "AUR-2027-008",
+      "title": "Production Backup and Recovery Schedule",
+      "file": "inputs/contracts/AUR-2027-008.pdf",
+      "sha256": "44719470c9d047d4751b4fb7bea9be61cf048a1dfd94b92cb57c5f1116c0c586",
+      "party_ids": [
+        "P01",
+        "P04"
+      ],
+      "effective_date": "2027-01-20",
+      "end_date": "2027-12-15",
+      "document_form": "Recovery service schedule",
+      "initial": true
+    },
+    {
+      "contract_id": "AUR-2027-009",
+      "title": "Controller Integration Statement of Work",
+      "file": "inputs/contracts/AUR-2027-009.pdf",
+      "sha256": "d11f5383dd39835eb611448b544ab2c2cc63056df51fdf856fb68fbd56ad7fa1",
+      "party_ids": [
+        "P01",
+        "P02"
+      ],
+      "effective_date": "2027-01-22",
+      "end_date": "2027-05-31",
+      "document_form": "Milestone project statement",
+      "initial": true
+    }
+  ],
+  "timezone": "Asia/Kolkata",
+  "baseline_clock": "2027-01-01T00:00:00+05:30"
+}

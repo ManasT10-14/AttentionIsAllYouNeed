@@ -1,0 +1,7 @@
+Subject: [ODIN-EVENT] EMAIL_BOUNCED AUR-2027-007
+
+EVENT_TYPE: EMAIL_BOUNCED
+OCCURRED_AT: 2027-03-01T10:00:00+05:30
+CONTRACT_ID: AUR-2027-007
+DESCRIPTION:
+This is a deliberately unsupported type; no supported classification is established.

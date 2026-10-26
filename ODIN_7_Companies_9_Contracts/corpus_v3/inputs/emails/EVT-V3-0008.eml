@@ -1,0 +1,20 @@
+From: event-desk@aurora.example
+To: odin-inbox@aurora.example
+Subject: [ODIN-EVENT] DELIVERY_RECEIVED AUR-2027-003
+Date: Sun, 23 May 2027 17:00:00 +0530
+Message-ID: <EVT-V3-0008@odin-fixtures.example>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+EVENT_ID: EVT-V3-0008
+EVENT_TYPE: DELIVERY_RECEIVED
+OCCURRED_AT: 2027-05-23T17:00:00+05:30
+CONTRACT_ID: AUR-2027-003
+COUNTERPARTY: Forge Electronics Private Limited
+REFERENCE: DEL-AX9-100
+DESCRIPTION:
+Receipt DEL-AX9-100 confirms physical delivery of the complete 100-unit AX9 l=
+ot at UNIT-A today at 17:00 IST. This is a fresh reset case with no earlier d=
+elivery. Technical testing has not completed and Mira Sen has not signed acce=
+ptance. The original May 20 delivery deadline has not been extended.

@@ -8,14 +8,21 @@ import json
 from datetime import date, datetime
 from typing import Iterable, Optional, Type, TypeVar
 
-from pydantic import BaseModel
-from sqlalchemy import or_, select, update
-
 from odin.core import bus
 from odin.core.context import maybe_current
 from odin.core.models import AgentMessage, Clause
 from odin.db.session import db
-from odin.db.tables import AgentMessageRow, ClauseRow, Company, Contract, ContractVersion, Record, Run
+from odin.db.tables import (
+    AgentMessageRow,
+    ClauseRow,
+    Company,
+    Contract,
+    ContractVersion,
+    Record,
+    Run,
+)
+from pydantic import BaseModel
+from sqlalchemy import or_, select, update
 
 M = TypeVar("M", bound=BaseModel)
 
@@ -25,17 +32,32 @@ def _scope():
     return (c.company_id, c.scenario_id, c.run_id) if c else (None, None, None)
 
 
+def _tenant(company_id: str | None = None) -> str:
+    """Explicit scope for trusted workers; an active caller cannot override its tenant."""
+    current_id = _scope()[0]
+    if current_id and company_id and company_id != current_id:
+        raise PermissionError("company scope cannot be overridden")
+    cid = company_id or current_id
+    if not cid:
+        raise RuntimeError("repository access without a company scope")
+    return cid
+
+
 # ───────────────────────────── records ─────────────────────────────
 def put(kind: str, model: BaseModel, *, company_id: str | None = None, contract_id: str | None = None,
         version: int | None = None, status: str | None = None, publish: bool = True, rid: str | None = None) -> dict:
     cid, scen, run_id = _scope()
-    company_id = company_id or cid
+    company_id = _tenant(company_id)
     data = model.model_dump(mode="json")
     rid = rid or data.get("id") or f"{kind}:{contract_id}:{version}"
     if scen and not rid.startswith(f"{scen}:") and repo_base_exists(rid, company_id):
         rid = f"{scen}:{rid}"          # what-if never overwrites a real record
     status = status if status is not None else str(data.get("status", ""))
     with db() as s:
+        if kind in ("finding", "violation") and not scen:
+            from odin.services.approvals import assert_basis_mutation_allowed
+            s.scalar(select(Company).where(Company.id == company_id).with_for_update())
+            assert_basis_mutation_allowed(s, company_id, rid, kind)
         row = s.get(Record, _pk(company_id, rid))
         if row is None:
             row = Record(id=_pk(company_id, rid), company_id=company_id, kind=kind, contract_id=contract_id, version=version,
@@ -71,7 +93,7 @@ def get(kind: str, rid: str, model: Type[M] | None = None):
     cid, scen, _ = _scope()
     with db() as s:
         row = (s.get(Record, _pk(cid, f"{scen}:{rid}")) if scen else None) or s.get(Record, _pk(cid, rid))
-        if not row or row.kind != kind:
+        if not row or row.kind != kind or row.scenario_id not in (None, scen):
             return None
         return model.model_validate(row.data) if model else row.data
 
@@ -81,7 +103,7 @@ def query(kind: str, *, company_id: str | None = None, contract_id: str | None =
           version: int | None = None, run_id: str | None = None, model: Type[M] | None = None,
           scenario_id: str | None = "__ctx__", limit: int | None = None) -> list:
     cid, scen, _ = _scope()
-    company_id = company_id or cid
+    company_id = _tenant(company_id)
     if scenario_id == "__ctx__":
         scenario_id = scen
     stmt = select(Record).where(Record.company_id == company_id, Record.kind == kind)
@@ -113,9 +135,14 @@ def query(kind: str, *, company_id: str | None = None, contract_id: str | None =
 def set_status(rid: str, status: str, **data_updates) -> Optional[dict]:
     cid, scen, run_id = _scope()
     with db() as s:
+        if not scen:
+            s.scalar(select(Company).where(Company.id == cid).with_for_update())
         row = (s.get(Record, _pk(cid, f"{scen}:{rid}")) if scen else None) or s.get(Record, _pk(cid, rid))
-        if not row:
+        if not row or row.scenario_id not in (None, scen):
             return None
+        if row.kind in ("finding", "violation") and not scen:
+            from odin.services.approvals import assert_basis_mutation_allowed
+            assert_basis_mutation_allowed(s, cid, rid, row.kind)
         d = {**row.data, **data_updates}
         if "status" in d:
             d["status"] = status
@@ -134,23 +161,29 @@ def invalidate(kinds: list[str], contract_id: str, company_id: str | None = None
                except_status: tuple[str, ...] = ("sent", "applied", "approved")) -> int:
     """Mark derived records of a contract stale (contract update flow §6)."""
     cid, _, _ = _scope()
-    company_id = company_id or cid
+    company_id = _tenant(company_id)
     with db() as s:
+        if set(kinds) & {"finding", "violation"}:
+            s.scalar(select(Company).where(Company.id == company_id).with_for_update())
         rows = s.scalars(select(Record).where(Record.company_id == company_id, Record.contract_id == contract_id,
                                               Record.kind.in_(kinds), Record.scenario_id.is_(None))).all()
         n = 0
         for r in rows:
             if r.status in except_status:
                 continue
+            if r.kind in ("finding", "violation"):
+                from odin.services.approvals import assert_basis_mutation_allowed
+                assert_basis_mutation_allowed(s, company_id, r.id, r.kind)
             r.status = "superseded"
             r.data = {**r.data, "status": "superseded"} if "status" in r.data else r.data
             n += 1
         return n
 
 
-def drop_scenario(scenario_id: str) -> None:
+def drop_scenario(scenario_id: str, *, company_id: str | None = None) -> None:
+    cid = _tenant(company_id)
     with db() as s:
-        for r in s.scalars(select(Record).where(Record.scenario_id == scenario_id)).all():
+        for r in s.scalars(select(Record).where(Record.company_id == cid, Record.scenario_id == scenario_id)).all():
             s.delete(r)
 
 
@@ -168,6 +201,7 @@ def message(msg: AgentMessage) -> None:
 
 
 def messages(company_id: str, run_id: str | None = None, limit: int = 500) -> list[dict]:
+    company_id = _tenant(company_id)
     stmt = select(AgentMessageRow).where(AgentMessageRow.company_id == company_id)
     if run_id:
         stmt = stmt.where(AgentMessageRow.run_id == run_id)
@@ -179,10 +213,11 @@ def messages(company_id: str, run_id: str | None = None, limit: int = 500) -> li
             for r in reversed(rows)]
 
 
-def update_run(run_id: str, **fields) -> None:
+def update_run(run_id: str, *, company_id: str | None = None, **fields) -> None:
+    cid = _tenant(company_id)
     with db() as s:
-        s.execute(update(Run).where(Run.id == run_id).values(**fields))
-        r = s.get(Run, run_id)
+        s.execute(update(Run).where(Run.company_id == cid, Run.id == run_id).values(**fields))
+        r = s.scalar(select(Run).where(Run.company_id == cid, Run.id == run_id))
         company_id = r.company_id if r else None
         snap = run_dict(r) if r else None
     if company_id:
@@ -198,30 +233,31 @@ def run_dict(r: Run) -> dict:
 
 # ───────────────────────────── contracts / clauses ─────────────────────────────
 def company(company_id: str) -> Company | None:
+    company_id = _tenant(company_id)
     with db() as s:
         return s.get(Company, company_id)
 
 
 def sim_now(company_id: str | None = None) -> date:
-    cid = company_id or _scope()[0]
+    cid = _tenant(company_id)
     c = company(cid)
     return c.sim_now if c and c.sim_now else date.today()
 
 
 def contracts(company_id: str | None = None) -> list[Contract]:
-    cid = company_id or _scope()[0]
+    cid = _tenant(company_id)
     with db() as s:
         return list(s.scalars(select(Contract).where(Contract.company_id == cid).order_by(Contract.contract_id)))
 
 
 def contract(contract_id: str, company_id: str | None = None) -> Contract | None:
-    cid = company_id or _scope()[0]
+    cid = _tenant(company_id)
     with db() as s:
         return s.scalar(select(Contract).where(Contract.company_id == cid, Contract.contract_id == contract_id))
 
 
 def version_row(contract_id: str, version: int, company_id: str | None = None) -> ContractVersion | None:
-    cid = company_id or _scope()[0]
+    cid = _tenant(company_id)
     with db() as s:
         return s.scalar(select(ContractVersion).where(ContractVersion.company_id == cid,
                                                       ContractVersion.contract_id == contract_id,
@@ -230,7 +266,7 @@ def version_row(contract_id: str, version: int, company_id: str | None = None) -
 
 def clauses(contract_id: str | None = None, version: int | None = None, *, current_only: bool = True,
             company_id: str | None = None, numbers: list[str] | None = None) -> list[ClauseRow]:
-    cid = company_id or _scope()[0]
+    cid = _tenant(company_id)
     stmt = select(ClauseRow).where(ClauseRow.company_id == cid)
     if contract_id:
         stmt = stmt.where(ClauseRow.contract_id == contract_id)

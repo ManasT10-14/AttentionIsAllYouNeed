@@ -1,0 +1,10 @@
+Subject: [ODIN-EVENT] SLA_BREACH AUR-2027-007
+
+EVENT_ID: EVT-V3-0019
+EVENT_TYPE: SLA_BREACH
+OCCURRED_AT: 2027-02-20T10:40:00+05:30
+CONTRACT_ID: AUR-2027-007
+COUNTERPARTY: Sentinel Security Private Limited
+REFERENCE: SOC-P1-01
+DESCRIPTION:
+Sentinel received valid priority-one alert SOC-P1-01 in its monitored mailbox at 10:00 IST today and acknowledged it at 10:40 IST. Monitored-mailbox logs prove both timestamps. Aurora claims the credit today. This is the only late P1 acknowledgement in February in this reset case. No actual data breach is proved by this alert alone.

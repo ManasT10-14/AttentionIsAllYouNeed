@@ -9,13 +9,15 @@ from fastapi.responses import HTMLResponse, Response
 from sqlalchemy import select
 
 from odin.api.deps import current_user
+from odin.api.responses import PrivateAPIRoute, RedactedJSONResponse
+from odin.core.privacy import redact
 from odin.api.routes import scope
 from odin.db import repo
 from odin.db.session import db
 from odin.db.tables import Record, Run, ToolCall, User, AgentMessageRow
 from odin.services import report_render, runs as runs_svc
 
-router = APIRouter()
+router = APIRouter(default_response_class=RedactedJSONResponse, route_class=PrivateAPIRoute)
 OUT_KINDS = ("finding", "alert", "action", "violation")
 
 
@@ -36,7 +38,8 @@ def _timeline(u: User, run: dict) -> dict:
     with db() as s:
         calls = [{"agent": t.agent, "tool": t.tool, "ok": t.ok, "blocked": t.blocked, "ms": round(t.duration_ms, 1),
                   "summary": t.result_summary[:160], "ts": t.ts.isoformat()}
-                 for t in s.scalars(select(ToolCall).where(ToolCall.run_id == run["id"]).order_by(ToolCall.ts)).all()]
+                 for t in s.scalars(select(ToolCall).where(ToolCall.company_id == u.company_id,
+                                  ToolCall.run_id == run["id"]).order_by(ToolCall.ts)).all()]
     steps, last = [], {}
     for m in msgs:    # a message is posted when an agent finishes a step: it ran since the previous message of that contract
         start = last.get(m["contract_id"]) or last.get(None) or run["started_at"]
@@ -89,6 +92,7 @@ def workflow(run_id: str, u: User = Depends(current_user)):
 
 # ───────────────────────────── reports ─────────────────────────────
 def _respond(r: dict, html_fn, name: str, format: str):
+    r = redact(r)
     if format == "json":
         return r
     body = html_fn(r)

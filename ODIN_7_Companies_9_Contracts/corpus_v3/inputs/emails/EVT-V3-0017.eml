@@ -1,0 +1,20 @@
+From: event-desk@aurora.example
+To: odin-inbox@aurora.example
+Subject: [ODIN-EVENT] DELIVERY_LATE AUR-2027-006
+Date: Tue, 25 May 2027 16:00:00 +0530
+Message-ID: <EVT-V3-0017@odin-fixtures.example>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+EVENT_ID: EVT-V3-0017
+EVENT_TYPE: DELIVERY_LATE
+OCCURRED_AT: 2027-05-25T16:00:00+05:30
+CONTRACT_ID: AUR-2027-006
+COUNTERPARTY: SwiftRoute Logistics Private Limited
+REFERENCE: FR-AX9-100
+DESCRIPTION:
+Consignment FR-AX9-100 was fully delivered today at 16:00 IST. The booked del=
+ivery deadline was May 23 at 17:00 IST. Delivery scans support the date; no s=
+igned variation or substantiated excused delay exists. Treat this as a fresh =
+case, not a second incident added to another test.

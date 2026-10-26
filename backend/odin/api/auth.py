@@ -8,13 +8,15 @@ from pydantic import BaseModel
 from sqlalchemy import select
 
 from odin.api.deps import current_user
+from odin.api.responses import PrivateAPIRoute, RedactedJSONResponse
 from odin.core.config import settings
 from odin.core.models import new_id
 from odin.db.session import db
 from odin.db.tables import Company, OAuthToken, User
 from odin.email.gmail import SCOPES, store_tokens
 
-router = APIRouter(prefix="/auth", tags=["auth"])
+router = APIRouter(prefix="/auth", tags=["auth"], default_response_class=RedactedJSONResponse,
+                   route_class=PrivateAPIRoute)
 oauth = OAuth()
 oauth.register("google", client_id=settings().google_client_id, client_secret=settings().google_client_secret,
                server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",

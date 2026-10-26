@@ -1,0 +1,10 @@
+Subject: [ODIN-EVENT] DISPUTE_RAISED AUR-2027-009
+
+EVENT_ID: EVT-V3-0027
+EVENT_TYPE: DISPUTE_RAISED
+OCCURRED_AT: 2027-03-25T10:00:00+05:30
+CONTRACT_ID: AUR-2027-009
+COUNTERPARTY: Forge Electronics Private Limited
+REFERENCE: INT-EXIT-DISPUTE
+DESCRIPTION:
+Aurora wants to end the SOW for convenience on April 24 after giving notice today. Forge cites a 60-day provision while Aurora cites 30 days. There is no signed amendment or precedence rule resolving the two provisions. Neither party alleges uncured material breach in this case.

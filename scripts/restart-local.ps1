@@ -37,7 +37,7 @@ foreach ($taskOwner in $taskOwners) {
 & docker compose up -d --wait db
 if ($LASTEXITCODE -ne 0) { throw 'Database startup failed. Check docker compose logs db.' }
 
-$env:PYTHONPATH = Join-Path $taskRoot 'backend'
+$env:PYTHONPATH = @((Join-Path $taskRoot 'backend'), (Join-Path $taskRoot 'eval')) -join [IO.Path]::PathSeparator
 $pythonExe = Join-Path $taskRoot '.venv\Scripts\python.exe'
 $backendProcess = Start-Process -FilePath $pythonExe -WorkingDirectory $taskRoot -WindowStyle Hidden -PassThru `
     -ArgumentList @('-m', 'uvicorn', 'odin.api.main:app', '--host', '127.0.0.1', '--port', '8000') `

@@ -41,19 +41,26 @@ def receive(company_id: str, *, subject: str, body: str, sender: str = "", gmail
                             "problems": [existing.get("reject_reason") or "Event could not be parsed"], "auto_replied": False}
                 return {"status": "duplicate", "dedupe": dedupe}
         ev_id = new_id("evt")
-        quarantine = ""
+        original_body = body
         try:
+            # The email guard scans body and headers together before any parser.
             body = HOOKS.on_email(body, {"company_id": company_id, "sender": sender, "subject": subject,
                                          "event_id": ev_id})
         except Blocked as e:   # held for admin review (POST /api/security/events/{id}), never auto-run
-            quarantine = f"quarantined by security guard: {e}"
+            ev = Event(id=ev_id, gmail_msg_id=dedupe, subject=subject, sender=sender,
+                       event_type="CUSTOM", occurred_at=event_parser.utcnow(),
+                       scenario_id=scenario_id, parse_method=method, parse_confidence=0)
+            return quarantine_event(company_id, ev, f"quarantined by security guard: {e}",
+                                    evidence={"body": original_body, "subject": subject, "sender": sender,
+                                              "thread_id": thread_id, "method": method})
         parse_method, conf = method, 1.0
         try:
             parsed = event_parser.parse(subject, body)
         except event_parser.EventParseError as e:
             parsed, conf, problems = _llm_parse(subject, body, e.problems)
             if not parsed:
-                return _reject(company_id, ev_id, dedupe, subject, body, sender, problems, thread_id, scenario_id, method)
+                return _reject(company_id, ev_id, dedupe, subject, body, sender, problems, thread_id, scenario_id,
+                               method, strict_problems=e.problems)
             parse_method = "llm"
         known = {c.contract_id for c in repo.contracts()}
         if parsed.contract_ids == ["ALL"]:
@@ -68,10 +75,6 @@ def receive(company_id: str, *, subject: str, body: str, sender: str = "", gmail
                    **parsed.model_dump())
         if unknown:
             ev.reject_reason = f"unknown contract ids ignored: {unknown}; Heimdall will infer"
-        if quarantine:
-            ev.status, ev.reject_reason = "quarantined", "; ".join(filter(None, [quarantine, ev.reject_reason]))
-            repo.put("event", ev)
-            return {"status": "quarantined", "event_id": ev_id, "reason": quarantine}
         repo.put("event", ev)
         if not scenario_id:
             _advance_clock(company_id, ev)
@@ -80,6 +83,61 @@ def receive(company_id: str, *, subject: str, body: str, sender: str = "", gmail
         run_id = event_graph.run(company_id, ev_id, scenario_id=scenario_id, background=background)
         return {"status": "accepted", "event_id": ev_id, "run_id": run_id, "parse_method": parse_method}
     return {"status": "accepted", "event_id": ev_id, "parse_method": parse_method}
+
+
+class QuarantineEvidence(BaseModel):
+    id: str
+    event_id: str
+    evidence: dict
+    body: str = ""
+
+
+def quarantine_event(company_id: str, event: Event, reason: str, *, evidence: dict | None = None) -> dict:
+    """Keep canonical evidence private; expose only a safe, unparsed held event.
+
+    Scheduled pack events pass their already parsed Event as source_event. Email
+    callers supply original headers/body instead. Neither representation is sent to the bus.
+    """
+    from odin.core.privacy import redact
+    private = evidence if evidence is not None else {"source_event": event.model_dump(mode="json")}
+    with run_ctx(company_id, scenario_id=event.scenario_id):
+        repo.put("quarantine_evidence", QuarantineEvidence(id="quarantine:" + event.id, event_id=event.id,
+                 evidence=private, body=private.get("body", "")), publish=False)
+        safe = event.model_copy(update={"status": "quarantined", "raw": "", "description": "",
+                    "reference": "", "counterparty": "", "subject": redact(event.subject),
+                    "sender": redact(event.sender), "reject_reason": redact(reason), "parse_confidence": 0})
+        repo.put("event", safe)
+    return {"status": "quarantined", "event_id": event.id, "reason": redact(reason)}
+
+
+def validate_released_event(held: dict, evidence: dict) -> Event:
+    """Deliberate post-review validation, without any rejection reply or graph effect."""
+    source = evidence.get("source_event")
+    if source is not None:
+        ev = Event.model_validate(source)
+        if ev.id != held["id"] or ev.scenario_id != held.get("scenario_id"):
+            raise ValueError("quarantined evidence identity mismatch")
+    else:
+        subject, body = evidence["subject"], evidence["body"]
+        method, conf = evidence.get("method", "strict"), 1.0
+        try:
+            parsed = event_parser.parse(subject, body)
+        except event_parser.EventParseError as exc:
+            parsed, conf, problems = _llm_parse(subject, body, exc.problems)
+            if not parsed:
+                raise ValueError("released email could not be validated")
+            method = "llm"
+        ev = Event.model_validate({**held, **parsed.model_dump(mode="json"), "subject": subject,
+                    "sender": evidence.get("sender", ""), "raw": body[:20000],
+                    "parse_method": method, "parse_confidence": conf})
+    known = {c.contract_id for c in repo.contracts()}
+    if ev.contract_ids == ["ALL"]:
+        ev.contract_ids = sorted(known)
+    unknown = [cid for cid in ev.contract_ids if cid not in known]
+    ev.contract_ids = [cid for cid in ev.contract_ids if cid in known]
+    ev.status = "processing"
+    ev.reject_reason = f"unknown contract ids ignored: {unknown}; Heimdall will infer" if unknown else ""
+    return ev
 
 
 def _llm_parse(subject: str, body: str, problems: list[str]):
@@ -93,21 +151,24 @@ def _llm_parse(subject: str, body: str, problems: list[str]):
     return None, out.confidence, problems + out.problems
 
 
-def _reject(company_id, ev_id, dedupe, subject, body, sender, problems, thread_id, scenario_id, method) -> dict:
+def _reject(company_id, ev_id, dedupe, subject, body, sender, problems, thread_id, scenario_id, method,
+            strict_problems=None) -> dict:
     ev = Event(id=ev_id, gmail_msg_id=dedupe, sender=sender, subject=subject, raw=body[:20000], status="rejected",
                reject_reason="; ".join(problems), parse_method=method, parse_confidence=0.0, scenario_id=scenario_id,
                event_type="CUSTOM", occurred_at=event_parser.utcnow())
     repo.put("event", ev)
+    reply_problems = strict_problems if strict_problems is not None else problems
+    repo.set_status(ev.id, "rejected", reject_problems=reply_problems, thread_id=thread_id)
     replied = False
     if sender and method == "strict" and odin_config()["email"]["auto_reply_on_reject"] and not scenario_id:
         try:
             from odin.tools.registry import REGISTRY
             REGISTRY.invoke("system", "send_system_reply", {"to": sender, "subject": f"Re: {subject}",
-                                                            "body": event_parser.reply_body(problems),
-                                                            "thread_id": thread_id})
+                                                            "body": event_parser.reply_body(reply_problems),
+                                                            "thread_id": thread_id, "event_id": ev_id})
             replied = True
         except Exception as e:   # noqa: BLE001
-            log.warning("auto-reply failed: %s", e)
+            log.warning("auto-reply failed (%s)", type(e).__name__)
     return {"status": "rejected", "event_id": ev_id, "problems": problems, "auto_replied": replied}
 
 

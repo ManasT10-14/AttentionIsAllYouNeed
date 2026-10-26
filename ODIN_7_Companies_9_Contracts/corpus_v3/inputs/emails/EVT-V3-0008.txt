@@ -1,0 +1,10 @@
+Subject: [ODIN-EVENT] DELIVERY_RECEIVED AUR-2027-003
+
+EVENT_ID: EVT-V3-0008
+EVENT_TYPE: DELIVERY_RECEIVED
+OCCURRED_AT: 2027-05-23T17:00:00+05:30
+CONTRACT_ID: AUR-2027-003
+COUNTERPARTY: Forge Electronics Private Limited
+REFERENCE: DEL-AX9-100
+DESCRIPTION:
+Receipt DEL-AX9-100 confirms physical delivery of the complete 100-unit AX9 lot at UNIT-A today at 17:00 IST. This is a fresh reset case with no earlier delivery. Technical testing has not completed and Mira Sen has not signed acceptance. The original May 20 delivery deadline has not been extended.

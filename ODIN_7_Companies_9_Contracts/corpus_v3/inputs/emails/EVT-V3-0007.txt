@@ -1,0 +1,10 @@
+Subject: [ODIN-EVENT] DELIVERY_LATE AUR-2027-003
+
+EVENT_ID: EVT-V3-0007
+EVENT_TYPE: DELIVERY_LATE
+OCCURRED_AT: 2027-05-23T18:00:00+05:30
+CONTRACT_ID: AUR-2027-003
+COUNTERPARTY: Forge Electronics Private Limited
+REFERENCE: PO-AX9-100
+DESCRIPTION:
+The complete PO-AX9-100 lot reached UNIT-A at 17:00 IST on May 23, three calendar dates after its May 20 deadline. A signed receiving scan confirms delivery. Mira Sen has not yet signed the technical acceptance record. There is no agreed extension or evidenced force majeure.

@@ -1,0 +1,10 @@
+Subject: [ODIN-EVENT] CUSTOM AUR-2027-009
+
+EVENT_ID: EVT-V3-0026
+EVENT_TYPE: CUSTOM
+OCCURRED_AT: 2027-03-04T18:00:00+05:30
+CONTRACT_ID: AUR-2027-009
+COUNTERPARTY: Forge Electronics Private Limited
+REFERENCE: DEMO-M1-01
+DESCRIPTION:
+Forge demonstrated M1 today at 17:00 IST, after its February 28 deadline. DEMO-M1-01 confirms this was the first demonstration. Technical acceptance has not been signed and no invoice has been received. No extension or excused delay applies.

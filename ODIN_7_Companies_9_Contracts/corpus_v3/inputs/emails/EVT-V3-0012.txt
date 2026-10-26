@@ -1,0 +1,10 @@
+Subject: [ODIN-EVENT] FORCE_MAJEURE AUR-2027-004
+
+EVENT_ID: EVT-V3-0012
+EVENT_TYPE: FORCE_MAJEURE
+OCCURRED_AT: 2027-03-05T10:00:00+05:30
+CONTRACT_ID: AUR-2027-004
+COUNTERPARTY: Copperline Components Private Limited
+REFERENCE: COP-FM-01
+DESCRIPTION:
+Copperline reports a factory shutdown and asks Aurora to source AX9 elsewhere. No route or factory evidence, agreed duration or signed release from exclusivity is attached. Aurora has not placed any new order in this case. Please assess the request, not an already completed substitute purchase.

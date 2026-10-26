@@ -1,0 +1,10 @@
+Subject: [ODIN-EVENT] CUSTOM AUR-2027-008
+
+EVENT_ID: EVT-V3-0023
+EVENT_TYPE: CUSTOM
+OCCURRED_AT: 2027-03-15T16:05:00+05:30
+CONTRACT_ID: AUR-2027-008
+COUNTERPARTY: Nimbus Cloud Private Limited
+REFERENCE: RESTORE-01
+DESCRIPTION:
+This case includes two notifications for the same RESTORE-01 completion: message RESTORE-FIRST at 16:00 and RESTORE-REPEAT at 16:05 today. Both report one valid request received 10:00 and completed 16:00 IST. Aurora claims today. No other restore request or credit exists in March. Process the one real incident once.

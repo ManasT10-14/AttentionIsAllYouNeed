@@ -1,0 +1,10 @@
+Subject: [ODIN-EVENT] FORCE_MAJEURE AUR-2027-006
+
+EVENT_ID: EVT-V3-0018
+EVENT_TYPE: FORCE_MAJEURE
+OCCURRED_AT: 2027-05-21T10:00:00+05:30
+CONTRACT_ID: AUR-2027-006
+COUNTERPARTY: SwiftRoute Logistics Private Limited
+REFERENCE: FR-AX9-100-FM
+DESCRIPTION:
+SwiftRoute alleges a route closure and requests a two-day extension of booking FR-AX9-100. No authority closure record, duration evidence or mitigation plan is supplied. A dispatcher mentions rain. The allegation is not an agreed variation and does not by itself establish the contract excuse.

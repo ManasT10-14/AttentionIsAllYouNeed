@@ -1,0 +1,20 @@
+From: event-desk@aurora.example
+To: odin-inbox@aurora.example
+Subject: [ODIN-EVENT] SERVICE_OUTAGE AUR-2027-001
+Date: Mon, 15 Feb 2027 13:00:00 +0530
+Message-ID: <EVT-V3-0002@odin-fixtures.example>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+EVENT_ID: EVT-V3-0002
+EVENT_TYPE: SERVICE_OUTAGE
+OCCURRED_AT: 2027-02-15T13:00:00+05:30
+CONTRACT_ID: AUR-2027-001
+COUNTERPARTY: Nimbus Cloud Private Limited
+REFERENCE: INC-PROD-01
+DESCRIPTION:
+Incident INC-PROD-01 affected PROD-AUR and RESIDENT-ONE continuously from 10:=
+00 to 13:00 IST today. Nimbus monitoring confirms 180 minutes of unplanned do=
+wntime. No maintenance approval exists. No other February incidents exist in =
+this case. Aurora and Willow submitted their credit claims today.

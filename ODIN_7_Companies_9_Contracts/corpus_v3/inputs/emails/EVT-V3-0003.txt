@@ -1,0 +1,11 @@
+Subject: [ODIN-EVENT] SLA_BREACH AUR-2027-001
+
+EVENT_ID: EVT-V3-0003
+EVENT_TYPE: SLA_BREACH
+OCCURRED_AT: 2027-02-16T11:00:00+05:30
+CONTRACT_ID: AUR-2027-001
+COUNTERPARTY: Nimbus Cloud Private Limited
+REFERENCE: INC-MAINT-02
+SEVERITY_HINT: high
+DESCRIPTION:
+Incident INC-MAINT-02 interrupted PROD-AUR and RESIDENT-ONE for 45 minutes today, from 10:15 to 11:00 IST. Nimbus maintenance approval was issued at 09:00 IST on February 14, more than 48 hours beforehand. Both parties filed any available credit claim today. This is the only incident in this reset case. The sender believes severity is high.

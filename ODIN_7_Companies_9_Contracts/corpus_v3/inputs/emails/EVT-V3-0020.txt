@@ -1,0 +1,10 @@
+Subject: [ODIN-EVENT] PARTY_CHANGE AUR-2027-007
+
+EVENT_ID: EVT-V3-0020
+EVENT_TYPE: PARTY_CHANGE
+OCCURRED_AT: 2027-03-10T10:00:00+05:30
+CONTRACT_ID: AUR-2027-007
+COUNTERPARTY: Sentinel Security Private Limited
+REFERENCE: SOC-ASSIGN-01
+DESCRIPTION:
+Sentinel says it intends to assign the monitoring contract to another legal entity on April 1. No executed assignment, transferee identity or Aurora written consent is provided. The sender asks to update the counterparty record immediately. No new company has become a contracting party in this case.

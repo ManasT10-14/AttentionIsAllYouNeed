@@ -118,6 +118,11 @@ Use three terminals, all starting at the repository root.
 docker compose up -d db
 ```
 
+Docker PostgreSQL includes pgvector and listens on `127.0.0.1:5433`, leaving any
+native PostgreSQL service on port 5432 alone. Set `POSTGRES_PORT=5433` and
+`DATABASE_URL=postgresql+psycopg://odin:odin@127.0.0.1:5433/odin` in `.env`.
+Database contents persist in Docker's `pgdata` volume across restarts.
+
 **Terminal 2: backend (API, agents, Gmail poller) on port 8000**
 
 ```powershell
@@ -186,7 +191,7 @@ uv run --locked --all-extras ruff check eval
 cd frontend; npm run typecheck; npm test; cd ..
 ```
 
-Corpus checks (the same steps CI runs):
+Corpus checks (run locally; GitHub Actions CI is deferred for now):
 
 ```powershell
 uv run --locked --all-extras ragnarok corpus-validate

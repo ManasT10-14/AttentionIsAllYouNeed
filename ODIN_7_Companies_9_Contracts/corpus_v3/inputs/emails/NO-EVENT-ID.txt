@@ -1,0 +1,7 @@
+Subject: [ODIN-EVENT] PAYMENT_LATE AUR-2027-002
+
+EVENT_TYPE: PAYMENT_LATE
+OCCURRED_AT: 2027-02-10T18:00:00+05:30
+CONTRACT_ID: AUR-2027-002
+DESCRIPTION:
+January portal fee remains unpaid. This parser case supplies no full ledger.

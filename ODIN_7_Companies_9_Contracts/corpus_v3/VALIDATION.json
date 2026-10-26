@@ -1,0 +1,30 @@
+{
+  "status": "PASS",
+  "companies": 7,
+  "unique_contracts": 9,
+  "company_folders": 7,
+  "browsing_copies": 18,
+  "contract_pages": 26,
+  "distinct_effective_dates": 9,
+  "citation_units": 133,
+  "business_event_cases": 30,
+  "email_fixtures": 37,
+  "email_event_types": 16,
+  "parser_and_dedup_cases": 8,
+  "agent_vectors": 180,
+  "conflict_cases": 9,
+  "checks": [
+    "Aurora is party A to every agreement",
+    "seven party registry entries",
+    "exact PDF clause/row evidence and hashes",
+    "company copies match canonical PDFs",
+    "strict email syntax and all sixteen enum types",
+    "independent reset scopes",
+    "JSONL syntax and role boundaries",
+    "selected independent decimal arithmetic"
+  ],
+  "agents_executed": 0,
+  "emails_sent": 0,
+  "gmail_or_groq_tested": false,
+  "visual_review": "Reviewed all 26 pages; no clipping, overlap or broken tables seen. See VISUAL_REVIEW.json."
+}

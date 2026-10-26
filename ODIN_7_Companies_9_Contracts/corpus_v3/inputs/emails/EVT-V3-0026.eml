@@ -1,0 +1,20 @@
+From: event-desk@aurora.example
+To: odin-inbox@aurora.example
+Subject: [ODIN-EVENT] CUSTOM AUR-2027-009
+Date: Thu, 04 Mar 2027 18:00:00 +0530
+Message-ID: <EVT-V3-0026@odin-fixtures.example>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+EVENT_ID: EVT-V3-0026
+EVENT_TYPE: CUSTOM
+OCCURRED_AT: 2027-03-04T18:00:00+05:30
+CONTRACT_ID: AUR-2027-009
+COUNTERPARTY: Forge Electronics Private Limited
+REFERENCE: DEMO-M1-01
+DESCRIPTION:
+Forge demonstrated M1 today at 17:00 IST, after its February 28 deadline. DEM=
+O-M1-01 confirms this was the first demonstration. Technical acceptance has n=
+ot been signed and no invoice has been received. No extension or excused dela=
+y applies.

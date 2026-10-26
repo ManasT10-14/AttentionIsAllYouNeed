@@ -1,0 +1,19 @@
+From: event-desk@aurora.example
+To: odin-inbox@aurora.example
+Subject: [ODIN-EVENT] PRICE_CHANGE AUR-2027-004
+Date: Mon, 01 Mar 2027 10:00:00 +0530
+Message-ID: <EVT-V3-0010@odin-fixtures.example>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+EVENT_ID: EVT-V3-0010
+EVENT_TYPE: PRICE_CHANGE
+OCCURRED_AT: 2027-03-01T10:00:00+05:30
+CONTRACT_ID: AUR-2027-004
+COUNTERPARTY: Copperline Components Private Limited
+REFERENCE: COP-PRICE-01
+DESCRIPTION:
+Copperline asks to increase the AX9 unit price from INR 7,500 to INR 8,250 fo=
+r future call-offs with immediate effect. Aurora has not signed a variation. =
+No call-off or invoice has been issued under the proposed new rate.

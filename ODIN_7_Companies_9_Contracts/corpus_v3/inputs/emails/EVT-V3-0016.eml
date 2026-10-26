@@ -1,0 +1,21 @@
+From: event-desk@aurora.example
+To: odin-inbox@aurora.example
+Subject: [ODIN-EVENT] INVOICE_RECEIVED AUR-2027-006
+Date: Tue, 25 May 2027 18:00:00 +0530
+Message-ID: <EVT-V3-0016@odin-fixtures.example>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+EVENT_ID: EVT-V3-0016
+EVENT_TYPE: INVOICE_RECEIVED
+OCCURRED_AT: 2027-05-25T18:00:00+05:30
+CONTRACT_ID: AUR-2027-006
+COUNTERPARTY: SwiftRoute Logistics Private Limited
+AMOUNT: INR 30,000
+REFERENCE: FREIGHT-01
+DESCRIPTION:
+SwiftRoute delivered consignment FR-AX9-100 on May 25 at 16:00 IST and issued=
+ a valid freight invoice FREIGHT-01 for INR 30,000 at 18:00 IST today. Both d=
+elivery and invoice records are attached. No delivery extension applies. No c=
+laim for damage is made.

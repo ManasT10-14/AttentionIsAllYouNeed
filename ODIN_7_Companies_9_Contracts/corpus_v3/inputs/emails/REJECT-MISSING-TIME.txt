@@ -1,0 +1,6 @@
+Subject: [ODIN-EVENT] CUSTOM UNKNOWN
+
+EVENT_TYPE: CUSTOM
+CONTRACT_ID: UNKNOWN
+DESCRIPTION:
+Something happened at an unspecified time. No timestamp is supplied.

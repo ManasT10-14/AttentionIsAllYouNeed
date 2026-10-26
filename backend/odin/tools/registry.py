@@ -14,22 +14,19 @@ from dataclasses import dataclass
 from typing import Any, Callable, Literal, Type
 
 from langchain_core.tools import StructuredTool
-from pydantic import BaseModel
-
 from odin.core.context import maybe_current
 from odin.core.hooks import HOOKS, Blocked
 from odin.core.models import new_id
+from odin.core.privacy import redact, redact_text
 from odin.db.session import db
 from odin.db.tables import ToolCall
+from odin.services.approvals import ApprovalRequired
+from pydantic import BaseModel
 
 Scope = Literal["read_contract", "read_state", "write_state", "retrieval", "external_send", "file_write"]
 
 
 class ToolDenied(Exception):
-    pass
-
-
-class ApprovalRequired(Exception):
     pass
 
 
@@ -88,50 +85,73 @@ class ToolRegistry:
             if name not in self.allow.get(agent, set()):
                 raise ToolDenied(f"agent '{agent}' may not call '{name}'")
             decision["authorized"] = True
+            # Missing approval is a deterministic denial even without a tenant context;
+            # payload validation and the atomic claim still occur after guards below.
+            if spec.requires_approval and not approval_id:
+                decision["approved"] = False
+                raise ApprovalRequired("this tool needs a payload-bound admin approval")
             c = maybe_current()
             if c and c.run_id:
                 from odin.core.budget import for_run
                 for_run(c.run_id).tool_calls += 1
-            if spec.requires_approval:
-                decision["approved"] = False
-                self._check_approval(approval_id)
-                decision["approved"] = True
             payload = HOOKS.pre_tool(agent, name, spec.scope, payload)
             parsed = spec.args.model_validate(payload)
-            decision["executed"] = True
-            result = spec.fn(parsed)
+            # Hash exactly the validated/defaulted values passed to the effect, after guards.
+            payload = parsed.model_dump(mode="json")
+            execution_id = None
+            if spec.requires_approval:
+                decision["approved"] = False
+                execution_id = self._check_approval(approval_id, name, payload)
+                decision["approved"] = True
+            try:
+                if execution_id:
+                    from odin.services.approvals import dispatch_context, revalidate_claim
+                    revalidate_claim(approval_id, execution_id, name, payload)
+                    with dispatch_context(approval_id, execution_id, name, payload):
+                        decision["executed"] = True
+                        result = spec.fn(parsed)
+                else:
+                    decision["executed"] = True
+                    result = spec.fn(parsed)
+            except Exception:
+                if execution_id:
+                    from odin.services.approvals import finish
+                    finish(approval_id, execution_id, ok=False, tool=name, dispatched=decision["executed"])
+                raise
+            if execution_id:
+                from odin.services.approvals import finish
+                finish(approval_id, execution_id, ok=True, tool=name)
             result = HOOKS.post_tool(agent, name, result)
             decision["ok"] = True
-            self._audit(agent, spec, payload, self.render(result, 300), ok=True, t0=t0)
+            self._audit(agent, spec, payload, self.render(redact(result), 300), ok=True, t0=t0)
             return result
         except Exception as e:
             decision["error_type"] = type(e).__name__
             if spec:
-                self._audit(agent, spec, payload, f"{type(e).__name__}: {e}"[:500], ok=False,
+                self._audit(agent, spec, payload, redact_text(f"{type(e).__name__}: {e}")[:500], ok=False,
                             blocked=isinstance(e, (Blocked, ToolDenied, ApprovalRequired)), t0=t0)
             raise
         finally:
-            HOOKS.record("tool", agent, payload, None, decision)
+            HOOKS.record("tool", agent, redact(payload), None, redact(decision))
 
-    def _check_approval(self, approval_id: str | None) -> None:
-        from odin.db import repo
-        if not approval_id:
-            raise ApprovalRequired("this tool needs an approved action (approval_id)")
-        a = repo.get("action", approval_id)
-        if not a or a.get("status") not in ("approved",):
-            raise ApprovalRequired(f"action {approval_id} is not approved by an admin")
+    def _check_approval(self, approval_id: str | None, tool: str | None = None, payload: dict | None = None) -> str:
+        from odin.services.approvals import claim
+        if not tool or payload is None:
+            raise ApprovalRequired("approval requires an exact tool and payload")
+        return claim(approval_id, tool, payload)
 
     def _audit(self, agent, spec: ToolSpec, args, summary, ok=True, blocked=False, t0=None):
         c = maybe_current()
         if not c:
             return
-        safe_args = {k: ("<redacted>" if spec.pii and k in ("body", "to") else v) for k, v in (args or {}).items()}
+        safe_args = redact({k: ("<redacted>" if spec.pii and k in ("body", "to") else v)
+                            for k, v in (args or {}).items()})
         try:
             with db() as s:
                 s.add(ToolCall(id=new_id("tc"), company_id=c.company_id, run_id=c.run_id, agent=agent, tool=spec.name,
                                scope=spec.scope, args=json.loads(json.dumps(safe_args, default=str))
                                if len(json.dumps(safe_args, default=str)) < 20000 else {"truncated": True},
-                               result_summary=summary, ok=ok, blocked=blocked,
+                               result_summary=redact_text(summary), ok=ok, blocked=blocked,
                                duration_ms=(time.perf_counter() - t0) * 1000 if t0 else 0))
         except Exception:   # audit must not take the product path down
             pass

@@ -1,0 +1,5 @@
+Subject: [ODIN-EVENT] PAYMENT_LATE AUR-2027-002
+
+CONTRACT_ID: AUR-2027-002
+DESCRIPTION:
+Payment is late. Observation time: 2027-02-10T18:00:00+05:30. January portal invoice remains unpaid.

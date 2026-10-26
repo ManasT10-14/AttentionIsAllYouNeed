@@ -1,9 +1,10 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSearchParams,useRouter } from 'next/navigation';
 import { ArrowRight,Search,FileText,PenLine } from 'lucide-react';
 import { useResource } from '@/lib/use-resource';
-import { dateText, daysBetween, deliveryOperation, validRecipient, list, query, record, text } from '@/lib/api';
+import { actionSecurity } from '@/lib/action-security';
+import { dateText, dateTimeText, daysBetween, deliveryOperation, validRecipient, list, query, record, text } from '@/lib/api';
 import { useWorkspace } from './providers';
 import { Badge, Button, PageTitle, Panel, PanelTitle, Sheet } from './ui';
 import { AmendmentDetail, AmendmentSummary } from './amendment-card';
@@ -25,11 +26,61 @@ export function ActionsView() {
 function ActionDetail({ actionId }: { actionId:string }) {
  const r = useResource('/api/actions/' + encodeURIComponent(actionId)); const action = record(r.data); const {canAdmin,demo} = useWorkspace();
  const [to,setTo] = useState(''); const [subject,setSubject] = useState(''); const [body,setBody] = useState(''); const [approved,setApproved] = useState(false); const [confirm,setConfirm] = useState(false);
+ const [wallClock, setWallClock] = useState(Date.now);
+ const dispatching = useRef(false);
  const m = useMutation(); const [result,setResult] = useState<unknown>();
  useEffect(() => { if (r.data !== undefined) { setTo(text(record(r.data).to,'')); setSubject(text(record(r.data).subject,'')); setBody(text(record(r.data).body_md,'')); setApproved(false); setConfirm(false); } },[r.data]);
+ useEffect(() => { const timer = setInterval(() => setWallClock(Date.now()), 1000); return () => clearInterval(timer); }, []);
  const operation = deliveryOperation(action.kind);
  const recipientValid = operation !== 'send' || validRecipient(to);
- const editable = canAdmin && action.status === 'draft';
+ const security = actionSecurity(action, wallClock);
+ const editable = canAdmin && security.canReview;
  const dirty = to !== text(action.to,'') || subject !== text(action.subject,'') || body !== text(action.body_md,'');
- return <ResourceState resource={r}>{r.data !== undefined && <><div className="workplan-summary"><Status value={action.status} /><SourceBadge value={action.source} /><TraceLink value={action.trace_url} /></div>{action.kind === 'amendment' && <AmendmentDetail action={action} />}<div className="action-editor"><label>Recipient<input type={operation === 'send' ? 'email' : 'text'} className="input" value={to} onChange={e => setTo(e.target.value)} disabled={!editable || m.pending} /></label><label>Subject<input className="input" value={subject} onChange={e => setSubject(e.target.value)} disabled={!editable || m.pending} /></label><label>Letter / amendment<textarea rows={15} value={body} onChange={e => setBody(e.target.value)} disabled={!editable || m.pending} /></label></div>{!recipientValid && <p className="form-error" role="alert">{editable ? 'Enter a recipient email address and save before approving this draft.' : 'Cannot send: the recipient must be a valid email address.'}</p>}{!operation && action.status === 'approved' && <p className="muted-note">Delivery is unavailable for this action type.</p>}<Citations values={action.citations} />{action.kind !== 'amendment' && <><h3>Financial counterfactual</h3><SourceBadge value="analysis" /><FieldValue value={action.counterfactual} /></>}{action.leverage_notes ? <><h3>Leverage notes</h3><FieldValue value={action.leverage_notes} /></> : null}<div className="detail-list"><div><span>Approved by</span><strong>{text(action.approved_by)}</strong></div><div><span>Approved at</span><strong>{dateText(action.approved_at)}</strong></div></div>{editable && <><Button variant="secondary" disabled={!dirty || m.pending} onClick={() => void m.run('/api/actions/' + encodeURIComponent(actionId),{to,subject,body_md:body},'PATCH')}>Save draft</Button><label className="checkbox-label"><input type="checkbox" checked={approved} onChange={e => setApproved(e.target.checked)} />I reviewed the source and the draft.</label><div className="button-row"><Button disabled={!approved || dirty || m.pending || !recipientValid} onClick={() => void m.run('/api/actions/' + encodeURIComponent(actionId) + '/approve')}>Approve draft</Button><Button variant="secondary" disabled={m.pending} onClick={() => void m.run('/api/actions/' + encodeURIComponent(actionId) + '/reject')}>Reject</Button></div>{dirty && <p className="muted-note">Save your edits before approval.</p>}</>}{canAdmin && action.status === 'approved' && operation && <div className="approval-box"><label className="checkbox-label"><input type="checkbox" checked={confirm} onChange={e => setConfirm(e.target.checked)} />Confirm {operation === 'apply' ? 'applying this amendment as a new contract version' : 'sending this approved message through Gmail'}.</label><Button disabled={!confirm || m.pending || demo || !recipientValid} onClick={async () => { const output = await m.run('/api/actions/' + encodeURIComponent(actionId) + ('/' + operation)); setResult(output); }}>{operation === 'apply' ? 'Apply amendment' : 'Send approved message'}</Button></div>}{demo && <p className="muted-note">Approvals in preview are local fixtures. Sending and applying require the backend.</p>}<MutationFeedback mutation={m} />{result !== undefined && <FieldValue value={result} />}</>}</ResourceState>;
+ const dispatch = async () => {
+  // Recheck the actual wall clock at the click boundary, including a background tab.
+  if (dispatching.current || !actionSecurity(action, Date.now()).canExecute || dirty || !confirm || !recipientValid || demo) return;
+  dispatching.current = true;
+  try { const output = await m.run('/api/actions/' + encodeURIComponent(actionId) + '/' + operation); setResult(output); }
+  finally { dispatching.current = false; }
+ };
+ return <ResourceState resource={r}>{r.data !== undefined && <>
+  <div className="workplan-summary"><Status value={action.status} /><SourceBadge value={action.source} /><TraceLink value={action.trace_url} /></div>
+  {action.kind === 'amendment' && <><p className="muted-note">Local proposal only. Applying creates a local proposed contract version; counterparty consent and legal effectiveness are not established.</p><AmendmentDetail action={action} /></>}
+  <div className="action-editor">
+   <label>Recipient<input type={operation === 'send' ? 'email' : 'text'} className="input" value={to} onChange={e => setTo(e.target.value)} disabled={!editable || m.pending || demo} /></label>
+   <label>Subject<input className="input" value={subject} onChange={e => setSubject(e.target.value)} disabled={!editable || m.pending || demo} /></label>
+   <label>Letter / amendment<textarea rows={15} value={body} onChange={e => setBody(e.target.value)} disabled={!editable || m.pending || demo} /></label>
+  </div>
+  {!recipientValid && <p className="form-error" role="alert">{editable ? 'Enter a recipient email address and save before approving this draft.' : 'Cannot send: the recipient must be a valid email address.'}</p>}
+  {!operation && action.status === 'approved' && <p className="muted-note">Delivery is unavailable for this action type.</p>}
+  <Citations values={action.citations} />
+  {action.kind !== 'amendment' && <><h3>Financial counterfactual</h3><SourceBadge value="analysis" /><FieldValue value={action.counterfactual} /></>}
+  {action.leverage_notes ? <><h3>Leverage notes</h3><FieldValue value={action.leverage_notes} /></> : null}
+  <div className="detail-list">
+   <div><span>Approved by</span><strong>{text(action.approved_by)}</strong></div>
+   <div><span>Approved at</span><strong>{dateTimeText(action.approved_at)}</strong></div>
+   <div><span>Bound tool</span><strong>{text(security.binding.tool, 'Requires fresh approval')}</strong></div>
+   <div><span>Approval expires (wall clock)</span><strong>{dateTimeText(security.binding.expires_at)}</strong></div>
+   <div><span>Execution state</span><strong>{security.execution}</strong></div>
+   <div><span>Payload binding</span><strong>{security.binding.payload_hash ? 'Saved payload hash recorded' : 'Missing'}</strong></div>
+  </div>
+  <p className="muted-note">Bound sources: {security.sources.length ? security.sources.map(source => text(source.contract_id) + ' · version ' + text(source.version)).join('; ') : 'No source versions recorded.'} The server checks current source versions, payload and prerequisites again before execution.</p>
+  {!security.canExecute && <p className="muted-note" role="status">{security.reason}</p>}
+  {editable && <>
+   <Button variant="secondary" disabled={!dirty || m.pending || demo} onClick={() => void m.run('/api/actions/' + encodeURIComponent(actionId),{to,subject,body_md:body},'PATCH')}>{action.status === 'approved' ? 'Save edits & require fresh review' : 'Save draft'}</Button>
+   {action.status === 'approved' && <p className="muted-note">Saving edits invalidates this approval and returns the action to draft. Reviewing again creates a new approval for the saved content and current sources.</p>}
+   <label className="checkbox-label"><input type="checkbox" checked={approved} disabled={m.pending || demo} onChange={e => setApproved(e.target.checked)} />I reviewed the source, recipient and saved draft.</label>
+   <div className="button-row">
+    <Button disabled={!approved || dirty || m.pending || demo || !recipientValid || !operation} onClick={() => void m.run('/api/actions/' + encodeURIComponent(actionId) + '/approve')}>{action.status === 'approved' ? 'Review & renew approval' : 'Approve draft'}</Button>
+    <Button variant="secondary" disabled={m.pending || demo} onClick={() => void m.run('/api/actions/' + encodeURIComponent(actionId) + '/reject')}>Reject</Button>
+   </div>
+   {dirty && <p className="muted-note">Save your edits before approval or execution.</p>}
+  </>}
+  {canAdmin && action.status === 'approved' && operation && <div className="approval-box">
+   <label className="checkbox-label"><input type="checkbox" checked={confirm} disabled={!security.canExecute || dirty || m.pending || demo} onChange={e => setConfirm(e.target.checked)} />Confirm {operation === 'apply' ? 'creating a local proposed amendment version; counterparty consent is not established' : 'sending this approved message through Gmail'}.</label>
+   <Button disabled={!confirm || !security.canExecute || dirty || m.pending || demo || !recipientValid} onClick={() => void dispatch()}>{operation === 'apply' ? 'Apply local proposal' : 'Send approved message'}</Button>
+  </div>}
+  {demo && <p className="muted-note">Approvals in preview are local fixtures. Sending and applying require the backend.</p>}
+  <MutationFeedback mutation={m} />{result !== undefined && <FieldValue value={result} />}
+ </>}</ResourceState>;
 }

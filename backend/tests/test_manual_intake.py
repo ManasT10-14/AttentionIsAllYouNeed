@@ -15,7 +15,7 @@ def test_manual_intake_http_status(monkeypatch, status, code):
     monkeypatch.setattr(routes.events_svc, "receive", lambda *a, **kw: result)
     app = FastAPI()
     app.include_router(routes.router, prefix="/api")
-    app.dependency_overrides[current_user] = lambda: SimpleNamespace(company_id="test")
+    app.dependency_overrides[current_user] = lambda: SimpleNamespace(company_id="test", role="admin")
     with TestClient(app) as client:
         response = client.post("/api/events", json={"subject": "Test", "body": "???"})
     assert response.status_code == code

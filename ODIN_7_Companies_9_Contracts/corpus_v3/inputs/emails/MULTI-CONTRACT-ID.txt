@@ -1,0 +1,9 @@
+Subject: [ODIN-EVENT] SERVICE_OUTAGE AUR-2027-001,AUR-2027-002
+
+EVENT_ID: EVT-V3-MULTI
+EVENT_TYPE: SERVICE_OUTAGE
+OCCURRED_AT: 2027-02-15T13:00:00+05:30
+CONTRACT_ID: AUR-2027-001,AUR-2027-002
+REFERENCE: INC-PROD-01
+DESCRIPTION:
+Independent parser/routing case: PROD-AUR and RESIDENT-ONE were unavailable for 180 minutes from 10:00 to 13:00 IST today. No maintenance approval or earlier February incident exists; both relevant credit claims were submitted today.

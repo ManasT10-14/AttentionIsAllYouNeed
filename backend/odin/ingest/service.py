@@ -6,8 +6,6 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
-from sqlalchemy import select, update
-
 from odin.core.config import DATA_DIR, odin_config
 from odin.core.hooks import HOOKS
 from odin.core.models import CompanyContext, new_id
@@ -16,6 +14,7 @@ from odin.db.tables import ClauseRow, Company, Contract, ContractVersion, Record
 from odin.ingest import pack
 from odin.ingest.parse import docx_to_pdf, image_to_pdf, parse_money, parse_pdf, text_to_pdf
 from odin.retrieval.hybrid import chunk_header, embed_passages
+from sqlalchemy import select, update
 
 
 @dataclass
@@ -37,7 +36,8 @@ def _safe(name: str) -> str:
 
 
 def ingest_contract(company_id: str, filename: str, content: bytes, *, twin_pdf: bytes | None = None,
-                    doc_id: str | None = None, title: str | None = None) -> IngestResult:
+                    doc_id: str | None = None, title: str | None = None,
+                    approval_execution_id: str | None = None) -> IngestResult:
     """doc_id forces the Document ID (bundle: filename stem); otherwise cover CONTRACT ID, else the stem.
     A dev-pack .txt is the canonical citation text; twin_pdf (or a rendering of the txt) feeds the viewer."""
     ext = Path(filename).suffix.lower()
@@ -113,6 +113,11 @@ def ingest_contract(company_id: str, filename: str, content: bytes, *, twin_pdf:
     expected_id = existing.id if existing else None
     with db() as s:
         s.scalar(select(Company).where(Company.id == company_id).with_for_update())
+        from odin.services.approvals import ApprovalRequired, assert_source_mutation_allowed
+        try:
+            assert_source_mutation_allowed(s, company_id, cid, execution_id=approval_execution_id)
+        except ApprovalRequired as exc:
+            raise ValueError(str(exc)) from exc
         current = s.scalar(select(Contract).where(Contract.company_id == company_id, Contract.contract_id == cid))
         if (current.id if current else None) != expected_id or (current and current.current_version != prev):
             raise ValueError("Contract changed or was deleted during upload; retry the upload")
@@ -246,6 +251,7 @@ def ingest_company_context(company_id: str, filename: str, content: bytes) -> Co
             text = "\n".join(p.get_text() for p in d)
     elif filename.lower().endswith(".docx"):
         import io
+
         from docx import Document
         text = "\n".join(p.text for p in Document(io.BytesIO(content)).paragraphs)
     else:

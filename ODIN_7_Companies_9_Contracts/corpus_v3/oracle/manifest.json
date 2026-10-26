@@ -1,0 +1,12 @@
+{
+  "dataset": "odin-v3-goldens",
+  "contracts": 9,
+  "companies": 7,
+  "event_cases": 30,
+  "agent_vectors": 180,
+  "conflict_cases": 9,
+  "parser_cases": 8,
+  "citation_units": 133,
+  "source_manifest_sha256": "52321f4d2fa4696baee9cb8d1de4e4da7d0a1cf494277abe554321242ba45221",
+  "status": "Authored expectations; actual agents/Gmail/Groq have not been executed."
+}

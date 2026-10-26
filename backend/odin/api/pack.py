@@ -4,6 +4,7 @@ import threading
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from odin.api.deps import current_user, require_role
+from odin.api.responses import PrivateAPIRoute, RedactedJSONResponse
 from odin.core.context import run_ctx
 from odin.db import repo
 from odin.db.session import db
@@ -11,7 +12,7 @@ from odin.db.tables import Run, User
 from odin.services import bundle, simulation, runs
 from sqlalchemy import select
 
-router = APIRouter()
+router = APIRouter(default_response_class=RedactedJSONResponse, route_class=PrivateAPIRoute)
 admin = require_role("admin")
 _dispatch_lock = threading.Lock()
 
@@ -97,9 +98,11 @@ def _launch(u, target=None, one=False):
             if 1 not in s["drops_loaded"] or (target.isoformat() > s["checkpoints"][0] and 2 not in s["drops_loaded"]):
                 raise HTTPException(400, "Load the required event drops before advancing")
         def go(rid):
-            simulation.advance(u.company_id, target, one=one)
+            result = simulation.advance(u.company_id, target, one=one)
+            if result.get("blocked_by_security"):
+                return "partial"
             with run_ctx(u.company_id):
-                incomplete = any(e.get("status") in ("received", "processing", "needs_review") or e.get("impact_review_required") for e in repo.query("event"))
+                incomplete = any(e.get("status") in ("received", "processing", "needs_review", "quarantined", "reviewing") or e.get("impact_review_required") for e in repo.query("event"))
             return "partial" if incomplete else "done"
         return {"run_id": runs.start(u.company_id, "simulation", go, background=True), "status": "running"}
 
