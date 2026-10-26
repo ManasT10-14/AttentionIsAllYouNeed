@@ -33,8 +33,13 @@ def receive(company_id: str, *, subject: str, body: str, sender: str = "", gmail
             run: bool = True, background: bool = True) -> dict:
     with run_ctx(company_id, scenario_id=scenario_id, agent="heimdall"):
         dedupe = gmail_msg_id or hashlib.sha1(f"{subject}\n{body}".encode()).hexdigest()[:16]
-        if not scenario_id and any(e.get("gmail_msg_id") == dedupe for e in repo.query("event")):
-            return {"status": "duplicate", "dedupe": dedupe}
+        if not scenario_id:
+            existing = next((e for e in repo.query("event") if e.get("gmail_msg_id") == dedupe), None)
+            if existing:
+                if method == "manual" and existing.get("status") == "rejected":
+                    return {"status": "rejected", "event_id": existing["id"],
+                            "problems": [existing.get("reject_reason") or "Event could not be parsed"], "auto_replied": False}
+                return {"status": "duplicate", "dedupe": dedupe}
         ev_id = new_id("evt")
         quarantine = ""
         try:

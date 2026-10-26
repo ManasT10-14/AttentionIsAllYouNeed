@@ -455,7 +455,10 @@ def list_events(u: User = Depends(current_user)):
 @router.post("/events", tags=["events"])
 def post_event(ev: EventIn, u: User = Depends(current_user)):
     """Manual fallback when Gmail is unavailable — same parser, same graph."""
-    return events_svc.receive(u.company_id, subject=ev.subject, body=ev.body, sender=ev.sender, method="manual")
+    result = events_svc.receive(u.company_id, subject=ev.subject, body=ev.body, sender=ev.sender, method="manual")
+    if result.get("status") == "rejected":
+        raise HTTPException(422, "; ".join(dict.fromkeys(result.get("problems") or ["Event could not be parsed"])))
+    return result
 
 
 @router.post("/events/{event_id}/reprocess", tags=["events"])

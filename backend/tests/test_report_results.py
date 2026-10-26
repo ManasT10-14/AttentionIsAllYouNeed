@@ -76,6 +76,22 @@ def test_verification_includes_rationale_even_without_contract_column(monkeypatc
     assert result["sections"][0]["value"][0]["rationale"] == "Clause supports the claim"
 
 
+def test_norns_contribution_serializes_dataclass_timeline(monkeypatch):
+    import json
+    from odin.core.models import Exposure
+    from odin.services import insights
+    from odin.services.timeline import ContractTimeline
+    exposure = Exposure(as_of=date(2027, 1, 15), expected=0, worst_case=0, currency="USD")
+    timeline = ContractTimeline("C1", [], exposure, date(2027, 6, 1), None)
+    monkeypatch.setattr(insights, "timelines", lambda: [timeline])
+    with run_ctx("tenant", run_id="r"):
+        result = message_results.capture_result("norns", "timeline", "C1", {})
+    value = result["sections"][0]["value"][0]
+    assert value["term_end"] == "2027-06-01"
+    assert value["exposure"]["expected"] == 0
+    json.dumps(result)
+
+
 @pytest.mark.parametrize("scenario,expected", [(None, 1), ("preview", 0)])
 def test_real_events_refresh_reports_but_simulations_do_not(monkeypatch, scenario, expected):
     from odin.graphs import event

@@ -2,6 +2,7 @@
 
 Snapshots are immutable message payloads; legacy enrichment is explicitly current state.
 """
+from fastapi.encoders import jsonable_encoder
 from odin.core.context import current
 from odin.db import repo
 
@@ -39,7 +40,7 @@ def capture_result(sender: str, kind: str, cid: str | None, payload: dict) -> di
         add("Clarification answers", records("clarification", [payload["clarification_id"]]) if payload.get("clarification_id") else records("clarification"))
     elif sender == "norns":
         from odin.services import insights
-        add("Timeline, exposure and calculation basis", [t.model_dump(mode="json") for t in insights.timelines() if not cid or t.contract_id == cid])
+        add("Timeline, exposure and calculation basis", [jsonable_encoder(t) for t in insights.timelines() if not cid or t.contract_id == cid])
     elif sender == "loki":
         add("Risk claims, scenarios and evidence", records("finding", fids) if fids else records("finding"))
         add("Clarification questions", records("clarification"))
