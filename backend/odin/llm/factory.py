@@ -58,7 +58,9 @@ def chat_model(name: str, temperature: float = 0.0, model: str | None = None, ma
         return ChatOpenAI(**kw)
     if kind == "anthropic":
         from langchain_anthropic import ChatAnthropic
-        return ChatAnthropic(model=cfg["model"], api_key=cfg["api_key"], max_tokens=max_tokens or 8192, **common)
+        # Current Claude models reject temperature; use their native default.
+        anthropic_common = {k: v for k, v in common.items() if k != 'temperature'}
+        return ChatAnthropic(model=cfg["model"], api_key=cfg["api_key"], max_tokens=max_tokens or 8192, **anthropic_common)
     if kind == "groq":
         from langchain_groq import ChatGroq
         return ChatGroq(model=cfg["model"], api_key=cfg["api_key"], max_tokens=max_tokens, **common)

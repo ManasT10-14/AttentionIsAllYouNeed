@@ -233,6 +233,50 @@ def counterparties(now: date | None = None) -> list[dict]:
 
 
 # ───────────────────────────── graph (FR9.1) ─────────────────────────────
+def _conflict_references(edge: dict) -> list[dict]:
+    """Resolve source passages for a saved conflict without changing graph topology."""
+    import re
+    from collections import Counter
+    from odin.core.citations import verify
+    from odin.core.models import Citation
+    from odin.retrieval.hybrid import tokenize
+
+    ids = [edge[key].removeprefix('c:') for key in ('source', 'target')]
+    rows = {cid: repo.clauses(cid) for cid in ids}
+    refs = []
+    for raw in edge.get('citations', []):
+        try:
+            citation = verify(Citation.model_validate(raw))
+            if citation.verified and citation.contract_id in ids:
+                refs.append(citation.model_dump(mode='json'))
+        except (ValueError, TypeError):
+            continue
+    reason = edge.get('reason', '')
+    def add(row, basis):
+        refs.append({'contract_id': row.contract_id, 'clause_number': row.number,
+                     'ref': row.ref, 'page': row.page, 'version': row.version,
+                     'quote': row.text, 'verified': True, 'reference_basis': basis})
+    for cid in ids:
+        if any(c['contract_id'] == cid for c in refs):
+            continue
+        explicit = re.findall(rf'\b{re.escape(cid)}\s*(?:§|sections?|clauses?)\s*([\w.-]+)', reason, re.I)
+        for row in rows[cid]:
+            if row.number in explicit:
+                add(row, 'explicit_reference')
+    # Older dependency records contain only a reason. Retrieve the related source
+    # on the other side; this locates evidence, not proof of the legal conflict.
+    query = set(tokenize(reason + ' ' + ' '.join(c['quote'] for c in refs)))
+    for cid in ids:
+        if any(c['contract_id'] == cid for c in refs) or not rows[cid]:
+            continue
+        terms = [(row, set(tokenize(row.heading + ' ' + row.text))) for row in rows[cid]]
+        frequency = Counter(word for _, words in terms for word in words)
+        row, words = max(terms, key=lambda item: sum(1 / frequency[w] for w in query & item[1]))
+        if len(query & words) >= 2:
+            add(row, 'related_source')
+    return refs
+
+
 def graph() -> dict:
     nodes, edges = [], []
     party_ids: dict[str, str] = {}
@@ -268,9 +312,13 @@ def graph() -> dict:
         cids = sorted(cids)
         for a, b in zip(cids, cids[1:]):
             edges.append({"source": f"c:{a}", "target": f"c:{b}", "kind": "conflicts_with", "reason": f["claim"],
-                          "severity": f["severity"], "finding_id": f["id"]})
+                          "severity": f["severity"], "finding_id": f["id"],
+                          "citations": [c for c in f.get("citations", []) if c.get("contract_id") in (a, b)]})
     ids = {n["id"] for n in nodes}  # drop links to contracts referenced in text but never uploaded
     edges = [e for e in edges if e["source"] in ids and e["target"] in ids]
+    for edge in edges:
+        if edge['kind'] == 'conflicts_with':
+            edge['citations'] = _conflict_references(edge)
     known = {c.contract_id for c in repo.contracts()}
     cascades = {c: [x for x in cascade(c) if x in known] for c in known}
     return {"nodes": nodes, "edges": edges, "cascades": {k: v for k, v in cascades.items() if v}}

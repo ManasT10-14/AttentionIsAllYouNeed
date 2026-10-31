@@ -81,7 +81,9 @@ def structured(agent: str, schema: Type[T], system: str, user: str, *, tools: li
                 tin = tout = 0
                 if tools:
                     convo, tin, tout = _tool_phase(agent, model, convo, tools, cfg)
-                runnable = model.with_structured_output(schema, method="function_calling", include_raw=True)
+                # Claude's native JSON output avoids forced-tool errors on Sonnet 5.5.
+                method = 'json_schema' if prov == 'anthropic' else 'function_calling'
+                runnable = model.with_structured_output(schema, method=method, include_raw=True)
                 convo = HOOKS.pre_llm(agent, convo)
                 res = runnable.invoke(convo, config=cfg)
                 a, b = _usage(res["raw"])
@@ -92,8 +94,9 @@ def structured(agent: str, schema: Type[T], system: str, user: str, *, tools: li
                         raise LLMFailure(f"schema mismatch: {res.get('parsing_error')}")
                     err = res.get("parsing_error")
                     convo += [res["raw"] if isinstance(res["raw"], AIMessage) else AIMessage(str(res["raw"])),
-                              HumanMessage(f"Your output did not match the schema: {err}. "
-                                           f"Call the {schema.__name__} tool again with valid arguments.")]
+                              HumanMessage(f"Your output did not match the schema: {err}. " +
+                                           (f"Return JSON matching {schema.__name__} with valid fields." if method == 'json_schema'
+                                            else f"Call the {schema.__name__} tool again with valid arguments."))]
                     convo = HOOKS.pre_llm(agent, convo)
                     res = runnable.invoke(convo, config=cfg)
                     a, b = _usage(res["raw"])

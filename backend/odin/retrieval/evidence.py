@@ -13,6 +13,23 @@ log = logging.getLogger(__name__)
 _REF = re.compile(r"\b(?:clauses?|sections?)\s+(\d+(?:\.\d+)*)(?:\s*(?:and|,)\s*(\d+(?:\.\d+)*))?", re.I)
 
 
+def facets(question: str) -> list[str]:
+    """Retrieve each decision dependency, rather than only the question's vocabulary."""
+    question = re.sub(r'(?:unrelated to|excluding|other than|apart from)\s+(?:service\s+)?(?:outages?|downtime)', '', question, flags=re.I)
+    queries = []
+    if re.search(r'uptime|outage|downtime|credits?|owe|receiv|recover', question, re.I):
+        queries += ['uptime measurement downtime scheduled maintenance exclusions',
+                    'monthly fee currency fees payment',
+                    'service credit calculation maximum cap',
+                    'credit request written notice deadline amendment',
+                    'effective date go live subscription period']
+    if re.search(r'default|breach|complian|insurance|exclusiv', question, re.I):
+        queries += ['insurance coverage lapse renewal notification cure termination',
+                    'exclusivity sector territory consent',
+                    'data security processing subprocessor audit obligations']
+    return queries
+
+
 def windows(text: str, size: int = 1200, overlap: int = 200):
     """Bounded overlapping spans retain offsets into the original stored clause."""
     start = 0
@@ -56,6 +73,14 @@ def retrieve(question: str, contract_ids: list[str], *, limit: int = 10, char_bu
                 scores[row.id] += 1 / (60 + rank + 1)
                 best_span[row.id] = (start, end)
     warnings = []
+    # Keep facet searches lexical and local: one embedding lookup per question.
+    dependencies = []
+    for query in facets(question):
+        words = set(hybrid.tokenize(query))
+        ranked = sorted(rows, key=lambda r: -len(words & set(hybrid.tokenize(f'{r.heading} {r.text}'))))
+        for row in ranked[:4]:
+            if words & set(hybrid.tokenize(f'{row.heading} {row.text}')) and row.id not in dependencies:
+                dependencies.append(row.id)
     try:
         dense = hybrid.search(question, contract_ids=contract_ids, top_k=32)
         for rank, hit in enumerate(dense):
@@ -83,14 +108,22 @@ def retrieve(question: str, contract_ids: list[str], *, limit: int = 10, char_bu
         selected += [identity for identity in order if identity not in selected][:max(0, target - len(selected))]
     else:
         selected = order[:limit]
+    if dependencies:
+        # Core SLA terms must survive paraphrasing and rank competition between
+        # counterparties. A top-k cutoff must not silently drop one party's target.
+        pinned = [r.id for r in rows if any(q.startswith('uptime measurement') for q in facets(question))
+                  and re.search(r'uptime commitment|uptime measurement|^service credits$|^fees and payment$|^credit request|^credit cap|maximum credit', r.heading, re.I)]
+        selected = list(dict.fromkeys(pinned + dependencies + selected))[:max(24, len(pinned))]
+        char_budget = max(char_budget, 40000)
     # Expand explicit same-agreement cross-references; never infer another agreement.
     lookup = {(r.contract_id, r.number): r.id for r in rows}
+    expansion_limit = len(selected) + 4
     for identity in list(selected[:5]):
         row = by_id[identity]
         numbers = {v for m in _REF.finditer(row.text) for v in m.groups() if v}
         for number in sorted(numbers):
             linked = lookup.get((row.contract_id, number))
-            if linked and linked not in selected and len(selected) < limit + 4:
+            if linked and linked not in selected and len(selected) < expansion_limit:
                 selected.append(linked)
     # Spend context on reference evidence as well as high-ranked parents.
     passages = []

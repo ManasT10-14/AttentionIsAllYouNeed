@@ -1,5 +1,11 @@
 import { deliveryOperation, list, record, text } from './api';
 
+export function validActionRecipients(value: string) {
+ if (/[\r\n\0]/.test(value)) return false;
+ const addresses = value.match(/[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\.)+[A-Za-z]{2,}/g);
+ return Boolean(addresses?.length);
+}
+
 /** A client preflight only. The server rechecks payload hashes and current sources. */
 export function actionSecurity(value: unknown, wallClockMs = Date.now()) {
  const action = record(value);

@@ -13,6 +13,7 @@ export default function config(phase: string): NextConfig {
   // Dev proxy must not gzip: compression buffers the /api/stream SSE so the live feed never connects.
   compress: false,
   images: { unoptimized: true },
+  experimental: { proxyTimeout: 240000 },
   env: { NEXT_PUBLIC_API_BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL ?? (proxy ? '/' : '') },
   ...(proxy ? {
    skipTrailingSlashRedirect: true,

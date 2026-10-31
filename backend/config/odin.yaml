@@ -18,7 +18,7 @@ providers:
     kind: anthropic
     api_key: ${ANTHROPIC_API_KEY}
     model: ${ANTHROPIC_MODEL}
-    price_per_mtok: {in: 3.0, out: 15.0}
+    price_per_mtok: {in: 2.0, out: 10.0}  # Claude Sonnet 5.5 standard pricing
   groq:
     kind: groq
     api_key: ${GROQ_API_KEY}
@@ -31,7 +31,7 @@ providers:
 
 defaults:
   provider: openai
-  fallback: [bedrock, anthropic, groq]
+  fallback: [bedrock, groq]  # Anthropic credits are reserved for Ask Odin only.
   temperature: 0
   max_retries: 2
 
@@ -47,7 +47,7 @@ agents:
   tyr: {models: {openai: moonshotai.kimi-k2.5, bedrock: moonshotai.kimi-k2.5}, max_tokens: 4000}        # rulings + ready-to-send drafts
   synth: {models: {openai: moonshotai.kimi-k2.5, bedrock: moonshotai.kimi-k2.5}, max_tokens: 1500}
   email_parse: {models: {openai: moonshotai.kimi-k2.5, bedrock: moonshotai.kimi-k2.5}, max_tokens: 1500}
-  ask: {models: {openai: moonshotai.kimi-k2.5, bedrock: moonshotai.kimi-k2.5}, max_tokens: 2000, max_retries: 0, timeout_s: 45, schema_repair: false, fallback: [bedrock]}
+  ask: {provider: anthropic, models: {anthropic: claude-sonnet-5-5}, max_tokens: 6000, max_retries: 0, timeout_s: 60, schema_repair: true, fallback: []}
 
 limits:
   max_clarify_rounds: 2

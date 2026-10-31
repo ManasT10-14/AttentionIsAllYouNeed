@@ -397,11 +397,12 @@ def list_actions(u: User = Depends(current_user)):
 
 @router.get("/actions/{aid}", tags=["actions"])
 def get_action(aid: str, u: User = Depends(current_user)):
+    from odin.services import approvals
     with scope(u):
         a = repo.get("action", aid)
         if not a:
             raise HTTPException(404)
-        return {**a, "counterfactual": insights.action_value(a)}
+        return {**a, "counterfactual": insights.action_value(a), "approval_eligibility": approvals.eligibility(aid)}
 
 
 @router.patch("/actions/{aid}", tags=["actions"])
@@ -449,6 +450,8 @@ def decide_action(aid: str, decision: str, u: User = Depends(admin)):
                 result = REGISTRY.invoke("system", tool, payload, approval_id=aid)
             except ApprovalRequired as e:
                 raise HTTPException(403, str(e))
+            except ValueError as e:
+                raise HTTPException(409, str(e))
             if result.get("is_update"):
                 # Application is already completed and its lease released. Analysis failure
                 # must not turn the applied proposal into a retryable external effect.

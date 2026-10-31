@@ -32,6 +32,16 @@ _META = {"status", "approval", "approval_execution", "approved_by", "approved_at
 _DISPATCH = ContextVar("approved_action_dispatch", default=None)
 
 
+def canonical_recipients(value: str) -> str:
+    """Accept generated display names/postal labels; authorize every extracted mailbox later."""
+    if any(c in value for c in ('\r', '\n', '\x00')):
+        raise ApprovalRequired('recipient must not contain header control characters')
+    addresses = list(dict.fromkeys(_EMAIL_IN_TEXT.findall(value)))
+    if not addresses or any(not _EMAIL.fullmatch(address) for address in addresses):
+        raise ApprovalRequired('add a documented recipient email address before approval')
+    return ', '.join(addresses)
+
+
 def _require_admin():
     context = maybe_current()
     if not context or context.user_role not in {"admin", "super_admin"}:
@@ -53,7 +63,7 @@ def action_payload(action: dict) -> tuple[str, dict]:
         if not action.get("redlines"):
             raise ApprovalRequired("amendment has no redlines")
         return "apply_amendment", {"action_id": action["id"]}
-    return "send_gmail", {"to": action.get("to", ""), "subject": action.get("subject", ""),
+    return "send_gmail", {"to": canonical_recipients(action.get("to", "")), "subject": action.get("subject", ""),
                            "body": action.get("body_md", ""), "thread_id": None}
 
 
@@ -72,7 +82,8 @@ def _sources(s, action):
     cid = action.get("contract_id")
     stmt = select(Contract).where(Contract.company_id == c.company_id)
     if cid != "cross":
-        stmt = stmt.where(Contract.contract_id == cid)
+        referenced = {cid, *(citation.get('contract_id') for citation in action.get('citations', []))}
+        stmt = stmt.where(Contract.contract_id.in_(referenced))
     contracts = s.scalars(stmt.order_by(Contract.contract_id).with_for_update()).all()
     if not contracts:
         raise ApprovalRequired("action source contract is unavailable")
@@ -87,6 +98,8 @@ def _sources(s, action):
                         "sha256": version.sha256, "meta_hash": _digest(contract.meta), "status": contract.status})
     by_id = {source["contract_id"]: source for source in sources}
     for citation in action.get("citations", []):
+        if citation.get('verified') is False:
+            raise ApprovalRequired('source quotations are unverified; review or reanalyse the draft before approval')
         source = by_id.get(citation.get("contract_id"))
         if not source or citation.get("version") != source["version"]:
             raise ApprovalRequired("action cites a stale source version")
@@ -112,8 +125,9 @@ def _basis(s, action):
 def _preconditions(s, action, tool, payload, contracts):
     if tool == "send_gmail":
         recipient = payload["to"]
-        if not _EMAIL.fullmatch(recipient) or "\r" in payload["subject"] or "\n" in payload["subject"]:
-            raise ApprovalRequired("action requires a single valid recipient and subject")
+        recipients = recipient.split(', ')
+        if any(not _EMAIL.fullmatch(address) for address in recipients) or "\r" in payload["subject"] or "\n" in payload["subject"]:
+            raise ApprovalRequired("action requires valid recipient addresses and a single-line subject")
         if not payload["body"].strip():
             raise ApprovalRequired("action body is empty")
         # Notice addresses must be evidenced, rather than inferred from a party name/domain.
@@ -130,10 +144,10 @@ def _preconditions(s, action, tool, payload, contracts):
                 Record.kind == "extraction", Record.contract_id == contract.contract_id,
                 Record.version == contract.current_version, Record.scenario_id.is_(None))).all()
             evidence.extend(row.data.get("notice", {}) for row in rows)
-        if action.get("kind") == "escalation_memo":
-            evidence.append(company.context if company else {})
+        # Internal reminders may be addressed to documented company personnel.
+        evidence.append(company.context if company else {})
         addresses = {value.casefold() for value in _EMAIL_IN_TEXT.findall(json.dumps(evidence))}
-        if recipient.casefold() not in addresses:
+        if any(address.casefold() not in addresses for address in recipients):
             raise ApprovalRequired("recipient is not a documented contract notice/contact address")
     if action.get("kind") == "payment_instruction":
         # Existing free-text drafts contain no typed beneficiary/amount authorization.
@@ -172,6 +186,24 @@ def approve(aid: str, *, reviewer: str) -> dict:
                 "approval": binding, "approval_execution": {}}
         _replace(s, row, data)
     return data
+
+
+def eligibility(aid: str) -> dict:
+    """Read-only preflight: explain missing prerequisites before showing an enabled approve button."""
+    try:
+        _require_admin()
+        with db() as s:
+            row = _row(s, aid)
+            action = row.data
+            if row.status not in {'draft', 'approved'} or action.get('approval_execution', {}).get('state'):
+                raise ApprovalRequired('action is consumed or no longer reviewable')
+            tool, payload = action_payload(action)
+            _, contracts = _sources(s, action)
+            _basis(s, action)
+            _preconditions(s, action, tool, payload, contracts)
+            return {'can_approve': True, 'reason': '', 'recipients': payload.get('to', '')}
+    except ApprovalRequired as exc:
+        return {'can_approve': False, 'reason': str(exc)}
 
 
 def edit(aid: str, updates: dict, *, reviewer: str) -> dict:

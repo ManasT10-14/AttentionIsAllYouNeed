@@ -60,6 +60,7 @@ def apply(action_id: str, *, expected_sources: list[dict] | None = None) -> dict
     # Do not ingest a proposal built from a version that changed during document construction.
     dispatch_sources(action_id, "apply_amendment", {"action_id": action_id})
     res = ingest_contract(company_id, f"{a['contract_id']}_amended.docx", content,
+                          doc_id=a['contract_id'],
                           approval_execution_id=a["approval_execution"]["id"])
     repo.set_status(action_id, "applied", applied_version=res.version)
     # The API launches analysis after registry.finish releases this action's durable lease.

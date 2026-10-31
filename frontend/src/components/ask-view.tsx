@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { useWorkspace } from './providers';
 import { list, record, text } from '@/lib/api';
@@ -37,7 +38,9 @@ export function AskView() {
  {messages.map((m, i) => <article key={i}><div className="question-bubble">{m.question}</div><div className="answer-bubble"><div className="button-row"><SourceBadge value="analysis" />{m.answer.status === 'partial' && <Badge tone="amber">Partially answered</Badge>}</div>
  {askReason(m.answer) && <p className={m.answer.insufficient_evidence ? 'form-error' : 'muted-note'}>{askReason(m.answer)}</p>}
  {m.answer.answer ? <p className="ask-answer-text">{text(m.answer.answer)}</p> : null}<Citations values={m.answer.citations} />
- {Array.isArray(m.answer.missing) && m.answer.missing.length > 0 && <div className="ask-limitations"><strong>{m.answer.insufficient_evidence ? 'What is needed' : 'Remaining gaps'}</strong><ul>{m.answer.missing.map((gap, j) => <li key={j}>{text(gap)}</li>)}</ul></div>}
+ {record(m.answer.next_step).href==='/dashboard/simulation'&&<Link className="button button-secondary" href="/dashboard/simulation">Open Simulation</Link>}
+ {list(m.answer.supporting_claims).length > 0 && <details><summary>Checked calculations and conditions</summary>{list(m.answer.supporting_claims).map((claim,j) => <div key={j}><p>{text(claim.text)}</p><Citations values={claim.citations} /></div>)}</details>}
+ {Array.isArray(m.answer.missing) && m.answer.missing.length > 0 && <details className="ask-limitations" open={m.answer.insufficient_evidence === true}><summary>{m.answer.insufficient_evidence ? 'What is needed' : 'Evidence gaps'} ({m.answer.missing.length})</summary><ul>{m.answer.missing.map((gap, j) => <li key={j}>{text(gap)}</li>)}</ul></details>}
  {Array.isArray(m.answer.warnings) && m.answer.warnings.map((warning, j) => <p className="muted-note" key={j}>{text(warning)}</p>)}
  {list(m.answer.sources).length > 0 && <details><summary>Agreement scope ({list(m.answer.sources).length})</summary><div className="citation-list">{list(m.answer.sources).map((s, j) => <span key={j} className="citation-chip">{text(s.title, text(s.contract_id))}</span>)}</div></details>}
  <details><summary>Retrieved evidence ({list(m.answer.passages).length} passages)</summary>{m.answer.resolved_question && m.answer.resolved_question !== m.question ? <p className="muted-note">Search context: {text(m.answer.resolved_question)}</p> : null}<FieldValue value={m.answer.passages} /></details>

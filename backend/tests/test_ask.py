@@ -4,7 +4,7 @@ from datetime import date
 from types import SimpleNamespace as NS
 
 import pytest
-from odin.core.models import Citation
+from odin.services.ask_evidence import AskCitation as Citation
 from odin.llm.call import LLMFailure
 from odin.retrieval import evidence
 from odin.services import ask as service
@@ -81,8 +81,34 @@ def test_inventory_does_not_call_model_or_retrieval(world, monkeypatch):
     assert '1 uploaded' in out['answer'] and out['status'] == 'answered'
 
 
+def test_march_question_before_replay_explains_missing_events_without_using_model(world, monkeypatch):
+    world[0][0].meta['canonical']='txt'
+    monkeypatch.setattr(service.repo,'sim_now',lambda:date(2027,1,15))
+    monkeypatch.setattr(service,'structured',lambda *a,**k:pytest.fail('Future incident evidence is unavailable'))
+    out=ask('company','What was March uptime and how much do we owe?')
+    assert out['reason']=='period_not_replayed' and out['status']=='unanswered'
+    assert 'March 2027' in out['answer'] and '2027-01-15' in out['answer']
+    assert out['next_step']['href']=='/dashboard/simulation'
+
+
 def claim(body='Thirty days are allowed.', quote='A cure period of thirty days applies.', cid='TEST-1'):
     return service.AnswerClaim(text=body, basis='clause', citations=[Citation(contract_id=cid, clause_number='7.2', quote=quote)])
+
+
+def test_short_answer_keeps_calculations_in_supporting_evidence(world, monkeypatch):
+    monkeypatch.setattr(service, 'calculation_claims', lambda *a: [claim('Calculation details.').model_dump(mode='json')])
+    monkeypatch.setattr(service, 'structured', lambda *a, **k: service.AnswerDraft(claims=[claim('Thirty days.')]))
+    out = ask('company', 'What is TEST-1 cure period?')
+    assert out['answer'] == 'Thirty days.'
+    assert out['supporting_claims'][0]['text'] == 'Calculation details.'
+    assert out['supporting_claims'][0]['citations'][0]['verified']
+
+
+def test_model_answer_word_budget_preserves_short_uncertainty_and_rejects_essays():
+    concise = service.CompactAnswerDraft(claims=[claim('Nominal credit: $6,000. Recovery and net: unverified.')])
+    assert 'unverified' in concise.claims[0].text
+    with pytest.raises(ValueError, match='at most 35 words'):
+        service.CompactAnswerDraft(claims=[claim('word ' * 20), claim('word ' * 16)])
 
 
 def test_partial_answer_retains_supported_claim_after_repair_failure(world, monkeypatch):
@@ -123,6 +149,16 @@ def test_provider_failure_preserves_retrieved_evidence(world, monkeypatch):
     out = ask('company', 'What is TEST-1 cure period?')
     assert out['reason'] == 'provider_failure' and out['passages']
     assert out['answer'] == '' and 'credentials' not in str(out)
+
+
+def test_provider_failure_still_returns_verified_calculation_summary(world, monkeypatch):
+    monkeypatch.setattr(service, 'calculation_claims', lambda *a: [claim('Checked nominal result.').model_dump(mode='json')])
+    def fail(*a, **k):
+        raise LLMFailure('offline')
+    monkeypatch.setattr(service, 'structured', fail)
+    out = ask('company', 'What is TEST-1 uptime?')
+    assert out['status'] == 'partial' and out['reason'] == 'provider_failure'
+    assert out['answer'] == 'Checked nominal result.' and out['citations'][0]['verified']
 
 
 def test_invalid_selection_never_falls_back_to_all_agreements(world, monkeypatch):
@@ -197,3 +233,92 @@ def test_removed_history_scope_never_silently_expands_to_portfolio(world):
     ids, _, invalid = service.resolve_scope('What about its notice?', None,
         [{'question': 'Explain removed agreement', 'contract_ids': ['REMOVED']}], world[0])
     assert ids == [] and invalid == ['REMOVED']
+
+
+def test_record_quotes_require_matching_id_type_and_exact_words(world):
+    records = [{'source_id': 'event-1', 'source_type': 'event', 'title': 'Outage', 'text': 'Duration: 90 minutes'}]
+    cited = Citation(contract_id='event-1', clause_number='record', source_type='event', quote='Duration: 90 minutes')
+    draft = service.AnswerDraft(claims=[service.AnswerClaim(text='Recorded downtime is 90 minutes.', basis='record', citations=[cited])])
+    good, bad = service.verified_claims(draft, 'clause', ['TEST-1'], records)
+    assert len(good) == 1 and not bad and good[0].citations[0].page is None
+    for update in ({'quote': 'Duration: 900 minutes'}, {'source_type': 'ledger'}, {'contract_id': 'other-tenant-event'}):
+        draft.claims[0].citations = [cited.model_copy(update=update)]
+        assert not service.verified_claims(draft, 'clause', ['TEST-1'], records)[0]
+
+
+def test_record_alone_cannot_support_a_legal_claim(world):
+    records = [{'source_id': 'event-1', 'source_type': 'event', 'title': 'Expiry', 'text': 'Policy expires tomorrow.'}]
+    draft = service.AnswerDraft(claims=[service.AnswerClaim(text='This is material breach.', basis='clause', citations=[
+        Citation(contract_id='event-1', clause_number='record', source_type='event', quote='Policy expires tomorrow.')])])
+    assert not service.verified_claims(draft, 'clause', ['TEST-1'], records)[0]
+
+
+def test_repair_replaces_instead_of_appending_conflicting_answer(world, monkeypatch):
+    drafts = iter([service.AnswerDraft(claims=[claim('Original conclusion.'), claim(quote='Invented quote')]),
+                   service.AnswerDraft(claims=[claim('Corrected conclusion.')])])
+    monkeypatch.setattr(service, 'structured', lambda *a, **k: next(drafts))
+    out = ask('company', 'What is TEST-1 cure period?')
+    assert out['answer'] == 'Corrected conclusion.' and out['status'] == 'answered'
+
+
+def test_governing_document_expansion_does_not_overwrite_question_type(world, monkeypatch):
+    from odin.services import bundle
+    world[0][0].meta['canonical'] = 'txt'
+    monkeypatch.setattr(service.insights, 'doc_relations', lambda: [
+        {'from_doc': 'TEST-1', 'to_doc': 'TEST-10', 'relation': 'incorporates'}])
+    monkeypatch.setattr(service.insights, 'clause_overrides', lambda: [])
+    monkeypatch.setattr(service.repo, 'company', lambda cid: NS(context={}))
+    monkeypatch.setattr(service.repo, 'query', lambda kind: [])
+    monkeypatch.setattr(bundle, 'ledger_as_of', lambda now: [])
+    monkeypatch.setattr(service.insights, 'extraction', lambda cid: NS(model_dump=lambda **kw: {'generated_note': 'duplicated-extraction-marker'}))
+    def model(agent, schema, system, payload):
+        assert 'duplicated-extraction-marker' not in payload
+        return service.AnswerDraft(claims=[claim()])
+    monkeypatch.setattr(service, 'structured', model)
+    out = ask('company', 'What is TEST-1 cure period?')
+    assert out['kind'] == 'clause' and set(out['scope_ids']) == {'TEST-1', 'TEST-10'}
+
+
+def test_credit_retrieval_covers_deadline_and_fee_without_question_keywords(world, monkeypatch):
+    rows = [clause(number=str(i), body='Monthly uptime performance credit threshold.') for i in range(12)]
+    rows += [clause(number='fees', body='Monthly Fee: USD 9000.'),
+             clause(number='notice', body='Credit request written notice deadline: fifteen days.')]
+    monkeypatch.setattr(evidence.repo, 'clauses', lambda cid: rows)
+    passages, _ = evidence.retrieve('What was uptime?', ['TEST-1'], limit=3)
+    assert {'fees', 'notice'} <= {p['clause_number'] for p in passages}
+
+
+def test_explicitly_excluded_outages_do_not_crowd_out_breach_evidence():
+    queries = evidence.facets('Are we in default or material breach unrelated to service outages?')
+    assert any('insurance' in q for q in queries)
+    assert not any('uptime' in q for q in queries)
+
+
+def test_sla_retrieval_preserves_all_selected_parties_targets_even_below_top_k(world, monkeypatch):
+    rows = [clause(number=str(i), body='Outage uptime financial customer credit March incident.') for i in range(35)]
+    target = clause(number='target', body='Availability commitment: ninety percent (90%).')
+    target.heading = 'Uptime Commitment'
+    rows.append(target)
+    monkeypatch.setattr(evidence.repo, 'clauses', lambda cid: rows)
+    passages, _ = evidence.retrieve('What financial credits apply to the March outage?', ['TEST-1'], limit=3)
+    assert any(p['clause_number'] == 'target' for p in passages)
+
+
+def test_unresolved_conditions_do_not_allow_definitive_financial_or_insurance_findings(world):
+    records = [{'source_id': 'company', 'source_type': 'company', 'title': 'Context', 'text': 'No renewal confirmation.'}]
+    for text, gap in [('Company is in material breach of insurance terms.', 'Whether insurance was renewed'),
+                      ('Company is not in default under its insurance obligation.', 'Whether replacement coverage exists'),
+                      ('Company is not in default, but insurance breach is possible if coverage lapsed.', 'Whether replacement coverage exists'),
+                      ('Company owes $6000 in service credits.', 'Whether a timely claim request was submitted')]:
+        draft = service.AnswerDraft(claims=[claim(text)], missing=[gap])
+        assert not service.verified_claims(draft, 'clause', ['TEST-1'], records)[0]
+    draft = service.AnswerDraft(claims=[claim('Company is entitled to receive $400, subject to the maximum credit cap.')],
+                               missing=['Whether a timely request was submitted'])
+    assert not service.verified_claims(draft, 'clause', ['TEST-1'], records)[0]
+    draft.claims[0].text = 'Company is entitled to an additional 5% service credit.'
+    assert not service.verified_claims(draft, 'clause', ['TEST-1'], records)[0]
+    draft = service.AnswerDraft(claims=[claim('Nominal service credit is $6000, subject to a timely request.')],
+                               missing=['Whether a timely request was submitted'])
+    assert service.verified_claims(draft, 'clause', ['TEST-1'], records)[0]
+    draft.claims[0].text = 'Base SLA: company owes $6000; net loss $6000.'
+    assert service.verified_claims(draft, 'clause', ['TEST-1'], records)[0]

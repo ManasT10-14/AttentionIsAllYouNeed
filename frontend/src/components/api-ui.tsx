@@ -20,6 +20,7 @@ export function Status({ value, severity = false }: { value: unknown; severity?:
 }
 export function CitationChip({ value }: { value: unknown }) {
   const c = record(value);
+  if (c.source_type && c.source_type !== 'contract') return <details className="citation-chip"><summary>{text(c.contract_id)} · {text(c.source_type)}{c.verified === false ? ' · Unverified' : ''}</summary><p>{text(c.ref)}</p><blockquote style={{whiteSpace:'pre-wrap'}}>{text(c.quote)}</blockquote></details>;
   if (!c.contract_id || !c.clause_number) return <span className="muted-note">No citation supplied</span>;
   return <Link className={'citation-chip ' + (c.verified === false ? 'citation-warning' : '')} href={viewerLink(c as Citation)} aria-label={'Open section ' + text(c.clause_number) + ' of contract ' + text(c.contract_id) + (typeof c.page === 'number' ? ', page ' + c.page : '') + (c.verified === false ? '. Quote not found in contract' : '')} title={c.verified === false ? 'Quote not found in contract' : text(c.quote,'Open reference')}>
     {citationLabel(c)}{typeof c.page === 'number' ? ' · p.' + c.page : ''}{c.verified === false ? ' · Quote not found in contract' : ''}<ExternalLink size={11} />

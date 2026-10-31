@@ -8,14 +8,14 @@ from odin.agents.base import j, prompt
 from odin.core import citations
 from odin.core.budget import BudgetExceeded
 from odin.core.context import run_ctx
-from odin.core.models import Citation
 from odin.core.telemetry import traced
 from odin.db import repo
 from odin.evals import scored
 from odin.llm.call import LLMFailure, structured
 from odin.retrieval import evidence
 from odin.services import insights
-from pydantic import BaseModel, Field
+from odin.services.ask_evidence import AskCitation, records_for, verify_record, incident_calculations, deadline_calculations, select_records, sla_calculations, invalid_comparison, calculation_claims, incorrect_deadline, coverage_claims, future_period
+from pydantic import BaseModel, Field, model_validator
 
 _PORTFOLIO = re.compile(r'\b(portfolio|counterparties|overview|total exposure|upcoming|attention|alerts?)\b|\b(?:which|list|what|how many)\b.*\b(?:contracts|agreements)\b|\brenew\w*\s+(?:next|this|in|by)\b', re.I)
 _CLAUSE = re.compile(r'\b(clauses?|sections?|liabilit\w*|caps?|cure|breach|terminat\w*|indemni\w*|penalt\w*|notice period|obligations?|exceptions?|force majeure|conflict\w*|precedence|governing law|payment terms?)\b', re.I)
@@ -26,13 +26,23 @@ _SKIP_KEYS = {'bboxes'}
 
 class AnswerClaim(BaseModel):
     text: str
-    basis: Literal['portfolio', 'clause']
-    citations: list[Citation] = Field(default_factory=list)
+    basis: Literal['portfolio', 'clause', 'record']
+    citations: list[AskCitation] = Field(default_factory=list)
 
 
 class AnswerDraft(BaseModel):
     claims: list[AnswerClaim]
     missing: list[str] = Field(default_factory=list)
+
+
+class CompactAnswerDraft(AnswerDraft):
+    claims: list[AnswerClaim] = Field(description='One-line answer: all claim texts combined MUST be at most 35 words. Citations do not count.')
+
+    @model_validator(mode='after')
+    def word_limit(self):
+        if sum(len(c.text.split()) for c in self.claims) > 35:
+            raise ValueError('Answer text must be at most 35 words combined. Return only results and essential uncertainty; omit explanations. Citations do not count.')
+        return self
 
 
 def classify(question: str) -> str:
@@ -122,7 +132,7 @@ def portfolio_context(question: str, contract_ids: list[str] | None = None, cont
             if p.get('role') != 'company' and p.get('name'):
                 parties.setdefault(p['name'], []).append(c.contract_id)
     detail = {}
-    for cid in (contract_ids or ment)[:6]:
+    for cid in (contract_ids or ment):
         x = insights.extraction(cid)
         if x:
             detail[cid] = _slim(x.model_dump(mode='json'))
@@ -156,14 +166,31 @@ def deterministic(question: str, ctx: dict) -> str | None:
     return None
 
 
-def verified_claims(draft: AnswerDraft, kind: str, ids: list[str]):
+def verified_claims(draft: AnswerDraft, kind: str, ids: list[str], records: list[dict] | None = None, context: dict | None = None):
     supported, rejected = [], []
     for claim in draft.claims:
         # A clause question can never bypass evidence checks by labelling a claim portfolio.
-        needs_citation = claim.basis == 'clause' or kind == 'clause' or bool(_CLAUSE.search(claim.text))
-        checked = citations.verify_all([c for c in claim.citations if c.contract_id in ids])
+        needs_citation = claim.basis in ('clause', 'record') or kind == 'clause' or bool(_CLAUSE.search(claim.text))
+        checked = []
+        for citation in claim.citations:
+            if citation.source_type != 'contract':
+                checked.append(verify_record(citation, records or []))
+            elif citation.contract_id in ids:
+                checked.append(citations.verify(citation))
         valid = [c for c in checked if c.verified]
-        if needs_citation and (not valid or len(valid) != len(claim.citations)):
+        rule_missing = (claim.basis == 'clause' or bool(_CLAUSE.search(claim.text))) and not any(c.source_type == 'contract' for c in valid)
+        qualified = bool(re.search(r'\b(if|would|may|might|could|unverified|uncertain|potential|conditional|nominal|nominally|cannot|not confirmed|not established|base[- ]SLA)\b|subject to[^.]{0,100}\b(request|claim|eligibility)\b', claim.text, re.I))
+        opening = re.split(r'\bbut\b|\bhowever\b|;', claim.text, maxsplit=1, flags=re.I)[0]
+        insurance_qualified = bool(re.search(r'\b(if|would|may|might|could|unverified|uncertain|potential|conditional|cannot|not confirmed|not established)\b', opening, re.I))
+        unresolved = ' '.join(draft.missing)
+        insurance_conflict = bool(records and not insurance_qualified and
+            re.search(r'insurance|polic(?:y|ies)|coverage', claim.text, re.I) and
+            re.search(r'\b(is|are|has|have|failed)\b.*\b(breach|default|lapsed|compliant)\b', claim.text, re.I) and
+            re.search(r'renew|replacement|whether.*laps', unresolved, re.I))
+        money_conflict = bool(records and not qualified and re.search(r'\$|\d+(?:\.\d+)?%|\bpercent\b', claim.text, re.I) and
+            re.search(r'owes?|entitled|recover|receiv', claim.text, re.I) and
+            re.search(r'whether.*(?:request|claim|applied|paid)|timely.*(?:request|claim)', unresolved, re.I))
+        if invalid_comparison(claim.text) or incorrect_deadline(claim.text, valid, context or {}) or insurance_conflict or money_conflict or (needs_citation and (not valid or len(valid) != len(claim.citations) or rule_missing)):
             rejected.append(claim)
         elif claim.text.strip():
             supported.append(claim.model_copy(update={'citations': valid}))
@@ -190,6 +217,14 @@ def ask(company_id: str, question: str, contract_ids: list[str] | None = None, h
         if not contracts:
             return result(kind=kind, ids=[], sources=[], reason='no_contracts', missing=['No contracts have been uploaded yet.'])
         pack_scope = any(c.meta.get("canonical") == "txt" for c in contracts if c.contract_id in ids)
+        period = future_period(resolved, repo.sim_now()) if pack_scope else None
+        if period:
+            out = result(f"{period} outage data hasn’t been replayed. Current simulation date: {repo.sim_now().isoformat()}. Load the event drops and run through {period} in Simulation.",
+                         kind=kind, ids=ids, sources=[], reason='period_not_replayed',
+                         missing=['The requested period is later than the current simulation date; future drops are not evidence yet.'])
+            out.update(status='unanswered', insufficient_evidence=True,
+                       next_step={'href': '/dashboard/simulation', 'label': 'Open Simulation'})
+            return out
         if pack_scope:
             # Include governing terms and amendments as explicit, visible source scope.
             rels = insights.doc_relations()
@@ -197,20 +232,36 @@ def ask(company_id: str, question: str, contract_ids: list[str] | None = None, h
             for _ in range(len(contracts)):
                 before = set(expanded)
                 for rel in rels:
-                    a, b, kind = rel.get("from_doc"), rel.get("to_doc"), rel.get("relation")
-                    if a in expanded or (b in expanded and kind in ("amends", "addendum_to")):
+                    a, b, relation = rel.get("from_doc"), rel.get("to_doc"), rel.get("relation")
+                    if a in expanded or (b in expanded and relation in ("amends", "addendum_to")):
                         expanded.update((a, b))
                 if expanded == before:
                     break
             ids = [c.contract_id for c in contracts if c.contract_id in expanded]
         ctx, _ = portfolio_context(resolved, ids, contracts)
         if pack_scope:
+            # Canonical clauses/records below already carry the actual evidence.
+            # Repeating every agent extraction bloats the prompt and lets generated
+            # analysis compete with the governing source text.
+            ctx.pop('extracted_fields_for_mentioned_contracts', None)
             from odin.services.bundle import ledger_as_of
             company = repo.company(company_id)
             ctx["company_context"] = company.context if company else {}
             ctx["ledger"] = ledger_as_of(repo.sim_now())
             ctx["events_so_far"] = [e for e in repo.query("event") if e.get("occurred_at") and e["occurred_at"][:10] <= repo.sim_now().isoformat()]
             ctx["effective_amendments"] = [o for o in insights.clause_overrides() if o.get("doc") in ids]
+
+        all_records = records_for(ctx, ids)
+        records = select_records(resolved, all_records)
+        ctx['incident_calculations'] = incident_calculations(all_records)
+        # Computed evidence must retain its underlying records even when those
+        # records have no lexical overlap with the user's words (e.g. uptime).
+        required = {identity for calc in ctx['incident_calculations'] for identity in calc['source_ids']}
+        records += [r for r in all_records if r['source_id'] in required and r not in records]
+        ctx['source_records'] = records
+        # The source records above provide explicit IDs/quotes; avoid duplicate raw context.
+        for key in ('company_context', 'ledger', 'events_so_far'):
+            ctx.pop(key, None)
 
         sources = [{'contract_id': c.contract_id, 'title': c.title} for c in contracts if c.contract_id in ids]
         direct = deterministic(question, ctx)
@@ -225,36 +276,65 @@ def ask(company_id: str, question: str, contract_ids: list[str] | None = None, h
                                      "ref": r.ref, "clause_id": r.id, "version": r.version,
                                      "page": r.page, "text": r.text, "heading": r.heading,
                                      "truncated": False})
+        ctx['deadline_calculations'] = deadline_calculations(passages, all_records, ctx['incident_calculations'])
+        ctx['sla_calculations'] = sla_calculations(passages, ctx['incident_calculations'])
+        computed = AnswerDraft(claims=[*calculation_claims(resolved, ctx, passages, records),
+                                      *coverage_claims(resolved, passages, records)])
+        checked_calculations, _ = verified_claims(computed, kind, ids, records)
         if kind == 'clause' and not passages:
             return result(kind=kind, ids=ids, sources=sources, reason='no_evidence', warnings=warnings,
                           missing=['No supporting clauses were found in the selected agreements. Try a clause number or a more specific question.'])
         payload = f'Question type: {kind}\nQuestion: {resolved}\n<portfolio>\n{j(ctx)}\n</portfolio>\n<document>\n{j(passages)}\n</document>'
         try:
             # Evidence is retrieved server-side; model tools cannot silently expand selected scope.
-            draft = structured('ask', AnswerDraft, prompt('ask'), payload)
+            draft = structured('ask', CompactAnswerDraft, prompt('ask'), payload)
         except (LLMFailure, BudgetExceeded) as exc:
             reason = 'budget_exceeded' if isinstance(exc, BudgetExceeded) else 'provider_failure'
-            return result(kind=kind, ids=ids, sources=sources, passages=passages, reason=reason,
+            out = result(' '.join(c.text for c in checked_calculations), kind=kind, ids=ids, sources=sources,
+                          passages=passages, reason=reason, cits=[c for claim in checked_calculations for c in claim.citations],
                           warnings=warnings, missing=['The answer service could not complete this request. Your retrieved evidence is available below.'])
-        good, bad = verified_claims(draft, kind, ids)
+            out['record_sources'] = records
+            out['claims'] = [c.model_dump(mode='json') for c in checked_calculations]
+            return out
+        good, bad = verified_claims(draft, kind, ids, records, ctx)
         missing = list(draft.missing)
-        if bad:
+        review = bool(records and evidence.facets(resolved))
+        if bad or review:
             try:
-                repair = structured('ask', AnswerDraft, prompt('ask'), payload + '\nRepair only these unsupported claims. Copy exact supporting quotes; omit claims you cannot support:\n' + j([c.model_dump(mode='json') for c in bad]))
-                repaired, rejected = verified_claims(repair, kind, ids)
-                good.extend(repaired)
-                missing.extend(repair.missing)
+                repair = structured('ask', CompactAnswerDraft, prompt('ask'), payload +
+                    '\nReview this draft and return ONE complete corrected answer, replacing it. '
+                    'Check each requested part, conflicting conclusions, party roles, dates, amendments, '
+                    'claim conditions and whether each quote actually supports its claim. '
+                    'Expiry without renewal evidence is not proof of lapse. A potential credit is not '
+                    'recoverable without satisfying claim conditions. Resolve conflicting interpretations '
+                    'or label them conditional. Never invent missing records. Cite record facts using source_records. '
+                    'Include a net figure only with explicit assumptions. Do not omit downstream customers '
+                    'when comparing uptime-related amounts owed and received. Correct invalid quotations '
+                    'using short contiguous source substrings, not ellipses. The following claims failed '
+                    'source verification and must be corrected or qualified, not repeated unchanged:\n' +
+                    j([claim.model_dump(mode='json') for claim in bad]) +
+                    '\nFull draft to replace:\n' + j(draft.model_dump(mode='json')))
+                repaired, rejected = verified_claims(repair, kind, ids, records, ctx)
+                # Replace the draft; appending repair claims can preserve contradictory conclusions.
+                good = repaired
+                missing = list(repair.missing)
                 if rejected or not repaired:
                     missing.append('Some requested claims could not be supported with verified quotations and were omitted.')
             except (LLMFailure, BudgetExceeded):
-                missing.append('Citation repair could not finish; unsupported claims were omitted.')
-        unique = {c.text.strip(): c for c in good}
-        answer = '\n\n'.join(c.text.strip() for c in unique.values())
-        cits = { (c.contract_id, c.clause_number, c.quote): c for claim in unique.values() for c in claim.citations }
+                missing.append('Answer review could not finish; unsupported claims were omitted and remaining conclusions need review.')
+        # The answer is the verified conclusion; calculations remain inspectable
+        # supporting evidence, rather than a second answer appended to every reply.
+        unique = {c.text.strip(): c for c in (good or checked_calculations)}
+        answer = ' '.join(c.text.strip() for c in unique.values())
+        cits = { (c.source_type, c.contract_id, c.clause_number, c.quote): c for claim in unique.values() for c in claim.citations }
         if not answer:
             missing.append('No answer claims passed evidence checks. Try narrowing the question or selecting an agreement.')
         out = result(answer, kind=kind, ids=ids, sources=sources, passages=passages,
                      reason=None if answer else 'citation_failure', warnings=warnings, cits=list(cits.values()), missing=list(dict.fromkeys(missing)))
         out['diagnostics'] = {'retrieved_passages': len(passages), 'supported_claims': len(unique), 'citation_repair_attempted': bool(bad)}
+        out['diagnostics']['consistency_review_attempted'] = review
+        out['record_sources'] = records
+        out['claims'] = [claim.model_dump(mode='json') for claim in unique.values()]
+        out['supporting_claims'] = [claim.model_dump(mode='json') for claim in checked_calculations]
         out['resolved_question'] = resolved
         return out

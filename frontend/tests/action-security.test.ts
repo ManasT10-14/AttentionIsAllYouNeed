@@ -1,8 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { actionSecurity } from '../src/lib/action-security';
+import { actionSecurity, validActionRecipients } from '../src/lib/action-security';
 
 const now = Date.parse('2026-10-26T12:00:00Z');
+test('generated recipient labels work while header injection fails preflight', () => {
+ assert.equal(validActionRecipients('Legal <legal@example.com>; Finance <finance@example.com>'), true);
+ assert.equal(validActionRecipients('Legal office, Email: legal@example.com'), true);
+ assert.equal(validActionRecipients('Legal office'), false);
+ assert.equal(validActionRecipients('legal@example.com\r\nBcc: other@example.com'), false);
+});
 const valid = {
  id: 'a1', kind: 'breach_notice', status: 'approved',
  approval: { id: 'approval1', action_id: 'a1', tool: 'send_gmail', action_revision: 'revision', payload_hash: 'hash',
